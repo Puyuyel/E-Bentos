@@ -218,8 +218,8 @@ Asegúrate de tener MySQL corriendo localmente y que el archivo `application.pro
 1. Clonar el repositorio:
 
    ```bash
-   git clone https://github.com/tuusuario/e-bentos.git
-   cd e-bentos
+   git clone https://github.com/Puyuyel/E-Bentos.git
+   cd E-Bentos
    ```
 
 2. Crear archivo `.env` (o usar el incluido)
