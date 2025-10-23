@@ -1,13 +1,6 @@
-# 🧩 E-Bentos – Entorno de Desarrollo Local con Docker
+# E-Bentos — Guía completa para configurar el entorno y flujo de trabajo (Fork → PR)
 
-Este proyecto define un entorno de desarrollo completo para **E-Bentos**, una aplicación compuesta por:
-
-* **Frontend:** React + Vite
-* **Backend:** Spring Boot + Maven (Java 17)
-* **Base de datos:** MySQL 8
-* **Orquestación:** Docker Compose
-
-El objetivo es permitir que cualquier desarrollador pueda **levantar todo el entorno localmente con un solo comando**, sin necesidad de instalar dependencias manuales.
+Este documento describe **paso a paso** cómo levantar el entorno de desarrollo de **E-Bentos**, trabajar colaborativamente mediante **forks** y **pull requests**, y manejar los contenedores con Docker Compose.
 
 ---
 
@@ -15,247 +8,171 @@ El objetivo es permitir que cualquier desarrollador pueda **levantar todo el ent
 
 Antes de comenzar, asegúrate de tener instalado:
 
-* [Docker Desktop](https://www.docker.com/products/docker-desktop/) (Windows/Mac)
-* [Git](https://git-scm.com/downloads)
-* (Opcional) Java 17 y Node.js 20 si deseas ejecutar los servicios fuera de Docker.
+- **Docker Desktop** (Windows, macOS o Linux)
+- **Git**
+- **MySQL** (solo si usarás tu base de datos local en lugar del contenedor)
+- **IDE recomendado:** VS Code, IntelliJ IDEA, o equivalente
 
 ---
 
-## 📁 Estructura del proyecto
+## 🔀 1. Flujo de trabajo con GitHub (Fork → PR)
 
-```
-E-Bentos/
-│
-├── backend/
-│   ├── Dockerfile
-│   ├── pom.xml
-│   └── src/
-│
-├── frontend/
-│   ├── Dockerfile
-│   ├── package.json
-│   └── src/
-│
-├── mysql-data/               # Se crea automáticamente (persistencia de datos)
-│
-├── docker-compose.yml
-├── .env                      # Variables de entorno globales
-└── README.md
-```
+1. Ingresa al repositorio principal:  
+   👉 `https://github.com/ORG/e-bentos`
+
+2. Haz clic en **Fork** (arriba a la derecha) para crear tu copia personal:  
+   Esto generará: `https://github.com/TU_USUARIO/e-bentos`
+
+3. Clona tu fork localmente:
+   ```bash
+   git clone https://github.com/TU_USUARIO/e-bentos.git
+   cd e-bentos
+   ```
+
+4. Crea una nueva rama de desarrollo:
+   ```bash
+   git checkout -b feature/nombre-descriptivo
+   ```
+
+5. Realiza tus cambios, agrega y commitea:
+   ```bash
+   git add .
+   git commit -m "feat(frontend): agregar componente X"
+   ```
+
+6. Sube tu rama al fork:
+   ```bash
+   git push origin feature/nombre-descriptivo
+   ```
+
+7. Desde GitHub, crea un **Pull Request (PR)** desde tu rama hacia la rama `develop` del repositorio original.
+
+> 💡 **Sugerencia:** para mantener tu fork actualizado con el repo principal:
+> ```bash
+> git remote add upstream https://github.com/ORG/e-bentos.git
+> git fetch upstream
+> git merge upstream/develop
+> ```
 
 ---
 
-## ⚙️ Configuración de entorno
+## 🗄️ 2. Configurar la base de datos local
 
-El archivo `.env` contiene las variables de configuración utilizadas por los servicios.
-Crea uno en la raíz del proyecto (o copia `.env.example` si existe):
+Crea la base de datos y el usuario:
 
-```bash
-cp .env.example .env
+```sql
+CREATE DATABASE ebentos;
+CREATE USER 'ebentos'@'%' IDENTIFIED BY 'losdibujitos';
+GRANT ALL PRIVILEGES ON ebentos.* TO 'ebentos'@'%';
+FLUSH PRIVILEGES;
 ```
 
-### Contenido recomendado para `.env`
+Verifica la conexión:
+- **Host:** localhost
+- **Puerto:** 3306 (o el que uses)
+- **Usuario:** ebentos
+- **Contraseña:** losdibujitos
+- **Base de datos:** ebentos
+
+---
+
+## ⚙️ 3. Crear el archivo `.env`
+
+En la raíz del repositorio, crea un archivo `.env` con el siguiente contenido (no se sube al repositorio, está en `.gitignore`):
 
 ```env
-# --- MySQL ---
-MYSQL_ROOT_PASSWORD=rootpassword
+MYSQL_ROOT_PASSWORD=root
 MYSQL_DATABASE=ebentos
 MYSQL_USER=ebentos
 MYSQL_PASSWORD=losdibujitos
-
-# --- Spring Boot ---
 SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/ebentos
 SPRING_DATASOURCE_USERNAME=ebentos
 SPRING_DATASOURCE_PASSWORD=losdibujitos
-
-# --- Frontend (Vite) ---
 REACT_APP_API_URL=http://backend:8080
 ```
 
----
-
-## 🐳 Servicios Docker
-
-El entorno se compone de tres contenedores principales definidos en `docker-compose.yml`:
-
-### **1️⃣ MySQL (Base de datos)**
-
-* Imagen: `mysql:8`
-* Puerto: `3306`
-* Datos persistentes en `./mysql-data`
-* Credenciales y nombre de base de datos definidos en `.env`
-
-📌 **Notas:**
-
-* Los datos no se borran al reiniciar los contenedores.
-* Si deseas reiniciar la base desde cero:
-
-  ```bash
-  docker compose down -v
-  ```
+### 🔎 Notas importantes
+- `SPRING_DATASOURCE_URL` usa **mysql** como host, ya que Docker Compose conecta los contenedores por nombre de servicio.
+- `REACT_APP_API_URL` apunta a `backend:8080` dentro de Docker. Si corres el frontend localmente, cámbialo a `http://localhost:8080`.
 
 ---
 
-### **2️⃣ Backend (Spring Boot)**
+## 🐳 4. Levantar el entorno con Docker Compose
 
-* Directorio: `/backend`
-* Puerto expuesto: `8080`
-* Se conecta automáticamente al contenedor de MySQL
-* Usa las variables de entorno `SPRING_DATASOURCE_*`
-
-📌 **Comportamiento:**
-
-* Se compila usando Maven (`mvn clean package -DskipTests`)
-* Levanta la aplicación con `java -jar app.jar`
-* Logs disponibles en tiempo real con:
-
-  ```bash
-  docker compose logs -f backend
-  ```
-
----
-
-### **3️⃣ Frontend (React + Vite)**
-
-* Directorio: `/frontend`
-* Puerto expuesto: `5173`
-* Conecta al backend vía proxy (`/api` → `backend:8080`)
-* Permite **hot reload** gracias a los volúmenes montados.
-
-📌 **Comportamiento:**
-
-* Usa `npm run dev` como comando por defecto.
-* Cualquier cambio en el código fuente se refleja automáticamente.
-* Logs disponibles con:
-
-  ```bash
-  docker compose logs -f frontend
-  ```
-
----
-
-## 🚀 Levantar el entorno completo
-
-Ejecuta desde la raíz del proyecto:
+Desde la raíz del repositorio:
 
 ```bash
 docker compose --env-file .env up --build
 ```
 
-Esto descargará las imágenes, construirá los contenedores y ejecutará los servicios en orden:
+### 🔧 Servicios esperados
+- **mysql** → base de datos
+- **backend** → aplicación Spring Boot
+- **frontend** → aplicación React (Vite)
 
-| Servicio | Puerto local | URL de acceso                                  |
-| -------- | ------------ | ---------------------------------------------- |
-| MySQL    | `3306`       | —                                              |
-| Backend  | `8080`       | [http://localhost:8080](http://localhost:8080) |
-| Frontend | `5173`       | [http://localhost:5173](http://localhost:5173) |
-
----
-
-## 🧩 Probar la conexión
-
-1. Abre tu navegador en
-   👉 **[http://localhost:5173](http://localhost:5173)**
-
-2. El frontend se conectará automáticamente al backend usando el proxy configurado.
-
-3. Para probar el backend directamente:
-   👉 **[http://localhost:8080/api/hello](http://localhost:8080/api/hello)**
-
-   (Ajusta según tus endpoints reales).
-
----
-
-## 🛠️ Desarrollo local (sin Docker)
-
-Si prefieres desarrollar de forma tradicional:
-
-### Backend
-
+### 🧹 Parar y limpiar
 ```bash
-cd backend
-mvn spring-boot:run
+docker compose down           # Detiene los contenedores
+```
+```bash
+docker compose down -v        # Detiene y elimina volúmenes (resetea la BD)
 ```
 
-### Frontend
+---
 
-```bash
-cd frontend
-npm install
-npm run dev
+## 📁 5. Estructura del proyecto
+
+```
+e-bentos/
+├── backend/          # Spring Boot (Java)
+│   ├── src/
+│   └── Dockerfile
+├── frontend/         # React + Vite
+│   ├── src/
+│   └── Dockerfile
+├── docker-compose.yml
+├── .env              # Variables de entorno (local)
+└── .gitignore
 ```
 
-Asegúrate de tener MySQL corriendo localmente y que el archivo `application.properties` apunte a `localhost:3306`.
+---
+
+## 🧪 6. Comandos útiles
+
+| Acción | Comando |
+|--------|----------|
+| Ver logs del backend | `docker compose logs -f backend` |
+| Ver logs del frontend | `docker compose logs -f frontend` |
+| Ver logs de MySQL | `docker compose logs -f mysql` |
+| Reconstruir solo el backend | `docker compose build backend` |
+| Reiniciar un servicio | `docker compose restart backend` |
 
 ---
 
-## 🧹 Comandos útiles
+## 🧭 7. Buenas prácticas de desarrollo
 
-| Comando                      | Descripción                        |
-| ---------------------------- | ---------------------------------- |
-| `docker compose up`          | Levanta los servicios              |
-| `docker compose down`        | Detiene los contenedores           |
-| `docker compose down -v`     | Detiene y borra datos (resetea DB) |
-| `docker compose logs -f`     | Muestra logs en vivo               |
-| `docker exec -it mysql bash` | Entra al contenedor MySQL          |
-| `docker image ls`            | Lista las imágenes locales         |
-
----
-
-## 💾 Persistencia de datos
-
-* Los datos de MySQL se almacenan en `./mysql-data` (en tu carpeta local).
-* Puedes eliminarla si necesitas un entorno limpio:
-
+- Crear ramas con prefijo `feature/`, `fix/` o `chore/` según corresponda.
+- No hacer commits directos a `develop` ni `main`.
+- Antes de subir cambios, verifica que los contenedores corran correctamente con:
   ```bash
-  rm -rf mysql-data
+  docker compose up --build
   ```
+- Mantén actualizado el `.gitignore`.
 
 ---
 
-## 🧑‍💻 Flujo de trabajo para desarrolladores
+## 💬 8. Soporte y resolución de problemas
 
-1. Clonar el repositorio:
-
+1. Verifica que Docker Desktop esté ejecutándose.
+2. Consulta los logs con `docker compose logs -f`.
+3. Si todo falla, limpia y reconstruye:
    ```bash
-   git clone https://github.com/Puyuyel/E-Bentos.git
-   cd E-Bentos
-   ```
-
-2. Crear archivo `.env` (o usar el incluido)
-
-3. Levantar el entorno:
-
-   ```bash
-   docker compose up --build
-   ```
-
-4. Modificar código en `frontend/` o `backend/`
-   → Los cambios se reflejarán automáticamente (gracias a los volúmenes).
-
-5. Cuando termines:
-
-   ```bash
-   docker compose down
+   docker compose down -v && docker compose up --build
    ```
 
 ---
 
-## ☁️ Próximos pasos
+✅ **Con esto tendrás tu entorno de E-Bentos completamente funcional.**
 
-Una vez que todo funcione localmente, este mismo entorno puede desplegarse fácilmente en:
+Cada desarrollador podrá levantar su entorno con un solo comando y contribuir mediante Pull Requests sin conflictos locales.
 
-* **AWS ECS o EC2**
-* **Render**
-* **DigitalOcean**
-* **Azure Container Apps**
-
-Solo necesitarás subir las imágenes a un registro (por ejemplo, Amazon ECR o Docker Hub).
-
----
-
-## 🧾 Licencia
-
-Este proyecto se distribuye bajo licencia privada interna para el equipo de desarrollo de **E-Bentos**.
-
----
