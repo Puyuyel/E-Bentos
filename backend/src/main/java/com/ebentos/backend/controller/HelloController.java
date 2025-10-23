@@ -11,6 +11,6 @@ public class HelloController {
 
   @GetMapping("/hello")
   public HelloResponse hello() {
-    return new HelloResponse("Backend E-Bentos está funcionando correctamente!", true);
+    return new HelloResponse("Backend E-Bentos está funcionando", true);
   }
 }
