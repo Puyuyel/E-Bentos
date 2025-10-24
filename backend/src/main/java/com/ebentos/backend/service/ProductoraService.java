@@ -42,7 +42,7 @@ public class ProductoraService {
     }
     
     public Productora modificar(Integer id, Productora productora) {
-        productora.setProductoraId(id);
+        productora.setUsuarioId(id);
         return productoraMapper.save(productora);
     }
     
@@ -50,9 +50,4 @@ public class ProductoraService {
         return productoraMapper.findByRazonSocialStartingWith(prefijo);
     }
     
-    public boolean verificarCredenciales(String email, String password) {
-        return productoraMapper.findByEmail(email)
-                .map(productora -> passwordEncoder.matches(password, productora.getContrasenha()))
-                .orElse(false);
-    }
 }

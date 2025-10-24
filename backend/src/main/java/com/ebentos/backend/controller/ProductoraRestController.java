@@ -55,13 +55,4 @@ public class ProductoraRestController {
         return productoraService.buscarPorRazonSocial(prefijo);
     }
     
-    @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody Productora p) {
-        boolean valido = productoraService.verificarCredenciales(p.getEmail(), p.getContrasenha());
-        if (valido) {
-            return ResponseEntity.ok("Login exitoso");
-        } else {
-            return ResponseEntity.status(401).body("Credenciales inválidas");
-        }
-    }
 }
