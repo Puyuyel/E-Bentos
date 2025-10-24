@@ -1,6 +1,8 @@
 package com.ebentos.backend.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrimaryKeyJoinColumn;
@@ -14,6 +16,7 @@ public class Gestor extends Usuario {
     private String apellidos;
     private String dni;
     private LocalDate fechaNacimiento;
+    @Enumerated(EnumType.STRING)
     private Genero genero;
     @ManyToOne
     @JoinColumn(name = "USUARIO_CREADOR_ID", nullable = true)

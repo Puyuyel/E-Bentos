@@ -1,6 +1,8 @@
 package com.ebentos.backend.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -21,6 +23,7 @@ public class Usuario {
     private String telefono;
     private String email;
     private String contrasenha;
+    @Enumerated(EnumType.STRING)
     private Rol rol;
     private boolean activo = true;
     
@@ -30,6 +33,10 @@ public class Usuario {
         this.email = email;
         this.contrasenha = contrasenha;
         this.rol = rol;
+    }
+    
+    public Usuario(){
+        
     }
 
     public Integer getUsuarioId() {

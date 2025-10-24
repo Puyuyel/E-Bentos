@@ -20,6 +20,10 @@ public class Productora extends Usuario{
         this.nombreLegal = nombreLegal;
         this.fechaFundacion = fechaFundacion;
     }
+    
+    public Productora(){
+        super();
+    }
 
     public String getRuc() {
         return ruc;

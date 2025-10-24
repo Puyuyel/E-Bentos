@@ -3,7 +3,9 @@ package com.ebentos.backend.service;
 import com.ebentos.backend.repository.UsuarioMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
+@Service
 public class UsuarioService {
     
     private final UsuarioMapper usuarioMapper;
