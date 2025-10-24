@@ -3,9 +3,13 @@ package com.ebentos.backend.model;
 import jakarta.persistence.Entity;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import java.time.LocalDate;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @Entity
 @PrimaryKeyJoinColumn(name = "USUARIO_ID")
+@SQLDelete(sql = "UPDATE usuario SET activo = false WHERE usuario_id = ?")
+@Where(clause = "activo = 1")
 public class Productora extends Usuario{
     
     private String ruc;
