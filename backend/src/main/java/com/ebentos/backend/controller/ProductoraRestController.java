@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
 
 @RestController
 @RequestMapping("/api/productoras")
@@ -52,5 +53,15 @@ public class ProductoraRestController {
     @GetMapping("/buscar")
     public List<Productora> buscarPorRazonSocial(@RequestParam String prefijo) {
         return productoraService.buscarPorRazonSocial(prefijo);
+    }
+    
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody Productora p) {
+        boolean valido = productoraService.verificarCredenciales(p.getEmail(), p.getContrasenha());
+        if (valido) {
+            return ResponseEntity.ok("Login exitoso");
+        } else {
+            return ResponseEntity.status(401).body("Credenciales inválidas");
+        }
     }
 }

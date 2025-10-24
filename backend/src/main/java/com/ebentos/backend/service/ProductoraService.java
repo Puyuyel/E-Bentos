@@ -6,15 +6,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Service
 public class ProductoraService {
 
     private final ProductoraMapper productoraMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public ProductoraService(ProductoraMapper productoraMapper) {
+    public ProductoraService(ProductoraMapper productoraMapper, PasswordEncoder passwordEncoder) {
         this.productoraMapper = productoraMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public Optional<Productora> obtenerPorId(Integer id) {
@@ -26,6 +29,7 @@ public class ProductoraService {
     }
 
     public Productora insertar(Productora productora) {
+        productora.setContrasenha(passwordEncoder.encode(productora.getContrasenha()));
         return productoraMapper.save(productora);
     }
 
@@ -44,5 +48,11 @@ public class ProductoraService {
     
     public List<Productora> buscarPorRazonSocial(String prefijo) {
         return productoraMapper.findByRazonSocialStartingWith(prefijo);
+    }
+    
+    public boolean verificarCredenciales(String email, String password) {
+        return productoraMapper.findByEmail(email)
+                .map(productora -> passwordEncoder.matches(password, productora.getContrasenha()))
+                .orElse(false);
     }
 }
