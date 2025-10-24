@@ -21,8 +21,9 @@ public class UsuarioRestController {
     }
     
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody Usuario u) {
-        boolean valido = usuarioService.verificarCredenciales(u.getEmail(), u.getContrasenha());
+    public ResponseEntity<String> login(@RequestBody Usuario usuario) {
+        boolean valido = usuarioService.verificarCredenciales(usuario.getEmail(),
+                usuario.getContrasenha());
         if (valido) {
             return ResponseEntity.ok("Login exitoso");
         } else {

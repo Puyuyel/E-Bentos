@@ -37,13 +37,13 @@ public class ProductoraRestController {
     }
 
     @PostMapping
-    public Productora insertar(@RequestBody Productora p) {
-        return productoraService.insertar(p);
+    public Productora insertar(@RequestBody Productora productora) {
+        return productoraService.insertar(productora);
     }
 
     @PutMapping("/{id}")
-    public Productora modificar(@PathVariable Integer id, @RequestBody Productora p) {
-        return productoraService.modificar(id, p);
+    public Productora modificar(@PathVariable Integer id, @RequestBody Productora productora) {
+        return productoraService.modificar(id, productora);
     }
 
     @DeleteMapping("/{id}")

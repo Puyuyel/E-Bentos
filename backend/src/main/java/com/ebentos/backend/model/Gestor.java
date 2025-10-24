@@ -21,8 +21,11 @@ public class Gestor extends Usuario {
     @ManyToOne
     @JoinColumn(name = "USUARIO_CREADOR_ID", nullable = true)
     private Usuario usuarioCreador;
+    @ManyToOne
+    @JoinColumn(name = "PUNTOVENTA_ID", nullable = true)
+    private PuntoVenta puntoventa;
 
-    public Gestor(String nombres, String apellidos, String dni, LocalDate fechaNacimiento, Genero genero, Usuario usuarioCreador, Integer usuarioId, String telefono, String email, String contrasenha, Rol rol) {
+    public Gestor(String nombres, String apellidos, String dni, LocalDate fechaNacimiento, Genero genero, Usuario usuarioCreador, PuntoVenta puntoventa, Integer usuarioId, String telefono, String email, String contrasenha, Rol rol) {
         super(usuarioId, telefono, email, contrasenha, rol);
         this.nombres = nombres;
         this.apellidos = apellidos;
@@ -30,6 +33,11 @@ public class Gestor extends Usuario {
         this.fechaNacimiento = fechaNacimiento;
         this.genero = genero;
         this.usuarioCreador = usuarioCreador;
+        this.puntoventa = puntoventa;
+    }
+
+    public Gestor() {
+        super();
     }
 
     public String getNombres() {
@@ -78,6 +86,14 @@ public class Gestor extends Usuario {
 
     public void setUsuarioCreador(Usuario usuarioCreador) {
         this.usuarioCreador = usuarioCreador;
+    }
+
+    public PuntoVenta getPuntoventa() {
+        return puntoventa;
+    }
+
+    public void setPuntoventa(PuntoVenta puntoventa) {
+        this.puntoventa = puntoventa;
     }
     
 }
