@@ -3,7 +3,7 @@ package com.ebentos.backend.controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.ebentos.backend.dto.HelloResponse;
+import com.ebentos.backend.model.HelloResponse;
 
 @RestController
 @RequestMapping("/api")
