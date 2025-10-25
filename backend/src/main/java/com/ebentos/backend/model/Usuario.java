@@ -12,7 +12,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 @Entity
-@SQLDelete(sql = "UPDATE usuario SET activo = false WHERE usuario_id = ?")
+@SQLDelete(sql = "UPDATE usuario SET activo = 0 WHERE usuario_id = ?")
 @Where(clause = "activo = 1")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Usuario {

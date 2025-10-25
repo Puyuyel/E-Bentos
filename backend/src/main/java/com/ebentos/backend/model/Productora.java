@@ -7,7 +7,7 @@ import org.hibernate.annotations.Where;
 
 @Entity
 @PrimaryKeyJoinColumn(name = "USUARIO_ID")
-@SQLDelete(sql = "UPDATE usuario SET activo = false WHERE usuario_id = ?")
+@SQLDelete(sql = "UPDATE usuario SET activo = 0 WHERE usuario_id = ?")
 @Where(clause = "activo = 1")
 public class Productora extends Usuario{
     
@@ -42,11 +42,11 @@ public class Productora extends Usuario{
         this.razonSocial = razonSocial;
     }
 
-    public String getNombreLegal() {
+    public String getNombreComercial() {
         return nombreComercial;
     }
 
-    public void setNombreLegal(String nombreComercial) {
+    public void setNombreComercial(String nombreComercial) {
         this.nombreComercial = nombreComercial;
     }    
 }
