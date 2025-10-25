@@ -19,7 +19,7 @@ public class GestorService {
         this.gestorMapper = gestorMapper;
         this.passwordEncoder = passwordEncoder;
     }
-
+    
     public Optional<Gestor> obtenerPorId(Integer id) {
         return gestorMapper.findById(id);
     }
@@ -32,7 +32,7 @@ public class GestorService {
         gestor.setContrasenha(passwordEncoder.encode(gestor.getContrasenha()));
         return gestorMapper.save(gestor);
     }
-
+    
     public void eliminar(Integer id) {
         if (gestorMapper.existsById(id)) {
             gestorMapper.deleteById(id);

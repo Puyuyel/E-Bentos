@@ -6,10 +6,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @Entity
-@Table(name = "puntoventa")
+@SQLDelete(sql = "UPDATE puntoventa SET activo = false WHERE puntoventa_id = ?")
+@Where(clause = "activo = 1")
 public class PuntoVenta {
     
     @Id
@@ -20,6 +22,7 @@ public class PuntoVenta {
     @ManyToOne
     @JoinColumn(name = "DISTRITO_ID", nullable = false)
     private Distrito distrito;
+    private boolean activo = true;
 
     public PuntoVenta(Integer puntoventaId, String nombre, String direccion, Distrito distrito) {
         this.puntoventaId = puntoventaId;
@@ -64,6 +67,13 @@ public class PuntoVenta {
         this.distrito = distrito;
     }
     
+    public boolean isActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
+    }
     
     
 }
