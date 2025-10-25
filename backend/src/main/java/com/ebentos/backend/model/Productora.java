@@ -7,7 +7,7 @@ import org.hibernate.annotations.Where;
 
 @Entity
 @PrimaryKeyJoinColumn(name = "USUARIO_ID")
-@SQLDelete(sql = "UPDATE usuario SET activo = false WHERE usuario_id = ?")
+@SQLDelete(sql = "UPDATE usuario SET activo = 0 WHERE usuario_id = ?")
 @Where(clause = "activo = 1")
 public class Productora extends Usuario{
     

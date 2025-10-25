@@ -26,7 +26,7 @@ public class DistritoRestController {
     }
     
     @GetMapping("/buscar")
-    public List<Distrito> buscarPorProvinciaId(@RequestParam int departamentoId) {
-        return distritoService.buscarPorProvinciaId(departamentoId);
+    public List<Distrito> buscarPorProvinciaId(@RequestParam int provinciaId) {
+        return distritoService.buscarPorProvinciaId(provinciaId);
     }
 }

@@ -11,8 +11,8 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 @Entity
-@Table(name = "puntoventa")
-@SQLDelete(sql = "UPDATE puntoventa SET activo = false WHERE puntoventa_id = ?")
+@Table(name = "PUNTOVENTA")
+@SQLDelete(sql = "UPDATE puntoventa SET activo = 0 WHERE puntoventa_id = ?")
 @Where(clause = "activo = 1")
 public class PuntoVenta {
     

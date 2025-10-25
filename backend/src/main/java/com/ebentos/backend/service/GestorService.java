@@ -1,6 +1,7 @@
 package com.ebentos.backend.service;
 
 import com.ebentos.backend.model.Gestor;
+import com.ebentos.backend.model.Rol;
 import com.ebentos.backend.repository.GestorMapper;
 import java.util.List;
 import java.util.Optional;
@@ -46,11 +47,8 @@ public class GestorService {
         return gestorMapper.save(gestor);
     }
     
-    public List<Gestor> buscarPorDNI(String prefijo) {
-        return gestorMapper.findByDniStartingWith(prefijo);
+    public List<Gestor> buscarPorPrefijoYRol(String prefijo, Rol rol) {
+        return gestorMapper.buscarPorPrefijoYRol(prefijo, rol);
     }
     
-    public List<Gestor> buscarPorApellidos(String prefijo) {
-        return gestorMapper.findByApellidosStartingWith(prefijo);
-    }
 }

@@ -1,6 +1,7 @@
 package com.ebentos.backend.controller;
 
 import com.ebentos.backend.model.Gestor;
+import com.ebentos.backend.model.Rol;
 import com.ebentos.backend.service.GestorService;
 import java.util.List;
 import java.util.Optional;
@@ -51,14 +52,9 @@ public class GestorRestController {
         gestorService.eliminar(id);
     }
     
-    @GetMapping("/buscarPorDNI")
-    public List<Gestor> buscarPorDNI(@RequestParam String prefijo) {
-        return gestorService.buscarPorDNI(prefijo);
-    }
-    
-    @GetMapping("/buscarPorApels")
-    public List<Gestor> buscarPorApellidos(@RequestParam String prefijo) {
-        return gestorService.buscarPorApellidos(prefijo);
+    @GetMapping("/buscar")
+    public List<Gestor> buscarPorPrefijoYRol(@RequestParam String prefijo, @RequestParam Rol rol) {
+        return gestorService.buscarPorPrefijoYRol(prefijo, rol);
     }
     
 }
