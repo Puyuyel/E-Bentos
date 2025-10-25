@@ -1,6 +1,8 @@
 package com.ebentos.backend.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -18,12 +20,20 @@ public class PuntoVenta {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "PUNTOVENTA_ID")
     private Integer puntoventaId;
+    
+    @Column(name = "NOMBRE", nullable = false, length = 45)
     private String nombre;
+    
+    @Column(name = "DIRECCION", nullable = false, length = 45)
     private String direccion;
+    
     @ManyToOne
     @JoinColumn(name = "DISTRITO_ID", nullable = false)
     private Distrito distrito;
+    
+    @Column(name = "ACTIVO", nullable = false)
     private boolean activo = true;
 
     public PuntoVenta(Integer puntoventaId, String nombre, String direccion, Distrito distrito) {

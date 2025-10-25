@@ -1,5 +1,6 @@
 package com.ebentos.backend.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -11,8 +12,12 @@ import jakarta.persistence.ManyToOne;
 public class Distrito {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "DISTRITO_ID")
     private Integer distritoId;
+    
+    @Column(name = "NOMBRE", nullable = false, length = 45)
     private String nombre;
+    
     @ManyToOne
     @JoinColumn(name = "PROVINCIA_ID", nullable = false)
     private Provincia provincia;

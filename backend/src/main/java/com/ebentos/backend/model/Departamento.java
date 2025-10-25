@@ -1,5 +1,6 @@
 package com.ebentos.backend.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -10,7 +11,11 @@ public class Departamento {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    
+    @Column(name = "DEPARTAMENTO_ID")
     private Integer departamentoId;
+    
+    @Column(name = "NOMBRE", nullable = false, length = 45)
     private String nombre;
 
     public Departamento(Integer departamentoId, String nombre) {
