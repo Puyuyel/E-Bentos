@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface GestorMapper extends JpaRepository<Gestor, Integer> {
-    @Query("SELECT g FROM Gestor u WHERE g.rol = :rol AND (" +
+    @Query("SELECT g FROM Gestor g WHERE g.rol = :rol AND (" +
            "LOWER(g.dni) LIKE LOWER(CONCAT(:prefijo, '%')) OR " +
            "LOWER(g.nombres) LIKE LOWER(CONCAT(:prefijo, '%')) OR " +
            "LOWER(g.apellidos) LIKE LOWER(CONCAT(:prefijo, '%')))")
