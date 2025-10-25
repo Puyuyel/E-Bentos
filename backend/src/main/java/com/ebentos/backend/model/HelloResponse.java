@@ -1,4 +1,4 @@
-package com.ebentos.backend.dto;
+package com.ebentos.backend.model;
 
 public class HelloResponse {
   private String message;
