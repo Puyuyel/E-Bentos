@@ -1,3 +1,20 @@
+
+
+import Login from "./pages/Login";
+
+function App() {
+  return (
+    <div className="App">
+      <Login />
+    </div>
+  );
+}
+
+export default App;
+
+
+
+/*
 import React, { useEffect, useState } from "react";
 
 const App: React.FC = () => {
@@ -26,7 +43,7 @@ const App: React.FC = () => {
       <div style={{
         textAlign: "center"
       }}>
-        <h1>React + Spring Boot</h1>
+        <h1>HOLAAAAAA, zxczxc</h1>
         <p>{message || "Cargando..."}</p>
       </div>
     </div>
@@ -34,3 +51,4 @@ const App: React.FC = () => {
 }
 
 export default App;
+ */

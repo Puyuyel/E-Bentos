@@ -1,0 +1,108 @@
+/* Contenedor principal */
+.form-login-container {
+  width: 95%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2.5rem;
+  background-color: #ffffff;
+  box-sizing: border-box;
+}
+
+/* Sección que alinea la fila completamente a la derecha */
+.signup-area {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end; /* alinea toda la fila a la derecha */
+  margin-bottom: 0.75rem;
+}
+
+/* Fila con el texto a la izquierda y el botón a la derecha */
+.signup-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 56%; /* ancho para controlar separación entre p y botón */
+  gap: 1rem;
+  margin-bottom: 20%;
+}
+
+.signup {
+  margin: 0;
+}
+
+.signup p {
+  margin: 0;
+  color: #333;
+  font-weight: 500;
+}
+
+.signup-btn {
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+}
+
+/* Título */
+.title {
+  font-size: 1.89rem; /* text-2xl */
+  font-weight: 700;
+  margin: 1rem 0 3.05rem 0; /* espacio inferior similar a mb-6 */
+  color: #111;
+}
+
+/* Formulario */
+.login-form {
+  width: 100%;
+  max-width: 20rem; /* max-w-xs */
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; /* espacio entre elementos */
+}
+
+.input-email {
+    margin-bottom: 10%;
+}
+
+.btn-login {
+    display: flex;
+    justify-content: center; /* centra horizontalmente */
+    align-items: center;     /* centra verticalmente */
+}
+
+.link-forgot-pass {
+  display: block;
+  text-align: center; /* centra el texto horizontalmente */
+  margin-top: 5%;
+  margin-bottom: 5%;
+}
+
+/* Para que sea responsive en dispositivos móviles y pantallas grandes */
+@media (max-width: 768px) {
+  .signup-row {
+    width: 100%;               /* usa todo el ancho disponible */
+    flex-direction: column;    /* coloca texto y botón uno debajo del otro */
+    align-items: center;       /* centra ambos horizontalmente */
+    gap: 0.75rem;              /* espacio entre ellos */
+    margin-bottom: 10%;        /* reduce separación vertical */
+  }
+
+  .title {
+    text-align: center;        /* centra el título */
+    font-size: 1.5rem;         /* un poco más pequeño */
+  }
+
+  .login-form {
+    max-width: 100%;           /* inputs ocupan todo el ancho */
+  }
+}
+
+/* Para evitar que Chrome muestre franjas negras cuando se está probando el ser responsive */
+
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow-x: hidden; /* evita scroll horizontal */
+  background-color: #fff; /* color de respaldo */
+}
