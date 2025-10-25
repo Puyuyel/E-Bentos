@@ -1,3 +1,17 @@
+// import Login from "./pages/Login";
+import AppRouter from '../src/routes/AppRouter.tsx'
+
+const App: React.FC = () => {
+  return (
+    <AppRouter/>
+  );
+}
+
+export default App;
+
+
+
+/*
 import React, { useEffect, useState } from "react";
 import GestionarProductora from './pages/GestionarProductora';
 import GestionarGestorLocal from './pages/GestionarGestorLocal';
@@ -78,7 +92,7 @@ const App: React.FC = () => {
       <div style={{
         textAlign: "center"
       }}>
-        <h1>React + Spring Boot</h1>
+        <h1>HOLAAAAAA, zxczxc</h1>
         <p>{message || "Cargando..."}</p>
         <div style={{ marginTop: 20 }}>
           <button
@@ -103,3 +117,4 @@ const App: React.FC = () => {
 }
 
 export default App;
+ */

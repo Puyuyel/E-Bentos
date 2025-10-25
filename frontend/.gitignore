@@ -15,6 +15,9 @@ dist/
 dist-ssr/
 build/
 
+# TypeScript
+*.tsbuildinfo
+
 # Environment variables
 .env
 .env.local
@@ -37,3 +40,4 @@ ehthumbs.db
 
 # Optional: cache/history
 .history/
+
