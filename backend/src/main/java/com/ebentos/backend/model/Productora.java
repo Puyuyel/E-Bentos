@@ -2,7 +2,6 @@ package com.ebentos.backend.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.PrimaryKeyJoinColumn;
-import java.time.LocalDate;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
@@ -14,15 +13,13 @@ public class Productora extends Usuario{
     
     private String ruc;
     private String razonSocial;
-    private String nombreLegal;
-    private LocalDate fechaFundacion;
+    private String nombreComercial;
 
-    public Productora(String ruc, String razonSocial, String nombreLegal, LocalDate fechaFundacion, Integer usuarioId, String telefono, String email, String contrasenha, Rol rol) {
+    public Productora(String ruc, String razonSocial, String nombreComercial, Integer usuarioId, String telefono, String email, String contrasenha, Rol rol) {
         super(usuarioId, telefono, email, contrasenha, rol);
         this.ruc = ruc;
         this.razonSocial = razonSocial;
-        this.nombreLegal = nombreLegal;
-        this.fechaFundacion = fechaFundacion;
+        this.nombreComercial = nombreComercial;
     }
     
     public Productora(){
@@ -46,19 +43,10 @@ public class Productora extends Usuario{
     }
 
     public String getNombreLegal() {
-        return nombreLegal;
+        return nombreComercial;
     }
 
-    public void setNombreLegal(String nombreLegal) {
-        this.nombreLegal = nombreLegal;
-    }
-
-    public LocalDate getFechaFundacion() {
-        return fechaFundacion;
-    }
-
-    public void setFechaFundacion(LocalDate fechaFundacion) {
-        this.fechaFundacion = fechaFundacion;
-    }
-    
+    public void setNombreLegal(String nombreComercial) {
+        this.nombreComercial = nombreComercial;
+    }    
 }

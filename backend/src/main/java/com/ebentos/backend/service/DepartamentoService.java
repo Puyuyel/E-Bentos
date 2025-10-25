@@ -5,7 +5,9 @@ import com.ebentos.backend.model.Productora;
 import com.ebentos.backend.repository.DepartamentoMapper;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class DepartamentoService {
     private final DepartamentoMapper departamentoMapper;
     
