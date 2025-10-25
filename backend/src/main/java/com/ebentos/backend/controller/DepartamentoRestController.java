@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/departamentos")
 public class DepartamentoRestController {
-    
+
     private final DepartamentoService departamentoService;
-    
+
     @Autowired
-    public DepartamentoRestController(DepartamentoService departamentoService){
+    public DepartamentoRestController(DepartamentoService departamentoService) {
         this.departamentoService = departamentoService;
     }
-    
+
     @GetMapping
     public List<Departamento> listarTodas() {
         return departamentoService.listarTodas();
