@@ -1,12 +1,9 @@
+// import Login from "./pages/Login";
+import AppRouter from '../src/routes/AppRouter.tsx'
 
-
-import Login from "./pages/Login";
-
-function App() {
+const App: React.FC = () => {
   return (
-    <div className="App">
-      <Login />
-    </div>
+    <AppRouter/>
   );
 }
 
