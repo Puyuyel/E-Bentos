@@ -1,5 +1,6 @@
 package com.ebentos.backend.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -19,12 +20,23 @@ public class Usuario {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "USUARIO_ID")
     private Integer usuarioId;
+    
+    @Column(name = "TELEFONO", nullable = false, length = 9)
     private String telefono;
+    
+    @Column(name = "EMAIL", nullable = false, unique = true, length = 100)
     private String email;
+    
+    @Column(name = "CONTRASENHA", nullable = false, length = 100)
     private String contrasenha;
+    
     @Enumerated(EnumType.STRING)
+    @Column(name = "ROL", nullable = false)
     private Rol rol;
+    
+    @Column(name = "ACTIVO", nullable = false)
     private boolean activo = true;
     
     public Usuario(Integer usuarioId, String telefono, String email, String contrasenha, Rol rol) {

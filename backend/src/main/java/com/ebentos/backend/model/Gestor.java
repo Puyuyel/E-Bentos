@@ -1,8 +1,10 @@
 package com.ebentos.backend.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrimaryKeyJoinColumn;
@@ -16,14 +18,20 @@ import org.hibernate.annotations.Where;
 @Where(clause = "activo = 1")
 public class Gestor extends Usuario {
     
+    @Column(name = "NOMBRES", nullable = false, length = 100)
     private String nombres;
+    
+    @Column(name = "APELLIDOS", nullable = false, length = 100)
     private String apellidos;
+    
+    @Column(name = "DNI", nullable = false, unique = true, length = 8)
     private String dni;
-    @Enumerated(EnumType.STRING)
-    @ManyToOne
+    
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USUARIO_CREADOR_ID", nullable = true)
     private Usuario usuarioCreador;
-    @ManyToOne
+    
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PUNTOVENTA_ID", nullable = true)
     private PuntoVenta puntoventa;
 

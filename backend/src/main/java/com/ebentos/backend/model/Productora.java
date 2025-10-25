@@ -1,5 +1,6 @@
 package com.ebentos.backend.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import org.hibernate.annotations.SQLDelete;
@@ -11,8 +12,13 @@ import org.hibernate.annotations.Where;
 @Where(clause = "activo = 1")
 public class Productora extends Usuario{
     
+    @Column(name = "RUC", nullable = false, unique = true, length = 11)
     private String ruc;
+    
+    @Column(name = "RAZON_SOCIAL", nullable = false, length = 60)
     private String razonSocial;
+    
+    @Column(name = "NOMBRE_COMERCIAL", nullable = false, length = 60)
     private String nombreComercial;
 
     public Productora(String ruc, String razonSocial, String nombreComercial, Integer usuarioId, String telefono, String email, String contrasenha, Rol rol) {
