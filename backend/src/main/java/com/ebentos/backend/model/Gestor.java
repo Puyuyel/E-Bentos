@@ -19,9 +19,7 @@ public class Gestor extends Usuario {
     private String nombres;
     private String apellidos;
     private String dni;
-    private LocalDate fechaNacimiento;
     @Enumerated(EnumType.STRING)
-    private Genero genero;
     @ManyToOne
     @JoinColumn(name = "USUARIO_CREADOR_ID", nullable = true)
     private Usuario usuarioCreador;
@@ -34,8 +32,6 @@ public class Gestor extends Usuario {
         this.nombres = nombres;
         this.apellidos = apellidos;
         this.dni = dni;
-        this.fechaNacimiento = fechaNacimiento;
-        this.genero = genero;
         this.usuarioCreador = usuarioCreador;
         this.puntoventa = puntoventa;
     }
@@ -66,22 +62,6 @@ public class Gestor extends Usuario {
 
     public void setDni(String dni) {
         this.dni = dni;
-    }
-
-    public LocalDate getFechaNacimiento() {
-        return fechaNacimiento;
-    }
-
-    public void setFechaNacimiento(LocalDate fechaNacimiento) {
-        this.fechaNacimiento = fechaNacimiento;
-    }
-
-    public Genero getGenero() {
-        return genero;
-    }
-
-    public void setGenero(Genero genero) {
-        this.genero = genero;
     }
 
     public Usuario getUsuarioCreador() {
