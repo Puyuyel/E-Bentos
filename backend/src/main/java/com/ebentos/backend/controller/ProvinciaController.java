@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/provincias")
-public class ProvinciaRestController {
+public class ProvinciaController {
         
     private final ProvinciaService provinciaService;
     
     @Autowired
-    public ProvinciaRestController(ProvinciaService provinciaService){
+    public ProvinciaController(ProvinciaService provinciaService){
         this.provinciaService = provinciaService;
     }
     
