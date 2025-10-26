@@ -1,7 +1,7 @@
 package com.ebentos.backend.service;
 
 import com.ebentos.backend.model.PuntoVenta;
-import com.ebentos.backend.repository.PuntoVentaMapper;
+import com.ebentos.backend.repository.PuntoVentaRepository;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,28 +10,28 @@ import org.springframework.stereotype.Service;
 @Service
 public class PuntoVentaService {
     
-    private final PuntoVentaMapper puntoVentaMapper;
+    private final PuntoVentaRepository puntoVentaRepository;
     
     @Autowired
-    public PuntoVentaService(PuntoVentaMapper puntoVentaMapper) {
-        this.puntoVentaMapper = puntoVentaMapper;
+    public PuntoVentaService(PuntoVentaRepository puntoVentaRepository) {
+        this.puntoVentaRepository = puntoVentaRepository;
     }
     
     public Optional<PuntoVenta> obtenerPorId(Integer id) {
-        return puntoVentaMapper.findById(id);
+        return puntoVentaRepository.findById(id);
     }
 
     public List<PuntoVenta> listarTodas() {
-        return puntoVentaMapper.findAll();
+        return puntoVentaRepository.findAll();
     }
 
     public PuntoVenta insertar(PuntoVenta puntoVenta) {
-        return puntoVentaMapper.save(puntoVenta);
+        return puntoVentaRepository.save(puntoVenta);
     }
 
     public void eliminar(Integer id) {
-        if (puntoVentaMapper.existsById(id)) {
-            puntoVentaMapper.deleteById(id);
+        if (puntoVentaRepository.existsById(id)) {
+            puntoVentaRepository.deleteById(id);
         } else {
             throw new RuntimeException("Productora no encontrada con id: " + id);
         }
@@ -39,7 +39,7 @@ public class PuntoVentaService {
     
     public PuntoVenta modificar(Integer id, PuntoVenta puntoVenta) {
         puntoVenta.setPuntoventaId(id);
-        return puntoVentaMapper.save(puntoVenta);
+        return puntoVentaRepository.save(puntoVenta);
     }
     
    
