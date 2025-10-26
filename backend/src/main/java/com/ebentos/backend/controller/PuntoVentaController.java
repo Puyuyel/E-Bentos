@@ -16,12 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/puntoventas")
-public class PuntoVentaRestController {
+public class PuntoVentaController {
     
     private final PuntoVentaService puntoVentaService;
     
     @Autowired
-    public PuntoVentaRestController(PuntoVentaService puntoVentaService){
+    public PuntoVentaController(PuntoVentaService puntoVentaService){
         this.puntoVentaService = puntoVentaService;
     }
     

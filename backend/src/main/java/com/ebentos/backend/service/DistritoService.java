@@ -1,7 +1,7 @@
 package com.ebentos.backend.service;
 
 import com.ebentos.backend.model.Distrito;
-import com.ebentos.backend.repository.DistritoMapper;
+import com.ebentos.backend.repository.DistritoRepository;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,18 +9,18 @@ import org.springframework.stereotype.Service;
 @Service
 public class DistritoService {
     
-    private final DistritoMapper distritoMapper;
+    private final DistritoRepository distritoRepository;
     
     @Autowired
-    public DistritoService(DistritoMapper distritoMapper) {
-        this.distritoMapper = distritoMapper;
+    public DistritoService(DistritoRepository distritoRepository) {
+        this.distritoRepository = distritoRepository;
     }
     
     public List<Distrito> listarTodas() {
-        return distritoMapper.findAll();
+        return distritoRepository.findAll();
     }
     
     public List<Distrito> buscarPorProvinciaId(int provinciaId){
-        return distritoMapper.findByProvincia_ProvinciaId(provinciaId);
+        return distritoRepository.findByProvincia_ProvinciaId(provinciaId);
     }
 }

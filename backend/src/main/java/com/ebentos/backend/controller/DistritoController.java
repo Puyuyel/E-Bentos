@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/distritos")
-public class DistritoRestController {
+public class DistritoController {
         
     private final DistritoService distritoService;
     
     @Autowired
-    public DistritoRestController(DistritoService distritoService){
+    public DistritoController(DistritoService distritoService){
         this.distritoService = distritoService;
     }
     
