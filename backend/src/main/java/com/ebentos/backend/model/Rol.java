@@ -3,8 +3,6 @@ package com.ebentos.backend.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
-
 @Setter
 @Getter
 @AllArgsConstructor
@@ -22,10 +20,5 @@ public class Rol {
 
     @Column(nullable = false, name = "NOMBRE", length = 45)
     private String nombre;
-
-    //Por si quisiera bidireccionalidad
-    //@JsonIgnore
-    //@OneToMany(mappedBy = "rol")
-    //private List<Usuario> usuarios;
 
 }

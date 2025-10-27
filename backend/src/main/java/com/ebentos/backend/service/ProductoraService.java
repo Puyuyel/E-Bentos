@@ -53,16 +53,14 @@ public class ProductoraService {
     }
 
     private ProductoraDTO llenarDTO(Productora  productora){
-        UsuarioSimpleDTO usuarioDTO = new UsuarioSimpleDTO(
-                productora.getUsuario().getUsuarioId(),
-                productora.getUsuario().getTelefono(),
-                productora.getUsuario().getEmail()
-        );
         ProductoraDTO productoraDTO = new ProductoraDTO();
         productoraDTO.setRazonSocial(productora.getRazonSocial());
         productoraDTO.setNombreComercial(productora.getNombreComercial());
         productoraDTO.setRuc(productora.getRuc());
-        productoraDTO.setUsuario(usuarioDTO); // Asigna el DTO simple del usuario
+        productoraDTO.setId(productora.getUsuarioId());
+        productoraDTO.setTelefono(productora.getTelefono());
+        productoraDTO.setEmail(productora.getEmail());
+        
         return productoraDTO;
     }
 
@@ -85,25 +83,20 @@ public class ProductoraService {
             productoraExistente.setRuc(productoraActualizaDTO.getRuc());
         }
 
-        // ACTUALIZAR campos del Usuario relacionado
-        if (productoraActualizaDTO.getUsuario() != null) {
-            Usuario usuarioExistente = productoraExistente.getUsuario();
+        if (!Objects.equals(productoraActualizaDTO.getTelefono(), productoraExistente.getTelefono())) {
+            productoraExistente.setTelefono(productoraActualizaDTO.getTelefono());
+        }
 
-            if (!Objects.equals(productoraActualizaDTO.getUsuario().getTelefono(), usuarioExistente.getTelefono())) {
-                usuarioExistente.setTelefono(productoraActualizaDTO.getUsuario().getTelefono());
-            }
+        if (!Objects.equals(productoraActualizaDTO.getEmail(), productoraExistente.getEmail())) {
+            productoraExistente.setEmail(productoraActualizaDTO.getEmail());
+        }
 
-            if (!Objects.equals(productoraActualizaDTO.getUsuario().getEmail(), usuarioExistente.getEmail())) {
-                usuarioExistente.setEmail(productoraActualizaDTO.getUsuario().getEmail());
-            }
+        if (!productoraActualizaDTO.getContrasenha().isBlank()) {
+            productoraExistente.setContrasenha(passwordEncoder.encode(productoraActualizaDTO.getContrasenha()));
+        }
 
-            if (!productoraActualizaDTO.getUsuario().getContrasenha().isBlank()) {
-                usuarioExistente.setContrasenha(passwordEncoder.encode(productoraActualizaDTO.getUsuario().getContrasenha()));
-            }
-
-            if (!Objects.equals(productoraActualizaDTO.getUsuario().getActivo(), usuarioExistente.getActivo())) {
-                usuarioExistente.setActivo(productoraActualizaDTO.getUsuario().getActivo());
-            }
+        if (!Objects.equals(productoraActualizaDTO.getActivo(), productoraExistente.getActivo())) {
+            productoraExistente.setActivo(productoraActualizaDTO.getActivo());
         }
 
         //  GUARDAR y devolver
@@ -115,20 +108,6 @@ public class ProductoraService {
 
     private ProductoraDTO mapToProductoraDTO(Productora productora) {
 
-        // Mapear el Usuario a su DTO simple (UsuarioSimpleDTO)
-        UsuarioSimpleDTO usuarioDTO = null;
-
-        // Verificar que la relación Usuario no sea nula antes de acceder a ella
-        if (productora.getUsuario() != null) {
-            usuarioDTO = new UsuarioSimpleDTO();
-
-            // Mapeamos solo los campos necesarios del Usuario
-            usuarioDTO.setId(productora.getUsuario().getUsuarioId());
-            usuarioDTO.setTelefono(productora.getUsuario().getTelefono());
-            usuarioDTO.setEmail(productora.getUsuario().getEmail());
-
-        }
-
         //  Mapear la Productora al DTO principal (ProductoraDTO)
         ProductoraDTO productoraDTO = new ProductoraDTO();
 
@@ -137,33 +116,11 @@ public class ProductoraService {
         productoraDTO.setRuc(productora.getRuc());
         productoraDTO.setRazonSocial(productora.getRazonSocial());
         productoraDTO.setNombreComercial(productora.getNombreComercial());
-
-        // Asignar el DTO del Usuario al DTO de la Productora
-        productoraDTO.setUsuario(usuarioDTO);
+        productoraDTO.setId(productora.getUsuarioId());
+        productoraDTO.setTelefono(productora.getTelefono());
+        productoraDTO.setEmail(productora.getEmail());
 
         return productoraDTO;
-    }
-
-//    public List<ProductoraDTO> buscarPorRazonSocial(String prefijo) {
-//        return productoraRepository.findByRazonSocialStartingWith(prefijo);
-//    }
-
-    // ----------------------------------------------- CRUD -------------------------------------------------
-
-    // --------------------------------------------- Metodos Adicionales ---------------------------------------
-    // Construye la entidad productora sin guardarla
-    public Productora crearNuevaProductoraTemporal(RegistroUsuarioDTO registroUsuarioDTO) {
-
-        // Crear y pre-llenar la productora
-        Productora nuevaProductora = new Productora();
-
-        // El UsuarioService se encarga de enlazar el 'usuario' y el 'id'
-
-        nuevaProductora.setRuc(registroUsuarioDTO.getRuc());
-        nuevaProductora.setNombreComercial(registroUsuarioDTO.getNombreComercial());
-        nuevaProductora.setRazonSocial(registroUsuarioDTO.getRazonSocial());
-
-        return nuevaProductora;
     }
 
 }

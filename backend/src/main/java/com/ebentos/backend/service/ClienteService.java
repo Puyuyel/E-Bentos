@@ -17,26 +17,5 @@ public class ClienteService {
         this.clienteRepository = clienteRepository;
     }
 
-    // CRUD, fala
-
-
-    // Construye la entidad cliente sin guardarla
-    public Cliente crearNuevoClienteTemporal(RegistroUsuarioDTO registroUsuarioDTO) {
-
-        // Crear y pre-llenar el Cliente
-        Cliente nuevoCliente = new Cliente();
-
-        // El UsuarioService se encarga de enlazar el 'usuario' y el 'id'
-
-        nuevoCliente.setPuntosGastados(0);
-        nuevoCliente.setPuntosAcumulados(0);
-        nuevoCliente.setRegistradoPorTaquillero(1);
-        nuevoCliente.setNombres(registroUsuarioDTO.getNombres());
-        nuevoCliente.setApellidos(registroUsuarioDTO.getApellidos());
-        nuevoCliente.setDni(registroUsuarioDTO.getDni());
-        nuevoCliente.setFechaNacimiento(registroUsuarioDTO.getFechaNacimiento());
-        nuevoCliente.setGenero(registroUsuarioDTO.getGenero());
-
-        return nuevoCliente;
-    }
+    // CRUD, falta
 }

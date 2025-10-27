@@ -21,6 +21,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import java.util.Collections;
 
 import java.util.Arrays;
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -72,7 +73,8 @@ public class Securityconfig {
                 // Autorización de Rutas
                 .authorizeHttpRequests(authz -> authz
                         // Permite el registro y el login públicamente
-                        .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
+                        .requestMatchers(antMatcher("/api/auth/register")).permitAll()
+                        .requestMatchers(antMatcher("/api/auth/login")).permitAll()
                         // Protege todas las demás rutas
                         .anyRequest().authenticated()
                 )
