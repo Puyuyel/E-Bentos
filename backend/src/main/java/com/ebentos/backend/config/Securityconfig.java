@@ -1,6 +1,5 @@
 package com.ebentos.backend.config;
 
-
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -53,8 +52,7 @@ public class Securityconfig {
                             usuario.getEmail(),
                             usuario.getContrasenha(),
                             // 5. Le pasa la lista con la autoridad
-                            Collections.singletonList(authority)
-                    );
+                            Collections.singletonList(authority));
                 })
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + email));
     }
@@ -74,8 +72,7 @@ public class Securityconfig {
                         // Permite el registro y el login públicamente
                         .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
                         // Protege todas las demás rutas
-                        .anyRequest().authenticated()
-                )
+                        .anyRequest().authenticated())
 
                 .exceptionHandling(ex -> ex
                         // Esto se dispara cuando un usuario no autenticado
@@ -83,8 +80,7 @@ public class Securityconfig {
                         .authenticationEntryPoint((request, response, authException) -> {
                             // En lugar de redirigir a HTML, devolvemos 401.
                             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No autorizado");
-                        })
-                )
+                        }))
 
                 // Configuración de FORM LOGIN (para que funcione como API REST)
                 .formLogin(form -> form
@@ -104,16 +100,14 @@ public class Securityconfig {
                             System.out.println("Error de autenticación: " + exception.getMessage());
 
                             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Credenciales inválidas");
-                        })
-                )
+                        }))
 
                 // Configuración de LOGOUT (opcional)
                 .logout(logout -> logout
                         .logoutUrl("/api/auth/logout")
                         .logoutSuccessHandler((request, response, authentication) -> {
                             response.setStatus(HttpServletResponse.SC_OK);
-                        })
-                );
+                        }));
 
         return http.build();
     }
@@ -123,7 +117,7 @@ public class Securityconfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         // El puerto donde corre React
-        configuration.setAllowedOrigins(Arrays.asList(origenPermitido));
+        configuration.setAllowedOrigins(Arrays.asList(origenPermitido, "http://react:5173", "http://127.0.0.1:5173"));
 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
