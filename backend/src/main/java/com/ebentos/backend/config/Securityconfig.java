@@ -1,6 +1,5 @@
 package com.ebentos.backend.config;
 
-
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -21,15 +20,16 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import java.util.Collections;
 
 import java.util.Arrays;
-import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Configuration
 @EnableWebSecurity
 public class Securityconfig {
 
-    // Inyecta el valor desde application.properties
-    @Value("${app.cors.allowed-origin}")
-    private String origenPermitido;
+    // Inyecta el valor CSV desde application.properties
+    @Value("${app.cors.allowed-origins}")
+    private String allowedOriginsCsv;
 
     // BEAN: Codificador de Contraseñas
     @Bean
@@ -54,8 +54,7 @@ public class Securityconfig {
                             usuario.getEmail(),
                             usuario.getContrasenha(),
                             // 5. Le pasa la lista con la autoridad
-                            Collections.singletonList(authority)
-                    );
+                            Collections.singletonList(authority));
                 })
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + email));
     }
@@ -73,11 +72,9 @@ public class Securityconfig {
                 // Autorización de Rutas
                 .authorizeHttpRequests(authz -> authz
                         // Permite el registro y el login públicamente
-                        .requestMatchers(antMatcher("/api/auth/register")).permitAll()
-                        .requestMatchers(antMatcher("/api/auth/login")).permitAll()
+                        .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
                         // Protege todas las demás rutas
-                        .anyRequest().authenticated()
-                )
+                        .anyRequest().authenticated())
 
                 .exceptionHandling(ex -> ex
                         // Esto se dispara cuando un usuario no autenticado
@@ -85,8 +82,7 @@ public class Securityconfig {
                         .authenticationEntryPoint((request, response, authException) -> {
                             // En lugar de redirigir a HTML, devolvemos 401.
                             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No autorizado");
-                        })
-                )
+                        }))
 
                 // Configuración de FORM LOGIN (para que funcione como API REST)
                 .formLogin(form -> form
@@ -106,16 +102,14 @@ public class Securityconfig {
                             System.out.println("Error de autenticación: " + exception.getMessage());
 
                             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Credenciales inválidas");
-                        })
-                )
+                        }))
 
                 // Configuración de LOGOUT (opcional)
                 .logout(logout -> logout
                         .logoutUrl("/api/auth/logout")
                         .logoutSuccessHandler((request, response, authentication) -> {
                             response.setStatus(HttpServletResponse.SC_OK);
-                        })
-                );
+                        }));
 
         return http.build();
     }
@@ -124,9 +118,15 @@ public class Securityconfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // El puerto donde corre React
-        configuration.setAllowedOrigins(Arrays.asList(origenPermitido));
 
+        // Parsea CSV y trim
+        List<String> origins = Arrays.stream(allowedOriginsCsv.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toList());
+
+        // Usa allowedOriginPatterns para más flexibilidad con puertos/hosts
+        configuration.setAllowedOriginPatterns(origins);
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
