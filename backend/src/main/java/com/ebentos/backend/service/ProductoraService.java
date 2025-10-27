@@ -8,10 +8,15 @@ import com.ebentos.backend.model.Productora;
 import com.ebentos.backend.model.Usuario;
 import com.ebentos.backend.repository.ProductoraRepository;
 import jakarta.persistence.EntityNotFoundException;
+import java.util.HashMap;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -37,6 +42,34 @@ public class ProductoraService {
         ProductoraDTO productoraDTO = llenarDTO(productora);
 
         return productoraDTO;
+    }
+    
+    public Map<String, Object> listarPaginado(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Productora> productorasPage = productoraRepository.findAll(pageable);
+
+        // Convertimos la lista de entidades a DTOs
+        List<ProductoraDTO> productorasDTO = productorasPage.getContent().stream()
+                .map(this::llenarDTO)
+                .collect(Collectors.toList());
+
+        // Construimos la respuesta con la estructura pedida
+        Map<String, Object> response = new HashMap<>();
+        response.put("data", productorasDTO);
+
+        Map<String, Object> pagination = new HashMap<>();
+        pagination.put("totalItems", productorasPage.getTotalElements());
+        pagination.put("totalPages", productorasPage.getTotalPages());
+        pagination.put("currentPage", productorasPage.getNumber());
+        pagination.put("pageSize", productorasPage.getSize());
+        pagination.put("hasNextPage", productorasPage.hasNext());
+        pagination.put("hasPreviousPage", productorasPage.hasPrevious());
+        pagination.put("nextPage", productorasPage.hasNext() ? "/api/productoras?page=" + (page + 1) + "&limit=" + size : null);
+        pagination.put("prevPage", productorasPage.hasPrevious() ? "/api/productoras?page=" + (page - 1) + "&limit=" + size : null);
+
+        response.put("pagination", pagination);
+
+        return response;
     }
 
     public List<ProductoraDTO> listarTodas() {
