@@ -1,0 +1,7 @@
+INSERT INTO rol (rol_id, nombre)
+VALUES
+(1, 'CLIENTE'),
+(2, 'PRODUCTORA'),
+(3, 'GESTOR LOCAL'),
+(4, 'DUENHO LOCAL'),
+(5, 'TAQUILLERO');
