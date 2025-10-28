@@ -152,5 +152,13 @@ public class ProductoraService {
 
         return productoraDTO;
     }
+    
+    public void eliminar(Integer id){
+        if (productoraRepository.existsById(id)) {
+            productoraRepository.deleteById(id);
+        } else {
+            throw new RuntimeException("Productora no encontrada con id: " + id);
+        }
+    }
 
 }

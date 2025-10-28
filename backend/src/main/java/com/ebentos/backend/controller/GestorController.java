@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -51,6 +52,29 @@ public class GestorController {
         }
 
         return response;
+    }
+            
+    @GetMapping("/paginadoPorRol")
+    public Map<String, Object> listarPaginadoPorRol(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int limit,
+            @RequestParam String nombreRol) {
+
+        Map<String, Object> response = gestorService.listarPaginadoPorRol(page, limit, nombreRol);
+
+        // 🔹 Construir URLs completas usando el dominio actual
+        Map<String, Object> pagination = (Map<String, Object>) response.get("pagination");
+
+        String baseUrl = ServletUriComponentsBuilder.fromCurrentRequestUri().toUriString();
+
+        if ((boolean) pagination.get("hasNextPage")) {
+            pagination.put("nextPage", baseUrl + "?page=" + (page + 1) + "&limit=" + limit);
+        }
+        if ((boolean) pagination.get("hasPreviousPage")) {
+            pagination.put("prevPage", baseUrl + "?page=" + (page - 1) + "&limit=" + limit);
+        }
+
+        return response;
     } 
 
     @GetMapping("/{id}")
@@ -62,5 +86,10 @@ public class GestorController {
     public GestorDTO modificar(@PathVariable Integer id, @RequestBody GestorActualizaDTO gestorActualizaDTO) {
         // Llama al servicio con el ID y el DTO
         return gestorService.modificar(id, gestorActualizaDTO);
+    }
+    
+    @DeleteMapping("/{id}")
+    public void eliminar(@PathVariable Integer id) {
+        gestorService.eliminar(id);
     }
 }

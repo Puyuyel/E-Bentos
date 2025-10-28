@@ -33,7 +33,7 @@ public class PuntoVentaService {
         if (puntoVentaRepository.existsById(id)) {
             puntoVentaRepository.deleteById(id);
         } else {
-            throw new RuntimeException("Productora no encontrada con id: " + id);
+            throw new RuntimeException("Punto de venta no encontrado con id: " + id);
         }
     }
     

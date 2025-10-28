@@ -70,6 +70,34 @@ public class GestorService {
         return response;
     }
     
+    public Map<String, Object> listarPaginadoPorRol(int page, int size, String nombreRol) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Gestor> gestoresPage = gestorRepository.findByRol_Nombre(nombreRol, pageable);
+
+        // Convertimos la lista de entidades a DTOs
+        List<GestorDTO> gestoresDTO = gestoresPage.getContent().stream()
+                .map(this::llenarDTO)
+                .collect(Collectors.toList());
+
+        // Construimos la respuesta con la estructura pedida
+        Map<String, Object> response = new HashMap<>();
+        response.put("data", gestoresDTO);
+
+        Map<String, Object> pagination = new HashMap<>();
+        pagination.put("totalItems", gestoresPage.getTotalElements());
+        pagination.put("totalPages", gestoresPage.getTotalPages());
+        pagination.put("currentPage", gestoresPage.getNumber());
+        pagination.put("pageSize", gestoresPage.getSize());
+        pagination.put("hasNextPage", gestoresPage.hasNext());
+        pagination.put("hasPreviousPage", gestoresPage.hasPrevious());
+        pagination.put("nextPage", gestoresPage.hasNext() ? "/api/gestores?page=" + (page + 1) + "&limit=" + size : null);
+        pagination.put("prevPage", gestoresPage.hasPrevious() ? "/api/gestores?page=" + (page - 1) + "&limit=" + size : null);
+
+        response.put("pagination", pagination);
+
+        return response;
+    }
+    
     public List<GestorDTO> listarTodas() {
         // Obtener todas las entidades
         List<Gestor> gestores = gestorRepository.findAll();
@@ -92,12 +120,16 @@ public class GestorService {
         gestorDTO.setTelefono(gestor.getTelefono());
         gestorDTO.setEmail(gestor.getEmail());
         
-        UsuarioSimpleDTO usuarioCreador = new UsuarioSimpleDTO();
-        usuarioCreador.setUsuarioId(gestor.getUsuarioCreador().getUsuarioId());
-        gestorDTO.setUsuarioCreador(usuarioCreador);
+        if(gestor.getUsuarioCreador()!=null){
+            UsuarioSimpleDTO usuarioCreador = new UsuarioSimpleDTO();
+            usuarioCreador.setUsuarioId(gestor.getUsuarioCreador().getUsuarioId());
+            gestorDTO.setUsuarioCreador(usuarioCreador);
+        }
         
-        PuntoVentaDTO puntoVenta = new PuntoVentaDTO();
-        puntoVenta.setPuntoVentaId(gestor.getPuntoVenta().getPuntoventaId());
+        if(gestor.getPuntoVenta()!=null){
+            PuntoVentaDTO puntoVenta = new PuntoVentaDTO();
+            puntoVenta.setPuntoVentaId(gestor.getPuntoVenta().getPuntoventaId());
+        }
         
         return gestorDTO;
     }
@@ -161,10 +193,19 @@ public class GestorService {
         gestorDTO.setTelefono(gestor.getTelefono());
         gestorDTO.setEmail(gestor.getEmail());
         
-        PuntoVentaDTO puntoVentaDTO = new PuntoVentaDTO();
-        puntoVentaDTO.setPuntoVentaId(gestor.getPuntoVenta().getPuntoventaId());
-        gestorDTO.setPuntoVenta(puntoVentaDTO);
-
+        if(gestor.getPuntoVenta()!=null){
+            PuntoVentaDTO puntoVentaDTO = new PuntoVentaDTO();
+            puntoVentaDTO.setPuntoVentaId(gestor.getPuntoVenta().getPuntoventaId());
+            gestorDTO.setPuntoVenta(puntoVentaDTO);
+        }
         return gestorDTO;
+    }
+    
+    public void eliminar(Integer id){
+        if (gestorRepository.existsById(id)) {
+            gestorRepository.deleteById(id);
+        } else {
+            throw new RuntimeException("Gestor no encontrado con id: " + id);
+        }
     }
 }
