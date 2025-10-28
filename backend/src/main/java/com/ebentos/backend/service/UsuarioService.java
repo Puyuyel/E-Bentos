@@ -8,6 +8,7 @@ import com.ebentos.backend.dto.RegistroUsuarioDTO;
 import com.ebentos.backend.model.Rol;
 import com.ebentos.backend.model.Usuario;
 import com.ebentos.backend.model.Cliente; // Importar Cliente
+import com.ebentos.backend.model.Gestor;
 import com.ebentos.backend.repository.RolRepository;
 import com.ebentos.backend.repository.UsuarioRepository;
 
@@ -85,7 +86,21 @@ public class UsuarioService {
                 nuevoUsuario = nuevaProductora;
             }
 
-            default -> throw new IllegalArgumentException("Rol no soportado: " + registroUsuarioDTO.getNombreRol());
+            default -> {
+                Gestor nuevoGestor = new Gestor();
+                nuevoGestor.setDni(registroUsuarioDTO.getDni());
+                nuevoGestor.setNombres(registroUsuarioDTO.getNombres());
+                nuevoGestor.setApellidos(registroUsuarioDTO.getApellidos());
+                nuevoGestor.setUsuarioCreador(registroUsuarioDTO.getUsuarioCreador());
+                if(rolUsuario.getNombre().equals("TAQUILLERO"))
+                    nuevoGestor.setPuntoVenta(registroUsuarioDTO.getPuntoVenta());
+                nuevoGestor.setEmail(email);
+                nuevoGestor.setTelefono(registroUsuarioDTO.getTelefono());
+                nuevoGestor.setContrasenha(passwordEncoder.encode(contrasenha));
+                nuevoGestor.setRol(rolUsuario);
+                nuevoGestor.setActivo(1);
+                nuevoUsuario = nuevoGestor;
+            }
         }
 
         // Guardar en la BD
