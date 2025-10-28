@@ -12,19 +12,8 @@ import java.time.LocalDate;
 @ToString
 @Builder
 @Entity
-@Table(name = "cliente")
-public class Cliente {
-
-    @Id
-    // Esta columna comparte la clave primaria con Usuario
-    @Column(name = "usuario_id")
-    private Integer id;
-
-    @OneToOne(fetch = FetchType.LAZY) // Opcional: FetchType.LAZY suele ser mejor
-    @MapsId // Le dice a JPA que use el ID de Usuario como el ID de esta entidad
-    @JoinColumn(name = "usuario_id") // Une en la columna compartida PK/FK
-    @ToString.Exclude // Evita bucles en toString()
-    private Usuario usuario; // Referencia de vuelta al Usuario
+@Table(name = "CLIENTE")
+public class Cliente extends Usuario{
 
     @Column(name = "PUNTOS_ACUMULADOS")
     private Integer puntosAcumulados;
@@ -51,12 +40,5 @@ public class Cliente {
     @Enumerated(EnumType.STRING)
     private Genero genero; // Define un enum Genero si es necesario
 
-    // Metodo auxiliar para enlazar Usuario
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
-        if (usuario != null) {
-            this.id = usuario.getUsuarioId(); // Establece el ID al enlazar
-        }
-    }
 }
 

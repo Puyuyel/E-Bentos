@@ -13,6 +13,8 @@ import java.time.LocalDateTime;
 @Entity
 @SQLDelete(sql = "UPDATE usuario SET activo = 0 WHERE usuario_id = ?")
 @Where(clause = "activo = 1")
+@Table(name = "USUARIO")
+@Inheritance(strategy = InheritanceType.JOINED)
 public class Usuario {
 
     @Id
@@ -30,7 +32,7 @@ public class Usuario {
     private String contrasenha;
 
     @ManyToOne
-    @JoinColumn(name = "rol_id")
+    @JoinColumn(name = "ROL_ID")
     private Rol rol;
 
     @Column(name = "ACTIVO", nullable = false, columnDefinition = "TINYINT")
@@ -41,12 +43,6 @@ public class Usuario {
 
     @Column(name = "EXPIRACION_CODIGO", nullable = true)
     private LocalDateTime expiracionCodigo;
-
-    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
-    private Cliente cliente;
-
-    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
-    private Productora productora;
 
     //Constructores
     public Usuario(Integer usuarioId, String telefono, String email, String contrasenha, Rol rol) {
