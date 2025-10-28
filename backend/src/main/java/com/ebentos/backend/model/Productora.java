@@ -2,6 +2,8 @@ package com.ebentos.backend.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @Setter
 @Getter
@@ -9,6 +11,8 @@ import lombok.*;
 @NoArgsConstructor
 @ToString
 @Builder
+@SQLDelete(sql = "UPDATE usuario SET activo = 0 WHERE usuario_id = ?")
+@Where(clause = "activo = 1")
 @Entity
 @Table(name = "PRODUCTORA")
 public class Productora extends Usuario{

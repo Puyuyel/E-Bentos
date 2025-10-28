@@ -9,7 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 public class ProductoraDTO {
 
-    private Integer id;
+    private Integer usuarioId;
     private String telefono;
     private String email;
     private String ruc;

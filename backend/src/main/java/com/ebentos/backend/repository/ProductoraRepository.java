@@ -5,5 +5,5 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProductoraRepository extends JpaRepository<Productora, Integer> {
-    List<Productora> findByRazonSocialStartingWith(String prefijo);
+    
 }

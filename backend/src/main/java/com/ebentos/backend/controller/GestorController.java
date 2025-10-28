@@ -1,8 +1,7 @@
 package com.ebentos.backend.controller;
-
-import com.ebentos.backend.dto.ProductoraActualizaDTO;
-import com.ebentos.backend.dto.ProductoraDTO;
-import com.ebentos.backend.service.ProductoraService;
+import com.ebentos.backend.dto.GestorActualizaDTO;
+import com.ebentos.backend.dto.GestorDTO;
+import com.ebentos.backend.service.GestorService;
 import java.util.List;
 import java.util.Map;
 
@@ -17,19 +16,19 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
-@RequestMapping("/api/productoras")
-public class ProductoraController {
-
-    private final ProductoraService productoraService;
+@RequestMapping("/api/gestores")
+public class GestorController {
+    
+    private final GestorService gestorService;
 
     @Autowired
-    public ProductoraController(ProductoraService productoraService){
-        this.productoraService = productoraService;
+    public GestorController(GestorService gestorService){
+        this.gestorService = gestorService;
     }
-
+    
     @GetMapping
-    public List<ProductoraDTO> listarTodas() {
-        return productoraService.listarTodas();
+    public List<GestorDTO> listarTodas() {
+        return gestorService.listarTodas();
     }
     
     @GetMapping("/paginado")
@@ -37,7 +36,7 @@ public class ProductoraController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int limit) {
 
-        Map<String, Object> response = productoraService.listarPaginado(page, limit);
+        Map<String, Object> response = gestorService.listarPaginado(page, limit);
 
         // 🔹 Construir URLs completas usando el dominio actual
         Map<String, Object> pagination = (Map<String, Object>) response.get("pagination");
@@ -55,14 +54,13 @@ public class ProductoraController {
     } 
 
     @GetMapping("/{id}")
-    public ProductoraDTO obtenerPorId(@PathVariable Integer id) {
-        return productoraService.obtenerPorId(id);
+    public GestorDTO obtenerPorId(@PathVariable Integer id) {
+        return gestorService.obtenerPorId(id);
     }
 
     @PutMapping("/{id}")
-    public ProductoraDTO modificar(@PathVariable Integer id, @RequestBody ProductoraActualizaDTO productoraActualizaDTO) {
+    public GestorDTO modificar(@PathVariable Integer id, @RequestBody GestorActualizaDTO gestorActualizaDTO) {
         // Llama al servicio con el ID y el DTO
-        return productoraService.modificar(id, productoraActualizaDTO);
+        return gestorService.modificar(id, gestorActualizaDTO);
     }
-
 }
