@@ -22,7 +22,8 @@ const Login: React.FC = () => {
       console.log(rol);
       switch (rol) {
         case "ADMIN":
-          navigate("/admin/reporte-cliente");
+          alert('Administrador logueado ¡¡SATISFACTORIAMENTE!!.')
+          navigate("/admin/gestionar-productora");
           break;
         case "CLIENTE":
           alert("CLIENTE EXITOSAMENTE LOGEADO");
