@@ -2,6 +2,8 @@ package com.ebentos.backend.dto;
 
 
 import com.ebentos.backend.model.Genero;
+import com.ebentos.backend.model.PuntoVenta;
+import com.ebentos.backend.model.Usuario;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -30,5 +32,6 @@ public class RegistroUsuarioDTO {
     private String razonSocial;
     private String nombreComercial;
     //Campos usuario gestor (gestor de local, taquillero, dueño del local, organizador de eventos)
-
+    private Usuario usuarioCreador;
+    private PuntoVenta puntoVenta;
 }

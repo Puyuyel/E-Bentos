@@ -2,10 +2,7 @@ package com.ebentos.backend.service;
 
 import com.ebentos.backend.dto.ProductoraActualizaDTO;
 import com.ebentos.backend.dto.ProductoraDTO;
-import com.ebentos.backend.dto.RegistroUsuarioDTO;
-import com.ebentos.backend.dto.UsuarioSimpleDTO;
 import com.ebentos.backend.model.Productora;
-import com.ebentos.backend.model.Usuario;
 import com.ebentos.backend.repository.ProductoraRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.HashMap;
@@ -90,7 +87,7 @@ public class ProductoraService {
         productoraDTO.setRazonSocial(productora.getRazonSocial());
         productoraDTO.setNombreComercial(productora.getNombreComercial());
         productoraDTO.setRuc(productora.getRuc());
-        productoraDTO.setId(productora.getUsuarioId());
+        productoraDTO.setUsuarioId(productora.getUsuarioId());
         productoraDTO.setTelefono(productora.getTelefono());
         productoraDTO.setEmail(productora.getEmail());
         
@@ -149,11 +146,19 @@ public class ProductoraService {
         productoraDTO.setRuc(productora.getRuc());
         productoraDTO.setRazonSocial(productora.getRazonSocial());
         productoraDTO.setNombreComercial(productora.getNombreComercial());
-        productoraDTO.setId(productora.getUsuarioId());
+        productoraDTO.setUsuarioId(productora.getUsuarioId());
         productoraDTO.setTelefono(productora.getTelefono());
         productoraDTO.setEmail(productora.getEmail());
 
         return productoraDTO;
+    }
+    
+    public void eliminar(Integer id){
+        if (productoraRepository.existsById(id)) {
+            productoraRepository.deleteById(id);
+        } else {
+            throw new RuntimeException("Productora no encontrada con id: " + id);
+        }
     }
 
 }

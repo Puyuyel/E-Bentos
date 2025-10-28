@@ -9,8 +9,6 @@ import lombok.*;
 @AllArgsConstructor
 public class UsuarioSimpleDTO {
 
-    private Integer id;
-    private String telefono;
-    private String email;
+    private Integer usuarioId;
 
 }

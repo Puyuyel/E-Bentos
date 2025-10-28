@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -64,11 +65,10 @@ public class ProductoraController {
         // Llama al servicio con el ID y el DTO
         return productoraService.modificar(id, productoraActualizaDTO);
     }
-
-//    @GetMapping("/buscar")
-//    public List<Productora> buscarPorRazonSocial(@RequestParam String prefijo) {
-//        return productoraService.buscarPorRazonSocial(prefijo);
-//    }
-
+    
+    @DeleteMapping("/{id}")
+    public void eliminar(@PathVariable Integer id) {
+        productoraService.eliminar(id);
+    }
 
 }
