@@ -20,14 +20,16 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import java.util.Collections;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Configuration
 @EnableWebSecurity
 public class Securityconfig {
 
-    // Inyecta el valor desde application.properties
-    @Value("${app.cors.allowed-origin}")
-    private String origenPermitido;
+    // Inyecta el valor CSV desde application.properties
+    @Value("${app.cors.allowed-origins}")
+    private String allowedOriginsCsv;
 
     // BEAN: Codificador de Contraseñas
     @Bean
@@ -116,9 +118,15 @@ public class Securityconfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // El puerto donde corre React
-        configuration.setAllowedOrigins(Arrays.asList(origenPermitido, "http://react:5173", "http://127.0.0.1:5173"));
 
+        // Parsea CSV y trim
+        List<String> origins = Arrays.stream(allowedOriginsCsv.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toList());
+
+        // Usa allowedOriginPatterns para más flexibilidad con puertos/hosts
+        configuration.setAllowedOriginPatterns(origins);
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);

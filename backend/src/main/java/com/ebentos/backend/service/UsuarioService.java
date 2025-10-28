@@ -21,8 +21,6 @@ public class UsuarioService {
     private final RolRepository rolRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
-    private final ClienteService clienteService;
-    private final ProductoraService productoraService;
 
     // Injección de constructor
     public UsuarioService(
@@ -36,8 +34,6 @@ public class UsuarioService {
         this.rolRepository = rolRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailService = emailService;
-        this.clienteService = clienteService;
-        this.productoraService = productoraService;
     }
 
     // ------------------------- Metodos ----------------------------------------------
@@ -57,40 +53,42 @@ public class UsuarioService {
         }
 
         // Buscar el rol
-        Rol rolCliente = rolRepository.findByNombre(registroUsuarioDTO.getNombreRol())
+        Rol rolUsuario = rolRepository.findByNombre(registroUsuarioDTO.getNombreRol())
                 .orElseThrow(() -> new RuntimeException("Rol no encontrado"));
 
         // Crear la nueva entidad Usuario
-        Usuario nuevoUsuario = new Usuario();
-        nuevoUsuario.setEmail(email);
-        nuevoUsuario.setTelefono(registroUsuarioDTO.getTelefono());
+        Usuario nuevoUsuario;
+        switch (registroUsuarioDTO.getNombreRol().toUpperCase()) {
+            case "CLIENTE" -> {
+                Cliente nuevoCliente = new Cliente();
+                nuevoCliente.setPuntosGastados(0);
+                nuevoCliente.setPuntosAcumulados(0);
+                nuevoCliente.setRegistradoPorTaquillero(0);
+                nuevoCliente.setNombres(registroUsuarioDTO.getNombres());
+                nuevoCliente.setApellidos(registroUsuarioDTO.getApellidos());
+                nuevoCliente.setDni(registroUsuarioDTO.getDni());
+                nuevoCliente.setFechaNacimiento(registroUsuarioDTO.getFechaNacimiento());
+                nuevoCliente.setGenero(registroUsuarioDTO.getGenero());
+                nuevoUsuario = nuevoCliente;
+            }
 
-        // Hashear la contraseña
-        nuevoUsuario.setContrasenha(passwordEncoder.encode(contrasenha));
+            case "PRODUCTORA" -> {
+                Productora nuevaProductora = new Productora();
+                nuevaProductora.setRuc(registroUsuarioDTO.getRuc());
+                nuevaProductora.setRazonSocial(registroUsuarioDTO.getRazonSocial());
+                nuevaProductora.setNombreComercial(registroUsuarioDTO.getNombreComercial());
+                nuevaProductora.setEmail(email);
+                nuevaProductora.setTelefono(registroUsuarioDTO.getTelefono());
+                nuevaProductora.setContrasenha(passwordEncoder.encode(contrasenha));
+                nuevaProductora.setRol(rolUsuario);
+                nuevaProductora.setActivo(1);
+                nuevoUsuario = nuevaProductora;
+            }
 
-        nuevoUsuario.setRol(rolCliente);
-        nuevoUsuario.setActivo(1); // Activar el usuario por defecto
-
-        // Guardar el tipo de usuario (USANDO CASCADE)
-        if ( registroUsuarioDTO.getNombreRol().equals("CLIENTE") ) {
-
-            // Crear el objeto Cliente (sin persistencia aún)
-            Cliente nuevoCliente = clienteService.crearNuevoClienteTemporal(registroUsuarioDTO);
-
-            // Establecer la relación bidireccional
-            nuevoCliente.setUsuario(nuevoUsuario);
-            nuevoUsuario.setCliente(nuevoCliente);
-
-        } else if ( registroUsuarioDTO.getNombreRol().equals("PRODUCTORA") ) {
-            // Crear el objeto Productora (sin persistencia aún)
-            Productora nuevaProductora = productoraService.crearNuevaProductoraTemporal(registroUsuarioDTO);
-            // Establecer la relación bidireccional
-            nuevaProductora.setUsuario(nuevoUsuario);
-            nuevoUsuario.setProductora(nuevaProductora);
+            default -> throw new IllegalArgumentException("Rol no soportado: " + registroUsuarioDTO.getNombreRol());
         }
 
         // Guardar en la BD
-        // Esto guarda Usuario Y, por CascadeType.ALL, guarda los tipos de usuario
         Usuario usuario = usuarioRepository.save(nuevoUsuario);
 
         return usuario;
