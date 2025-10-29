@@ -70,6 +70,10 @@ public class UsuarioService {
                 nuevoCliente.setDni(registroUsuarioDTO.getDni());
                 nuevoCliente.setFechaNacimiento(registroUsuarioDTO.getFechaNacimiento());
                 nuevoCliente.setGenero(registroUsuarioDTO.getGenero());
+                nuevoCliente.setEmail(email);
+                nuevoCliente.setTelefono(registroUsuarioDTO.getTelefono());
+                nuevoCliente.setContrasenha(passwordEncoder.encode(contrasenha));
+                nuevoCliente.setRol(rolUsuario);
                 nuevoCliente.setActivo(1);
                 nuevoUsuario = nuevoCliente;
             }
