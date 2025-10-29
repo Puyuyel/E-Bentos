@@ -1,4 +1,4 @@
-import EbentosIcon from "../assets/ebentos-white-logo.png";
+import EbentosIcon from "../assets/ebentos-white-logo-big.png";
 import LoginBackground from "../assets/concert-blue.png";
 
 import { AuthLayout } from "../layouts/AuthLayout";
