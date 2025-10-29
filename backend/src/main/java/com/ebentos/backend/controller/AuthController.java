@@ -9,6 +9,8 @@ import com.ebentos.backend.dto.ContrasenhaResetDTO;
 import com.ebentos.backend.dto.RegistroUsuarioDTO;
 import com.ebentos.backend.model.Usuario;
 import com.ebentos.backend.service.UsuarioService;
+import java.util.List;
+import org.springframework.security.core.Authentication;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -19,8 +21,25 @@ public class AuthController {
 
     // Registro nuevo usuario
     @PostMapping("/register")
-    public ResponseEntity<?> registrarUsuario(@RequestBody RegistroUsuarioDTO registroDTO) { // DTO general recibe todos los campos posibles
+    public ResponseEntity<?> registrarUsuario(@RequestBody RegistroUsuarioDTO registroDTO, Authentication authentication) { // DTO general recibe todos los campos posibles
         try {
+            String rolSolicitado = registroDTO.getNombreRol();
+            // Caso 1: registro sin autenticación -> solo CLIENTE
+            if (authentication == null) {
+                if (!"CLIENTE".equalsIgnoreCase(rolSolicitado)) {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body("Solo se pueden crear cuentas de CLIENTE sin autenticación");
+                }
+            } else {
+                // Caso 2: usuario autenticado
+                String rolActual = authentication.getAuthorities().iterator().next().getAuthority();
+
+                // Validar jerarquía
+                if (!puedeCrear(rolActual, rolSolicitado)) {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body("No tienes permisos para crear usuarios con rol " + rolSolicitado);
+                }
+            }
             Usuario usuarioCreado = usuarioService.crearUsuario(registroDTO);
             // Devolvemos 201 Created (no devolvemos la contraseña)
             return ResponseEntity.status(HttpStatus.CREATED).body("Usuario creado con ID: " + usuarioCreado.getUsuarioId());
@@ -60,5 +79,14 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al actualizar la contraseña.");
         }
     }
+    
+    private boolean puedeCrear(String rolActual, String rolNuevo) {
+    return switch (rolActual) {
+        case "ROLE_ADMIN" -> List.of("PRODUCTORA", "GESTOR_LOCAL", "TAQUILLERO").contains(rolNuevo);
+        case "ROLE_PRODUCTORA" -> List.of("ORGANIZADOR_EVENTOS").contains(rolNuevo);
+        case "ROLE_GESTOR_LOCAL" -> List.of("DUENHO_LOCAL").contains(rolNuevo);
+        default -> false;
+    };
+}
 
 }
