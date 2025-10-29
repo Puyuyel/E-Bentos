@@ -70,6 +70,7 @@ public class UsuarioService {
                 nuevoCliente.setDni(registroUsuarioDTO.getDni());
                 nuevoCliente.setFechaNacimiento(registroUsuarioDTO.getFechaNacimiento());
                 nuevoCliente.setGenero(registroUsuarioDTO.getGenero());
+                nuevoCliente.setActivo(1);
                 nuevoUsuario = nuevoCliente;
             }
 
