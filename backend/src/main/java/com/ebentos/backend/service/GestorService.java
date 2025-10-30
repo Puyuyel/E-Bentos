@@ -70,9 +70,10 @@ public class GestorService {
         return response;
     }
     
-    public Map<String, Object> listarPaginadoPorRol(int page, int size, String nombreRol) {
+    public Map<String, Object> listarPaginadoPorBuscadorYRol(int page, int size, 
+            String nombreRol, String buscador) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Gestor> gestoresPage = gestorRepository.findByRol_Nombre(nombreRol, pageable);
+        Page<Gestor> gestoresPage = gestorRepository.buscarPorBuscadorYRol(nombreRol, buscador, pageable);
 
         // Convertimos la lista de entidades a DTOs
         List<GestorDTO> gestoresDTO = gestoresPage.getContent().stream()
@@ -141,10 +142,6 @@ public class GestorService {
         Gestor gestorExistente = gestorRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Gestor no encontrado con ID: " + id));
 
-        if (!Objects.equals(gestorActualizaDTO.getDni(), gestorExistente.getDni())) {
-            gestorExistente.setDni(gestorActualizaDTO.getDni());
-        }
-
         if (!Objects.equals(gestorActualizaDTO.getNombres(), gestorExistente.getNombres())) {
             gestorExistente.setNombres(gestorActualizaDTO.getNombres());
         }
@@ -167,10 +164,6 @@ public class GestorService {
 
         if (!gestorActualizaDTO.getContrasenha().isBlank()) {
             gestorExistente.setContrasenha(passwordEncoder.encode(gestorActualizaDTO.getContrasenha()));
-        }
-
-        if (!Objects.equals(gestorActualizaDTO.getActivo(), gestorExistente.getActivo())) {
-            gestorExistente.setActivo(gestorActualizaDTO.getActivo());
         }
 
         //  GUARDAR y devolver

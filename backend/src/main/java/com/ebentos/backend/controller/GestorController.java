@@ -54,13 +54,14 @@ public class GestorController {
         return response;
     }
             
-    @GetMapping("/paginadoPorRol")
-    public Map<String, Object> listarPaginadoPorRol(
+    @GetMapping("/paginadoPorBuscadorYRol")
+    public Map<String, Object> listarPaginadoPorBuscadorYRol(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int limit,
-            @RequestParam String nombreRol) {
+            @RequestParam String nombreRol,
+            @RequestParam String buscador) {
 
-        Map<String, Object> response = gestorService.listarPaginadoPorRol(page, limit, nombreRol);
+        Map<String, Object> response = gestorService.listarPaginadoPorBuscadorYRol(page, limit, nombreRol, buscador);
 
         // 🔹 Construir URLs completas usando el dominio actual
         Map<String, Object> pagination = (Map<String, Object>) response.get("pagination");
