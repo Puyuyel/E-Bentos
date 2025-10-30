@@ -41,9 +41,9 @@ public class ProductoraService {
         return productoraDTO;
     }
     
-    public Map<String, Object> listarPaginado(int page, int size) {
+    public Map<String, Object> listarPaginadoPorBuscador(int page, int size, String buscador) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Productora> productorasPage = productoraRepository.findAll(pageable);
+        Page<Productora> productorasPage = productoraRepository.buscarPorBuscador(buscador, pageable);
 
         // Convertimos la lista de entidades a DTOs
         List<ProductoraDTO> productorasDTO = productorasPage.getContent().stream()
@@ -109,10 +109,6 @@ public class ProductoraService {
             productoraExistente.setNombreComercial(productoraActualizaDTO.getNombreComercial());
         }
 
-        if (!Objects.equals(productoraActualizaDTO.getRuc(), productoraExistente.getRuc())) {
-            productoraExistente.setRuc(productoraActualizaDTO.getRuc());
-        }
-
         if (!Objects.equals(productoraActualizaDTO.getTelefono(), productoraExistente.getTelefono())) {
             productoraExistente.setTelefono(productoraActualizaDTO.getTelefono());
         }
@@ -123,10 +119,6 @@ public class ProductoraService {
 
         if (!productoraActualizaDTO.getContrasenha().isBlank()) {
             productoraExistente.setContrasenha(passwordEncoder.encode(productoraActualizaDTO.getContrasenha()));
-        }
-
-        if (!Objects.equals(productoraActualizaDTO.getActivo(), productoraExistente.getActivo())) {
-            productoraExistente.setActivo(productoraActualizaDTO.getActivo());
         }
 
         //  GUARDAR y devolver
