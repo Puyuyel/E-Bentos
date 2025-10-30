@@ -33,12 +33,13 @@ public class ProductoraController {
         return productoraService.listarTodas();
     }
     
-    @GetMapping("/paginado")
+    @GetMapping("/paginadoPorBuscador")
     public Map<String, Object> listarPaginado(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int limit) {
+            @RequestParam(defaultValue = "10") int limit,
+            @RequestParam String buscador) {
 
-        Map<String, Object> response = productoraService.listarPaginado(page, limit);
+        Map<String, Object> response = productoraService.listarPaginadoPorBuscador(page, limit, buscador);
 
         // 🔹 Construir URLs completas usando el dominio actual
         Map<String, Object> pagination = (Map<String, Object>) response.get("pagination");

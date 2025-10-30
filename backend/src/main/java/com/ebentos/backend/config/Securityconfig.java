@@ -73,6 +73,9 @@ public class Securityconfig {
                 .authorizeHttpRequests(authz -> authz
                         // Permite el registro y el login públicamente
                         .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
+                        .requestMatchers("/api/auth/forgot-password", "/api/auth/reset-password").hasRole("CLIENTE")
+                        .requestMatchers("/api/productoras/**").hasRole("ADMIN")
+                        .requestMatchers("/api/gestores/**").hasAnyRole("ADMIN","GESTOR_LOCAL","PRODUCTORA")
                         // Protege todas las demás rutas
                         .anyRequest().authenticated())
 
