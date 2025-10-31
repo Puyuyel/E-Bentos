@@ -9,6 +9,7 @@ import {
     ChartBarIcon,
     LogoutIcon
 } from './icons';
+import { useNavigate } from 'react-router-dom'
 import '../styles/Sidebar.css';
 
 interface NavItemProps {
@@ -25,29 +26,29 @@ type NavEntry = {
     route: string;
 }
 
-const NavItem: React.FC<NavItemProps> = ({ icon, label, active = false, route, onClick }) => (
-    <a
-        href={`#/${route}`}
-        onClick={(e) => {
-            if (route) {
-                window.location.hash = `#/${route}`;
-            } else if (onClick) {
-                e.preventDefault();
-                onClick();
-            }
-        }}
-        className={`nav-item ${active ? 'nav-item-active' : ''}`}
-    >
-        {icon}
-        <span className="nav-label">{label}</span>
-    </a>
-);
+const NavItem: React.FC<NavItemProps> = ({ icon, label, active = false, onClick }) => {
+    return (
+        <a
+            onClick={onClick}
+            className={`nav-item ${active ? 'nav-item-active' : ''}`}
+            style={{ cursor: 'pointer' }}
+        >
+            {icon}
+            <span className="nav-label">{label}</span>
+        </a>
+    );
+};
 
 interface SidebarProps {
     currentPath?: string;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ currentPath = '' }) => {
+    const navigate = useNavigate();
+
+    const handleNavigate = (route?: string) => {
+        if (route) navigate(`/admin/${route}`);
+    };
     const manageItems: NavEntry[] = [
         { icon: <DocumentReportIcon />, label: 'Productoras', route: 'gestionar-productora' },
         { icon: <OfficeBuildingIcon />, label: 'Gestores de locales', route: 'gestionar-gestor-local' },
@@ -80,8 +81,8 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath = '' }) => {
                                 key={index}
                                 icon={item.icon}
                                 label={item.label}
-                                route={item.route}
                                 active={currentPath === item.route}
+                                onClick={() => handleNavigate(item.route)}
                             />
                         ))}
                     </div>
@@ -94,8 +95,8 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath = '' }) => {
                                 key={index}
                                 icon={item.icon}
                                 label={item.label}
-                                route={item.route}
                                 active={currentPath === item.route}
+                                onClick={() => handleNavigate(item.route)}
                             />
                         ))}
                     </div>
@@ -103,7 +104,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath = '' }) => {
             </nav>
 
             <div className="logout-container">
-                <NavItem icon={<LogoutIcon />} label="Cerrar sesión"/>
+                <NavItem icon={<LogoutIcon />} label="Cerrar sesión" onClick={() => navigate('/login')} />
             </div>
         </aside>
     );
