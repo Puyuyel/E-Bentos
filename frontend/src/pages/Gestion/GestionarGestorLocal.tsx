@@ -1,6 +1,6 @@
-import React from 'react';
-import Sidebar from '../components/Sidebar';
-import '../styles/GestionarGestorLocal.css';
+import React from "react";
+import Sidebar from "../../components/Sidebar";
+import "../../styles/Gestion/GestionarGestorLocal.css";
 
 const GestionarGestorLocal: React.FC = () => {
   return (
