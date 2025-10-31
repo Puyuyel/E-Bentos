@@ -11,24 +11,49 @@ import {
   Tooltip,
 } from "@carbon/react";
 import { Help } from "@carbon/icons-react";
-import "./../styles/FormRegister.css";
+import "../../styles/Access/FormRegister.css";
+import {
+  verifyData,
+  contrasenhaIncluyeCaracterEspecial,
+  contrasenhaIncluyeMayuscula,
+  contrasenhaIncluyeMinuscula,
+  contrasenhaIncluyeNumero,
+} from "../util/verifiers";
 
 import React, { useState } from "react";
 import { useEffect } from "react";
 
-import type { RegisterData } from "../types/register.types";
+import type { RegisterData } from "../../types/register.types";
 
 interface FormRegisterProps {
   onIniciarSesionClick: () => void;
   onRegisterClick: () => void;
 }
 
+const STEP_PASS_COMPLETED = 20;
+
 const FormRegister: React.FC<FormRegisterProps> = ({
   onIniciarSesionClick,
   onRegisterClick,
 }) => {
+  const [loading, setLoading] = useState(false);
+
   const [apellidoMat, setApeMat] = useState("");
   const [apellidoPat, setApePat] = useState("");
+  const [isInvalidEmail, setIsInvalidEmail] = useState(false);
+  const [isInvalidContrasenha, setIsInvalidContrasenha] = useState(false);
+  const [estadoContra, setEstadoContra] = useState("active");
+  const [valueContrasenha, setValueContrasenha] = useState(0);
+  const [helperContra, sethelperContra] = useState(
+    "Esperando una contraseña fuerte y segura"
+  );
+  const [isInvalidNombres, setIsInvalidNombres] = useState(false);
+  const [isInvalidApePat, setIsInvalidApePat] = useState(false);
+  const [isInvalidApeMat, setIsInvalidApeMat] = useState(false);
+  const [isInvalidDNI, setIsInvalidDNI] = useState(false);
+  const [isInvalidFechaNac, setIsInvalidFechaNac] = useState(false);
+  const [isInvalidTelf, setIsInvalidTelf] = useState(false);
+  const [isInvalidGen, setIsInvalidGen] = useState(false);
   const [formData, setFormData] = useState<RegisterData>({
     email: "",
     contrasenha: "",
@@ -41,8 +66,70 @@ const FormRegister: React.FC<FormRegisterProps> = ({
     genero: "",
   });
 
+  const calcularProgresoContrasenha = (contrasenha: string): number => {
+    let total: number = 0;
+    if (contrasenha.length >= 8) total += STEP_PASS_COMPLETED;
+    if (contrasenhaIncluyeNumero(contrasenha)) total += STEP_PASS_COMPLETED;
+    if (contrasenhaIncluyeMayuscula(contrasenha)) total += STEP_PASS_COMPLETED;
+    if (contrasenhaIncluyeMinuscula(contrasenha)) total += STEP_PASS_COMPLETED;
+    if (contrasenhaIncluyeCaracterEspecial(contrasenha))
+      total += STEP_PASS_COMPLETED;
+
+    return total;
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
+    if (!verifyData(id, value)) {
+      console.log("Funcionando en handle change");
+      switch (id) {
+        case "email":
+          setIsInvalidEmail(true);
+          break;
+        case "contrasenha":
+          setIsInvalidContrasenha(true);
+          setValueContrasenha(calcularProgresoContrasenha(value));
+          sethelperContra(
+            `"Progreso: ${calcularProgresoContrasenha(
+              value
+            )} % - La contraseña no cumple con los requisitos, mírelos a la izquierda en el signo de interrogación."`
+          );
+          break;
+        case "nombres":
+          setIsInvalidNombres(true);
+          break;
+        case "dni":
+          setIsInvalidDNI(true);
+          break;
+        case "telefono":
+          setIsInvalidTelf(true);
+          break;
+      }
+      return;
+    }
+
+    switch (id) {
+      case "email":
+        setIsInvalidEmail(false);
+        break;
+      case "contrasenha":
+        setIsInvalidContrasenha(false);
+        setEstadoContra("finished");
+        sethelperContra(
+          "La contraseña CUMPLE con los requisitos. Recuerde guardarla para recordarla."
+        );
+        break;
+      case "nombres":
+        setIsInvalidNombres(false);
+        break;
+      case "dni":
+        setIsInvalidDNI(false);
+        break;
+      case "telefono":
+        setIsInvalidTelf(false);
+        break;
+    }
+
     setFormData((prev: RegisterData) => ({
       ...prev,
       [id]: value,
@@ -53,6 +140,11 @@ const FormRegister: React.FC<FormRegisterProps> = ({
     if (!dates || dates.length === 0) return;
     const date = dates[0];
     const fechaUTC = date.toISOString().split("T")[0];
+    if (!verifyData("fechaNacimiento", fechaUTC)) {
+      setIsInvalidFechaNac(true);
+      return;
+    }
+    setIsInvalidFechaNac(false);
     setFormData((prev: RegisterData) => ({
       ...prev,
       fechaNacimiento: fechaUTC,
@@ -62,6 +154,11 @@ const FormRegister: React.FC<FormRegisterProps> = ({
   // update apellido paterno + materno and keep a single "apellidos" field in formData
   const handleApePatChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newPat = e.target.value;
+    if (!verifyData("apePat", newPat)) {
+      setIsInvalidApePat(true);
+      return;
+    }
+    setIsInvalidApePat(false);
     setApePat(newPat);
     setFormData((prev: RegisterData) => ({
       ...prev,
@@ -71,6 +168,11 @@ const FormRegister: React.FC<FormRegisterProps> = ({
 
   const handleApeMatChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newMat = e.target.value;
+    if (!verifyData("apeMat", newMat)) {
+      setIsInvalidApeMat(true);
+      return;
+    }
+    setIsInvalidApeMat(false);
     setApeMat(newMat);
     setFormData((prev: RegisterData) => ({
       ...prev,
@@ -79,10 +181,37 @@ const FormRegister: React.FC<FormRegisterProps> = ({
   };
 
   const handleGeneroChange = ({ selectedItem }: { selectedItem: any }) => {
+    if (!verifyData("genero", selectedItem?.text)) {
+      setIsInvalidGen(true);
+      return;
+    }
+    setIsInvalidGen(false);
     setFormData((prev: RegisterData) => ({
       ...prev,
       genero: `${selectedItem?.text}`.toUpperCase() || "",
     }));
+  };
+
+  const handleRegistrar = async () => {
+    setLoading(true);
+    try {
+      if (
+        isInvalidApeMat ||
+        isInvalidApePat ||
+        isInvalidContrasenha ||
+        isInvalidDNI ||
+        isInvalidEmail ||
+        isInvalidFechaNac ||
+        isInvalidGen ||
+        isInvalidNombres
+      ) {
+        alert("Inserte los datos o arregle los errores antes de registrarse.");
+        return;
+      }
+      await onRegisterClick(formData);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -118,9 +247,12 @@ const FormRegister: React.FC<FormRegisterProps> = ({
         <div className="input-email">
           <TextInput
             id="email"
+            type="email"
             labelText="Correo electrónico"
             placeholder="Ej: ebento@ebento.com"
             onChange={handleChange}
+            invalid={isInvalidEmail}
+            invalidText="El correo ingresado no es válido."
           />
         </div>
 
@@ -131,6 +263,8 @@ const FormRegister: React.FC<FormRegisterProps> = ({
             type="password"
             placeholder="Ingrese su contraseña"
             onChange={handleChange}
+            invalid={isInvalidContrasenha}
+            invalidText="La contraseña ingresada es inválida."
           />
         </div>
 
@@ -153,7 +287,9 @@ const FormRegister: React.FC<FormRegisterProps> = ({
           </Tooltip>
           <ProgressBar
             className="progress-bar"
-            helperText="Esperando una contraseña fuerte y segura"
+            helperText={helperContra}
+            status={estadoContra}
+            value={valueContrasenha}
           />
           {/* Cuando se pone una buena contraseña -> cambiar el helper */}
         </div>
@@ -163,38 +299,54 @@ const FormRegister: React.FC<FormRegisterProps> = ({
         <div className="nombres-div">
           <TextInput
             id="nombres"
+            type="text"
             labelText="Nombres"
             placeholder="Ej: Juan"
             onChange={handleChange}
+            invalid={isInvalidNombres}
+            invalidText="El nombre proporcionado no es válido."
           />
         </div>
 
         <div className="apellidos-div">
           <TextInput
             id="apePat"
+            type="text"
             labelText="Apellido Paterno"
             placeholder="Ej: Perez"
             onChange={handleApePatChange}
+            invalid={isInvalidApePat}
+            invalidText="Apellido inválido"
           />
           <TextInput
             id="apeMat"
             labelText="Apellido Materno"
             placeholder="Ej: Ruiz"
             onChange={handleApeMatChange}
+            invalid={isInvalidApeMat}
+            invalidText="Apellido inválido"
           />
         </div>
 
         <div className="dni-nacimiento-div">
           <TextInput
             id="dni"
+            type="number"
             className="dni"
             labelText="DNI"
             placeholder="Ej: 12345678"
             onChange={handleChange}
+            invalid={isInvalidDNI}
+            invalidText="DNI inválido"
           />
           <div>
             <p className="fecha-p">Fecha de nacimiento</p>
-            <DatePicker onChange={handleDateChange} datePickerType="single">
+            <DatePicker
+              onChange={handleDateChange}
+              datePickerType="single"
+              invalid={isInvalidFechaNac}
+              invalidText="La fecha ingresada no es válida."
+            >
               <DatePickerInput id="fechaNacimiento" placeholder="mm/dd/aaaa" />
             </DatePicker>
           </div>
@@ -203,10 +355,13 @@ const FormRegister: React.FC<FormRegisterProps> = ({
         <div className="telf-gen-div">
           <TextInput
             id="telefono"
+            type="number"
             className="telf"
             labelText="Teléfono"
             placeholder="Ej: 900000000"
             onChange={handleChange}
+            invalid={isInvalidTelf}
+            invalidText="Teléfono inválido"
           />
           <div className="gen-p-ddl">
             <p className="genero-p">Género</p>
@@ -215,6 +370,7 @@ const FormRegister: React.FC<FormRegisterProps> = ({
               helperText="This is some helper text"
               id="genero"
               onChange={handleGeneroChange}
+              invalid={isInvalidGen}
               invalidText="invalid selection"
               /* itemToString must return the display string for each item */
               itemToString={(item: any) =>
@@ -234,7 +390,7 @@ const FormRegister: React.FC<FormRegisterProps> = ({
 
       {/* PARTE 2.2: BOTÓN DE REGISTRAR USUARIO */}
       <div className="btn-register">
-        <Button onClick={() => onRegisterClick(formData)} kind="primary">
+        <Button disabled={loading} onClick={handleRegistrar} kind="primary">
           Registrar
         </Button>
       </div>

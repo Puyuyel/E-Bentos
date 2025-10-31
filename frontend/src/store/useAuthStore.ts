@@ -4,7 +4,7 @@ import { login } from "../services/authService"; // tu servicio API
 import type { LoginCredentials } from "../types/auth.types";
 
 interface User {
-  loginCreds: LoginCredentials
+  loginCreds: LoginCredentials;
   rol: string; // o "role" según tu backend
 }
 
@@ -26,8 +26,8 @@ export const useAuthStore = create<AuthState>((set) => ({
       const response = await login(loginCreds); // devuelve { email, rol, ... }
       const userResponse = {
         email: loginCreds.email,
-        rol: response.role
-      }
+        rol: response.role,
+      };
       set({ user: userResponse, isLoggedIn: true });
       return userResponse.rol;
     } catch (error) {

@@ -1,13 +1,13 @@
-import EbentosIcon from "../assets/ebentos-white-logo-big.png";
-import LoginBackground from "../assets/concert-blue.png";
+import EbentosIcon from "../../assets/ebentos-white-logo-big.png";
+import LoginBackground from "../../assets/concert-blue.png";
 
-import { AuthLayout } from "../layouts/AuthLayout";
-import FormLogin from "../components/FormLogin";
+import { AuthLayout } from "../../layouts/AuthLayout";
+import FormLogin from "../../components/Access/FormLogin";
 import { useNavigate } from "react-router-dom";
-import { login } from "../services/authService";
+import { login } from "../../services/authService";
 
-import type { LoginCredentials } from "../types/auth.types";
-import { useAuthStore } from "../store/useAuthStore";
+import type { LoginCredentials } from "../../types/auth.types";
+import { useAuthStore } from "../../store/useAuthStore";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ const Login: React.FC = () => {
       console.log(rol);
       switch (rol) {
         case "ADMIN":
-          alert('Administrador logueado ¡¡SATISFACTORIAMENTE!!.')
+          alert("Administrador logueado ¡¡SATISFACTORIAMENTE!!.");
           navigate("/admin/gestionar-productora");
           break;
         case "CLIENTE":
