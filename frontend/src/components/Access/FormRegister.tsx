@@ -9,7 +9,9 @@ import {
   DatePickerInput,
   Dropdown,
   Tooltip,
+  Callout,
 } from "@carbon/react";
+
 import { Help } from "@carbon/icons-react";
 import "../../styles/Access/FormRegister.css";
 import {
@@ -22,6 +24,7 @@ import {
 
 import React, { useState } from "react";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 import type { RegisterData } from "../../types/register.types";
 
@@ -36,6 +39,9 @@ const FormRegister: React.FC<FormRegisterProps> = ({
   onIniciarSesionClick,
   onRegisterClick,
 }) => {
+  const navigate = useNavigate();
+  const [showSuccess, setShowSuccess] = useState(false);
+
   const [loading, setLoading] = useState(false);
 
   const [apellidoMat, setApeMat] = useState("");
@@ -208,7 +214,15 @@ const FormRegister: React.FC<FormRegisterProps> = ({
         alert("Inserte los datos o arregle los errores antes de registrarse.");
         return;
       }
-      await onRegisterClick(formData);
+      const respuesta = await onRegisterClick(formData);
+      if (respuesta >= 200) {
+        setShowSuccess(true);
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000); // 2000 ms = 2 segundos
+      }
+    } catch (error: any) {
+      console.error("Error en FormRegister.tsx: ", error);
     } finally {
       setLoading(false);
     }
@@ -394,6 +408,14 @@ const FormRegister: React.FC<FormRegisterProps> = ({
           Registrar
         </Button>
       </div>
+
+      {showSuccess && (
+        <Callout
+          kind="success"
+          statusIconDescription="notification"
+          title="¡Registro exitoso!"
+        />
+      )}
     </div>
   );
 };

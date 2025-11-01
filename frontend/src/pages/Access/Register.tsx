@@ -17,10 +17,13 @@ const Register: React.FC = () => {
   };
   const handleRegisterClick = async (data: RegisterData) => {
     try {
-      const user = await register(data);
-      alert("Usuario creado correctamente.");
+      const respuesta = await register(data); // LLAMADA al API
+      if (respuesta >= 200) {
+        alert("Usuario creado correctamente.");
+      }
+      return respuesta;
     } catch (e: any) {
-      alert("Hubo un error al momento de crear la contrasenia");
+      alert("Hubo un error al momento de crear un USUARIO.");
     }
   };
   return (
