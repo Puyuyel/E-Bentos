@@ -138,11 +138,6 @@ const AppRouter: React.FC = () => {
           }
         />
 
-        {/* Ruta /reportes */}
-        <Route path="/reporte-local" element={<ReporteLocal />} />
-
-        <Route path="/reporte-evento" element={<ReporteEvento />} />
-
         {/* Redirige cualquier ruta desconocida a /login */}
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
