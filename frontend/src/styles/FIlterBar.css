@@ -1,0 +1,48 @@
+.filters-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  width: 100%;
+  align-items: flex-end;
+  justify-content: flex-start;
+  margin: 1.5rem 0;
+  padding: 1rem;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+/* Cada item (DatePicker o Select) */
+.filter-item {
+  flex: 1 1 260px; /* base más ancha para que salten a segunda fila antes */
+  min-width: 240px;
+  max-width: 300px;
+  box-sizing: border-box;
+}
+
+/* Uniforma el tamaño de los campos de Carbon */
+.filter-item .cds--date-picker-input,
+.filter-item .cds--select-input {
+  height: 40px;
+  font-size: 0.95rem;
+}
+
+/* Ajuste visual del label */
+.filter-item .cds--label {
+  margin-bottom: 0.25rem;
+}
+
+/* RESPONSIVE — Forzar 2 filas en pantallas medianas o con zoom */
+@media (max-width: 1400px) {
+  .filter-item {
+    flex: 1 1 45%; /* 2 por fila */
+    min-width: 300px;
+  }
+}
+
+/* RESPONSIVE — En pantallas pequeñas (móviles) */
+@media (max-width: 768px) {
+  .filter-item {
+    flex: 1 1 100%; /* 1 por fila */
+    min-width: unset;
+  }
+}
