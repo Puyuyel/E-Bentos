@@ -1,16 +1,19 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Login from "../pages/Login"; // tu componente Login
-import Register from "../pages/Register"; // tu componente Login
-import GestionarGestorLocal from "../pages/GestionarGestorLocal";
-import GestionarProductora from "../pages/GestionarProductora";
-import GestionarPuntoDeVenta from "../pages/GestionarPuntoDeVenta";
-import GestionarTaquillero from "../pages/GestionarTaquillero";
-import ReporteCliente from "../pages/ReporteCliente";
-import ReporteEvento from "../pages/ReporteEvento";
-import ReporteLocal from "../pages/ReporteLocal";
-import ReporteOrganizador from "../pages/ReporteOrganizador";
-import ReporteProductora from "../pages/ReporteProductora";
-import ReporteTaquillero from "../pages/ReporteTaquillero";
+import Login from "../pages/Access/Login"; // tu componente Login
+import Register from "../pages/Access/Register"; // tu componente Login
+import ForgetPass from "../pages/Access/ForgetPass";
+import CodigoVerificacion from "../pages/Access/CodigoVerificacion";
+import NewPassword from "../pages/Access/NewPassword";
+import GestionarGestorLocal from "../pages/Gestion/GestionarGestorLocal";
+import GestionarProductora from "../pages/Gestion/GestionarProductora";
+import GestionarPuntoDeVenta from "../pages/Gestion/GestionarPuntoDeVenta";
+import GestionarTaquillero from "../pages/Gestion/GestionarTaquillero";
+import ReporteCliente from "../pages/Reportes/ReporteCliente";
+import ReporteEvento from "../pages/Reportes/ReporteEvento";
+import ReporteLocal from "../pages/Reportes/ReporteLocal";
+import ReporteOrganizador from "../pages/Reportes/ReporteOrganizador";
+import ReporteProductora from "../pages/Reportes/ReporteProductora";
+import ReporteTaquillero from "../pages/Reportes/ReporteTaquillero";
 
 import { ProtectedRoute } from "./ProtectedRoute"; // importa tu wrapper
 
@@ -24,6 +27,15 @@ const AppRouter: React.FC = () => {
 
         {/* Ruta /register */}
         <Route path="/register" element={<Register />} />
+
+        {/* Ruta /forgetpass */}
+        <Route path="/forgetpass" element={<ForgetPass />} />
+
+        {/* Ruta /codigo_verificacion */}
+        <Route path="/codigo_verificacion" element={<CodigoVerificacion />} />
+
+        {/* Ruta /newpass */}
+        <Route path="/newpass" element={<NewPassword />} />
 
         {/* RUTAS PROTEGIDAS */}
         {/* Ruta /gestionar gestor local */}

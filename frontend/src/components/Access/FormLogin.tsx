@@ -9,9 +9,9 @@ import {
   Button,
 } from "@carbon/react";
 // import { useState } from "react";
-import "./../styles/FormLogin.css";
+import "../../styles/Access/FormLogin.css";
 
-import type { LoginCredentials } from "../types/auth.types";
+import type { LoginCredentials } from "../../types/auth.types";
 
 interface FormLoginProps {
   onRegisterClick: () => void;
@@ -22,13 +22,14 @@ const FormLogin: React.FC<FormLoginProps> = ({
   onRegisterClick,
   onLoginClick,
 }) => {
-
   const [loading, setLoading] = useState(false);
 
   const handleLoginClick = async () => {
     setLoading(true);
     try {
       await onLoginClick(formData);
+    } catch (error: any) {
+      console.error("Error en FormLogin.tsx: ", error);
     } finally {
       setLoading(false);
     }
@@ -70,6 +71,7 @@ const FormLogin: React.FC<FormLoginProps> = ({
         <div className="input-email">
           <TextInput
             id="email"
+            type="email"
             labelText="Correo electrónico"
             placeholder="Ej: ebento@ebento.com"
             onChange={handleChange}
@@ -87,17 +89,13 @@ const FormLogin: React.FC<FormLoginProps> = ({
       </FluidForm>
 
       {/* PARTE 2.2: LINK de OLVIDASTE CONTRASEÑA */}
-      <Link className="link-forgot-pass" href="#">
+      <Link className="link-forgot-pass" href="/forgetpass">
         <p>¿Olvidaste tu contraseña?</p>
       </Link>
 
       {/* PARTE 2.3: BOTÓN DE INICIO DE SESIÓN */}
       <div className="btn-login">
-        <Button
-          disabled={loading}
-          onClick={handleLoginClick}
-          kind="primary"
-        >
+        <Button disabled={loading} onClick={handleLoginClick} kind="primary">
           Inicia sesión
         </Button>
       </div>

@@ -1,6 +1,6 @@
-import React from 'react';
-import Sidebar from '../components/Sidebar';
-import '../styles/ReporteProductora.css';
+import React from "react";
+import Sidebar from "../../components/Sidebar";
+import "../../styles/Reportes/ReporteProductora.css";
 
 const ReporteProductora: React.FC = () => {
   return (

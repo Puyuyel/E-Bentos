@@ -1,5 +1,5 @@
 import React from "react";
-import "../styles/AuthLayout.css";
+import "../styles/Access/AuthLayout.css";
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -7,7 +7,11 @@ interface AuthLayoutProps {
   logo: string;
 }
 
-export const AuthLayout: React.FC<AuthLayoutProps> = ({ children, backgroundImage, logo }) => {
+export const AuthLayout: React.FC<AuthLayoutProps> = ({
+  children,
+  backgroundImage,
+  logo,
+}) => {
   return (
     <div className="auth-layout">
       <div
@@ -17,9 +21,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children, backgroundImag
         <img src={logo} alt="Ebentos Icon" />
       </div>
 
-      <div className="auth-right">
-        {children}
-      </div>
+      <div className="auth-right">{children}</div>
     </div>
   );
 };

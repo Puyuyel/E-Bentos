@@ -1,6 +1,6 @@
-import React from 'react';
-import Sidebar from '../components/Sidebar';
-import '../styles/GestionarPuntoDeVenta.css';
+import React from "react";
+import Sidebar from "../../components/Sidebar";
+import "../../styles/Gestion/GestionarPuntoDeVenta.css";
 
 const GestionarPuntoDeVenta: React.FC = () => {
   return (

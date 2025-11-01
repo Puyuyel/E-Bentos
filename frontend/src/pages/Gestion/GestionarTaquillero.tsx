@@ -1,6 +1,6 @@
-import React from 'react';
-import Sidebar from '../components/Sidebar';
-import '../styles/GestionarTaquillero.css';
+import React from "react";
+import Sidebar from "../../components/Sidebar";
+import "../../styles/Gestion/GestionarTaquillero.css";
 
 const GestionarTaquillero: React.FC = () => {
   return (
