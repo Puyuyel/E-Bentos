@@ -9,8 +9,15 @@ import {
   ChartBarIcon,
   LogoutIcon,
 } from "./icons";
+
+import { Callout } from "@carbon/react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Sidebar.css";
+
+import { useState } from "react";
+import { logoutService } from "../services/logoutService";
+
+const LLAMADA_EXITOSA = 200;
 
 interface NavItemProps {
   icon: React.ReactNode;
@@ -50,7 +57,24 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ currentPath = "" }) => {
   const navigate = useNavigate();
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
 
+  const handleCerrarSessionClick = async () => {
+    try {
+      setLoading(true);
+      const llamadaAPI = await logoutService();
+      if (llamadaAPI === LLAMADA_EXITOSA) {
+        setShowSuccess(true);
+        setTimeout(() => {
+          navigate("/login");
+        }, 3000); // 1000 ms = 1 segundo
+      }
+    } catch (error: any) {
+    } finally {
+      setLoading(false);
+    }
+  };
   const handleNavigate = (route?: string) => {
     if (route) navigate(`/admin/${route}`);
   };
@@ -140,9 +164,18 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath = "" }) => {
         <NavItem
           icon={<LogoutIcon />}
           label="Cerrar sesión"
-          onClick={() => navigate("/login")}
+          onClick={handleCerrarSessionClick}
+          disabled={loading}
         />
       </div>
+      {showSuccess && (
+        <Callout
+          kind="success"
+          statusIconDescription="notification"
+          title="¡Session cerrada exitosamente!"
+          subtitle="Redirigiendo ..."
+        />
+      )}
     </aside>
   );
 };

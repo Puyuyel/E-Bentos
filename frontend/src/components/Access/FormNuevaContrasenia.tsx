@@ -52,7 +52,7 @@ const FormNuevaContrasenia: React.FC = () => {
     setLoading(true);
     try {
       const llamadaAPI = await newPassService(email, codigo, contrasenia);
-      if (llamadaAPI) {
+      if (llamadaAPI === 200) {
         setShowSuccess(true);
         console.log("Llamado api satisfactoria?", llamadaAPI);
         // Esperar 2-3 segundos antes de redirigir
@@ -129,6 +129,7 @@ const FormNuevaContrasenia: React.FC = () => {
           kind="success"
           statusIconDescription="notification"
           title="¡Contraseña cambiada exitosamente!"
+          subtitle="Redirigiendo al login ..."
         />
       )}
     </div>

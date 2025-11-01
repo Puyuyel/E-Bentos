@@ -16,7 +16,7 @@ export async function newPassService(
       "Respuesta desde el api de auth/reset-password: ",
       response.data
     );
-    return response.data;
+    return response.status;
   } catch (error: any) {
     throw new Error(
       error.response?.data?.message || "Error al enviar la nueva contrasenha"
