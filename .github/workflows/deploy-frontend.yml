@@ -1,0 +1,49 @@
+name: Deploy Frontend to EC2
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'frontend/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_FRONTEND_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.EC2_FRONTEND_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy Frontend to EC2
+        run: |
+          ssh -i ~/.ssh/id_rsa ubuntu@${{ secrets.EC2_FRONTEND_HOST }} << 'EOF'
+          set -e
+          echo "🚀 Iniciando despliegue del frontend..."
+
+          # Ir al directorio del proyecto
+          cd ~/ebentos/frontend
+
+          # Traer últimos cambios
+          git pull origin main
+
+          # Instalar dependencias (si cambió algo)
+          npm ci --force
+
+          # Construir el proyecto
+          npm run build
+
+          # Asignar permisos (por si acaso)
+          sudo chmod -R 755 dist
+
+          # Reiniciar nginx para aplicar cambios
+          sudo systemctl restart nginx
+
+          echo "✅ Frontend desplegado correctamente."
+          EOF
