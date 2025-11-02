@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import Sidebar from '../../components/Sidebar';
 import FilterBar from '../../components/FilterBar'; 
-import '../styles/Reporte.css';
+import '../../styles/Reportes/Reporte.css';
 
 const ReporteEvento: React.FC = () => {
   const [filters, setFilters] = useState<Record<string, any>>({});

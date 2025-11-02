@@ -5,7 +5,7 @@ import GroupedBar from '../../components/GroupedBar';
 import Donut from '../../components/Donut';
 import Gauge from '../../components/Gauge';
 import FilterBar from '../../components/FilterBar.tsx';
-import '../styles/Reporte.css';
+import '../../styles/Reportes/Reporte.css';
 import type { ChartDatum } from "../../components/types.ts";
 
 const ReporteLocal: React.FC = () => {

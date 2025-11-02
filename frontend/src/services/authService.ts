@@ -6,7 +6,7 @@ import type { LoginCredentials } from "../types/auth.types";
 const apiLog = axios.create({
   baseURL: "/api", // puedes usar variables de entorno import.meta.env.VITE_API_URL ||
   withCredentials: true, // importante, porque el backend usa cookies de sesión
-  headears: {
+  headers: {
     "Content-Type": "application/x-www-form-urlencoded",
   },
 });
