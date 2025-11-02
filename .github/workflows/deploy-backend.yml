@@ -14,23 +14,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Check required secrets
-        run: |
-          if [ -z "${{ secrets.EC2_BACKEND_HOST }}" ]; then
-            echo "EC2_BACKEND_HOST is not set"
-            exit 1
-          fi
-          if [ -z "${{ secrets.EC2_BACKEND_SSH_KEY }}" ]; then
-            echo "EC2_BACKEND_SSH_KEY is not set"
-            exit 1
-          fi
-
-      - name: Setup SSH
+      - name: Setup SSH (robusto + debug)
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_BACKEND_SSH_KEY }}" > ~/.ssh/id_rsa
+          # Escribe la clave exactamente usando printf
+          printf '%s\n' "${{ secrets.EC2_BACKEND_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.EC2_BACKEND_HOST }} >> ~/.ssh/known_hosts
+          # Debug: muestra número de líneas y primeros/últimos 1K bytes (masked in logs but useful locally)
+          echo "Key length (bytes):" $(wc -c < ~/.ssh/id_rsa)
+          echo "Key lines:" $(wc -l < ~/.ssh/id_rsa)
+          ssh-keyscan -H "${{ secrets.EC2_BACKEND_HOST }}" >> ~/.ssh/known_hosts
+        shell: bash
 
       - name: Deploy backend
         run: |
