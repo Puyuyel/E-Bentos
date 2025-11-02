@@ -122,7 +122,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath = "" }) => {
     <aside className="sidebar">
       <div className="logo-container">
         <img
-          src="../../public/images/ebentos-logo-morado.png"
+          src="/images/ebentos-logo-morado.png"
           alt="e-Bentos Logo"
           className="logo"
         />
