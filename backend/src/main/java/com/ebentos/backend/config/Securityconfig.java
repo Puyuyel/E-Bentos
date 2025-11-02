@@ -78,7 +78,7 @@ public class Securityconfig {
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
                         ).permitAll()
-                        .requestMatchers("/api/productoras/**").hasRole("ADMIN")
+                        .requestMatchers("/api/productoras/**", "/api/puntoventas/**").hasRole("ADMIN")
                         .requestMatchers("/api/gestores/**").hasAnyRole("ADMIN","GESTOR_LOCAL","PRODUCTORA")
                         // Protege todas las demás rutas
                         .anyRequest().authenticated())

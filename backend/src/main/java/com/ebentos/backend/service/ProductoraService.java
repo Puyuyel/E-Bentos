@@ -43,6 +43,7 @@ public class ProductoraService {
     
     public Map<String, Object> listarPaginadoPorBuscador(int page, int size, String buscador) {
         Pageable pageable = PageRequest.of(page, size);
+        buscador = "%" + buscador.toLowerCase() + "%";
         Page<Productora> productorasPage = productoraRepository.buscarPorBuscador(buscador, pageable);
 
         // Convertimos la lista de entidades a DTOs

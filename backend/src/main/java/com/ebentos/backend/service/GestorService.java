@@ -73,6 +73,7 @@ public class GestorService {
     public Map<String, Object> listarPaginadoPorBuscadorYRol(int page, int size, 
             String nombreRol, String buscador) {
         Pageable pageable = PageRequest.of(page, size);
+        buscador = "%" + buscador.toLowerCase() + "%";
         Page<Gestor> gestoresPage = gestorRepository.buscarPorBuscadorYRol(nombreRol, buscador, pageable);
 
         // Convertimos la lista de entidades a DTOs
