@@ -31,14 +31,14 @@ public class AuthController {
                             .body("Solo un usuario autenticado puede crear roles distintos a CLIENTE.");
                 }
             } else {
-	        String rolActual = authentication.getAuthorities().iterator().next().getAuthority();
-
+                String rolActual = authentication.getAuthorities().iterator().next().getAuthority();
+    
                 // Validar jerarquía
                 if (!puedeCrear(rolActual, rolSolicitado)) {
                     return ResponseEntity.status(HttpStatus.FORBIDDEN)
                         .body("No tienes permisos para crear usuarios con rol " + rolSolicitado);
                 }
-	    }
+            }
             Usuario usuarioCreado = usuarioService.crearUsuario(registroDTO);
             // Devolvemos 201 Created (no devolvemos la contraseña)
             return ResponseEntity.status(HttpStatus.CREATED).body("Usuario creado con ID: " + usuarioCreado.getUsuarioId());

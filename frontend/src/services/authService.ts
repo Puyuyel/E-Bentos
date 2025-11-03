@@ -7,7 +7,7 @@ const apiBaseUrl = import.meta.env.VITE_API_URL;
 const apiLog = axios.create({
   baseURL: `${apiBaseUrl}/api`, // puedes usar variables de entorno import.meta.env.VITE_API_URL ||
   withCredentials: true, // importante, porque el backend usa cookies de sesión
-  headears: {
+  headers: {
     "Content-Type": "application/x-www-form-urlencoded",
   },
 });
