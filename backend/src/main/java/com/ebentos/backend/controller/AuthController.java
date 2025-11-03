@@ -24,12 +24,20 @@ public class AuthController {
     public ResponseEntity<?> registrarUsuario(@RequestBody RegistroUsuarioDTO registroDTO, Authentication authentication) { // DTO general recibe todos los campos posibles
         try {
             String rolSolicitado = registroDTO.getNombreRol();
-            String rolActual = authentication.getAuthorities().iterator().next().getAuthority();
 
-            // Validar jerarquía
-            if (!puedeCrear(rolActual, rolSolicitado)) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("No tienes permisos para crear usuarios con rol " + rolSolicitado);
+            if (authentication == null) {
+                if (!"CLIENTE".equalsIgnoreCase(rolSolicitado)) {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                            .body("Solo un usuario autenticado puede crear roles distintos a CLIENTE.");
+                }
+            } else {
+                String rolActual = authentication.getAuthorities().iterator().next().getAuthority();
+    
+                // Validar jerarquía
+                if (!puedeCrear(rolActual, rolSolicitado)) {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body("No tienes permisos para crear usuarios con rol " + rolSolicitado);
+                }
             }
             Usuario usuarioCreado = usuarioService.crearUsuario(registroDTO);
             // Devolvemos 201 Created (no devolvemos la contraseña)
