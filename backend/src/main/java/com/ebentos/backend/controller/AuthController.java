@@ -19,7 +19,6 @@ public class AuthController {
     @Autowired
     private UsuarioService usuarioService;
 
-    // Registro nuevo usuario
     @PostMapping("/register")
     public ResponseEntity<?> registrarUsuario(@RequestBody RegistroUsuarioDTO registroDTO, Authentication authentication) { // DTO general recibe todos los campos posibles
         try {

@@ -34,7 +34,7 @@ public class UsuarioController {
                 .collect(Collectors.toList());
 
         // Usamos un DTO para no devolver la contraseña, demas campos
-        UsuarioLogInDTO usuarioDTO = new UsuarioLogInDTO(email, roles);
+        UsuarioLogInDTO usuarioDTO = new UsuarioLogInDTO(email, roles.get(0));
 
         return ResponseEntity.ok(usuarioDTO);
     }

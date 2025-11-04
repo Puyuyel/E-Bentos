@@ -86,16 +86,9 @@ public class LocalService {
         local.setNombre(localDTO.getNombre());
         local.setDireccion(localDTO.getDireccion());
         local.setFoto(localDTO.getFoto());
-        local.setDniPropietario(localDTO.getDniPropietario());
-        local.setNombreCompletoPropietario(localDTO.getNombreCompletoPropietario());
-        local.setDniResponsable(localDTO.getDniResponsable());
-        local.setNombreCompletoResponsable(localDTO.getNombreCompletoResponsable());
-        local.setTelefonoContacto1(localDTO.getTelefonoContacto1());
-        local.setTelefonoContacto2(localDTO.getTelefonoContacto2());
-        local.setCorreoContacto(localDTO.getCorreoContacto());
         local.setAforo(localDTO.getAforo());
         local.setTipoLocal(localDTO.getTipoLocal());
-        local.setEstado(localDTO.getEstado());
+        local.setActivo(1);
 
         // Asociar Gestor (solo con el ID)
         if (localDTO.getGestor() != null && localDTO.getGestor().getUsuarioId() != null) {
@@ -149,44 +142,12 @@ public class LocalService {
             localExistente.setFoto(localActualizaDTO.getFoto());
         }
 
-        if (!Objects.equals(localActualizaDTO.getDniPropietario(), localExistente.getDniPropietario())) {
-            localExistente.setDniPropietario(localActualizaDTO.getDniPropietario());
-        }
-
-        if (!Objects.equals(localActualizaDTO.getNombreCompletoPropietario(), localExistente.getNombreCompletoPropietario())) {
-            localExistente.setNombreCompletoPropietario(localActualizaDTO.getNombreCompletoPropietario());
-        }
-
-        if (!Objects.equals(localActualizaDTO.getDniResponsable(), localExistente.getDniResponsable())) {
-            localExistente.setDniResponsable(localActualizaDTO.getDniResponsable());
-        }
-
-        if (!Objects.equals(localActualizaDTO.getNombreCompletoResponsable(), localExistente.getNombreCompletoResponsable())) {
-            localExistente.setNombreCompletoResponsable(localActualizaDTO.getNombreCompletoResponsable());
-        }
-
-        if (!Objects.equals(localActualizaDTO.getTelefonoContacto1(), localExistente.getTelefonoContacto1())) {
-            localExistente.setTelefonoContacto1(localActualizaDTO.getTelefonoContacto1());
-        }
-
-        if (!Objects.equals(localActualizaDTO.getTelefonoContacto2(), localExistente.getTelefonoContacto2())) {
-            localExistente.setTelefonoContacto2(localActualizaDTO.getTelefonoContacto2());
-        }
-
-        if (!Objects.equals(localActualizaDTO.getCorreoContacto(), localExistente.getCorreoContacto())) {
-            localExistente.setCorreoContacto(localActualizaDTO.getCorreoContacto());
-        }
-
         if (!Objects.equals(localActualizaDTO.getAforo(), localExistente.getAforo())) {
             localExistente.setAforo(localActualizaDTO.getAforo());
         }
 
         if (!Objects.equals(localActualizaDTO.getTipoLocal(), localExistente.getTipoLocal())) {
             localExistente.setTipoLocal(localActualizaDTO.getTipoLocal());
-        }
-
-        if (!Objects.equals(localActualizaDTO.getEstado(), localExistente.getEstado())) {
-            localExistente.setEstado(localActualizaDTO.getEstado());
         }
         
         if (!Objects.equals(localActualizaDTO.getDistrito(), localExistente.getDistrito())) {
@@ -212,16 +173,8 @@ public class LocalService {
         localDTO.setNombre(local.getNombre());
         localDTO.setDireccion(local.getDireccion());
         localDTO.setFoto(local.getFoto());
-        localDTO.setDniPropietario(local.getDniPropietario());
-        localDTO.setNombreCompletoPropietario(local.getNombreCompletoPropietario());
-        localDTO.setDniResponsable(local.getDniResponsable());
-        localDTO.setNombreCompletoResponsable(local.getNombreCompletoResponsable());
-        localDTO.setTelefonoContacto1(local.getTelefonoContacto1());
-        localDTO.setTelefonoContacto2(local.getTelefonoContacto2());
-        localDTO.setCorreoContacto(local.getCorreoContacto());
         localDTO.setAforo(local.getAforo());
         localDTO.setTipoLocal(local.getTipoLocal());
-        localDTO.setEstado(local.getEstado());
 
         // Gestor
         if (local.getGestor() != null) {
@@ -248,16 +201,8 @@ public class LocalService {
         localdto.setNombre(local.getNombre());
         localdto.setDireccion(local.getDireccion());
         localdto.setFoto(local.getFoto());
-        localdto.setDniPropietario(local.getDniPropietario());
-        localdto.setNombreCompletoPropietario(local.getNombreCompletoPropietario());
-        localdto.setDniResponsable(local.getDniResponsable());
-        localdto.setNombreCompletoResponsable(local.getNombreCompletoResponsable());
-        localdto.setTelefonoContacto1(local.getTelefonoContacto1());
-        localdto.setTelefonoContacto2(local.getTelefonoContacto2());
-        localdto.setCorreoContacto(local.getCorreoContacto());
         localdto.setAforo(local.getAforo());
         localdto.setTipoLocal(local.getTipoLocal());
-        localdto.setEstado(local.getEstado());
         if (local.getGestor() != null) {
             GestorSimpleDTO gestorDTO = new GestorSimpleDTO();
             gestorDTO.setUsuarioId(local.getGestor().getUsuarioId());
