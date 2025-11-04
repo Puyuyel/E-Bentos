@@ -1,6 +1,4 @@
 package com.ebentos.backend.dto;
-
-import com.ebentos.backend.model.Usuario;
 import lombok.*;
 
 @Getter
@@ -10,7 +8,9 @@ import lombok.*;
 @ToString
 public class RegistroProductoraDTO {
 
-    private Usuario usuario;
+    private String telefono;
+    private String email;
+    private String contrasenha;
     private String ruc;
     private String razonSocial;
     private String nombreComercial;
