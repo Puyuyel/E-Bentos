@@ -1,0 +1,27 @@
+package com.ebentos.backend.dto;
+
+import com.ebentos.backend.model.CategoriaEvento;
+import com.ebentos.backend.model.EstadoEvento;
+import java.time.LocalDateTime;
+import lombok.*;
+
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+public class EventoDTO {
+    
+    private Integer eventoId;
+    private LocalSimpleDTO local;
+    private GestorSimpleDTO gestor;
+    private CategoriaEvento categoriaEvento;
+    private String nombre;
+    private String descripcion;
+    private String poster;
+    private LocalDateTime fechaHorarioInicio;
+    private Integer duracionEstimada; // En horas
+    private Double costoTotal;
+    private Integer visitas;
+    private EstadoEvento estado;
+}
