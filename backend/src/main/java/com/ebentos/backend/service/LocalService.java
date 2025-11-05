@@ -208,7 +208,8 @@ public class LocalService {
 
         //  Mapear el Local al DTO principal (LocalDTO)
         LocalDTO localDTO = new LocalDTO();
-
+        
+        localDTO.setLocalId(local.getLocalId());
         localDTO.setNombre(local.getNombre());
         localDTO.setDireccion(local.getDireccion());
         localDTO.setFoto(local.getFoto());
