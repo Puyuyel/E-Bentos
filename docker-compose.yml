@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     container_name: ebentos-backend
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://98.90.237.200:3306/ebentos
+      SPRING_DATASOURCE_URL: jdbc:mysql://98.87.133.46:3306/ebentos
       SPRING_DATASOURCE_USERNAME: ebentos
       SPRING_DATASOURCE_PASSWORD: losdibujitos
       SPRING_DEVTOOLS_RESTART_ENABLED: "true"
