@@ -169,7 +169,8 @@ public class LocalService {
 
         //  Mapear el Local al DTO principal (LocalDTO)
         LocalDTO localDTO = new LocalDTO();
-
+        
+        localDTO.setLocalId(local.getLocalId());
         localDTO.setNombre(local.getNombre());
         localDTO.setDireccion(local.getDireccion());
         localDTO.setFoto(local.getFoto());
@@ -203,6 +204,7 @@ public class LocalService {
         localdto.setFoto(local.getFoto());
         localdto.setAforo(local.getAforo());
         localdto.setTipoLocal(local.getTipoLocal());
+        localdto.setActivo(local.getActivo());
         if (local.getGestor() != null) {
             GestorSimpleDTO gestorDTO = new GestorSimpleDTO();
             gestorDTO.setUsuarioId(local.getGestor().getUsuarioId());
