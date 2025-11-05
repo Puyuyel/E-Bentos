@@ -1,0 +1,36 @@
+name: Deploy Backend to EC2
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup SSH (robusto + debug)
+        run: |
+          mkdir -p ~/.ssh
+          # Escribe la clave exactamente usando printf
+          printf '%s\n' "${{ secrets.EC2_BACKEND_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          # Debug: muestra número de líneas y primeros/últimos 1K bytes (masked in logs but useful locally)
+          echo "Key length (bytes):" $(wc -c < ~/.ssh/id_rsa)
+          echo "Key lines:" $(wc -l < ~/.ssh/id_rsa)
+          ssh-keyscan -H "${{ secrets.EC2_BACKEND_HOST }}" >> ~/.ssh/known_hosts
+        shell: bash
+
+      - name: Deploy backend
+        run: |
+          ssh -i ~/.ssh/id_rsa ubuntu@${{ secrets.EC2_BACKEND_HOST }} << 'EOF'
+          cd ~/ebentos/backend
+          git pull origin main
+          docker compose down
+          docker compose up -d --build
+          EOF

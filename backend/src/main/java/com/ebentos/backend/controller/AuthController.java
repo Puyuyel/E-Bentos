@@ -19,21 +19,19 @@ public class AuthController {
     @Autowired
     private UsuarioService usuarioService;
 
-    // Registro nuevo usuario
     @PostMapping("/register")
     public ResponseEntity<?> registrarUsuario(@RequestBody RegistroUsuarioDTO registroDTO, Authentication authentication) { // DTO general recibe todos los campos posibles
         try {
             String rolSolicitado = registroDTO.getNombreRol();
-            // Caso 1: registro sin autenticación -> solo CLIENTE
+
             if (authentication == null) {
                 if (!"CLIENTE".equalsIgnoreCase(rolSolicitado)) {
                     return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body("Solo se pueden crear cuentas de CLIENTE sin autenticación");
+                            .body("Solo un usuario autenticado puede crear roles distintos a CLIENTE.");
                 }
             } else {
-                // Caso 2: usuario autenticado
                 String rolActual = authentication.getAuthorities().iterator().next().getAuthority();
-
+    
                 // Validar jerarquía
                 if (!puedeCrear(rolActual, rolSolicitado)) {
                     return ResponseEntity.status(HttpStatus.FORBIDDEN)
@@ -81,11 +79,13 @@ public class AuthController {
     }
     
     private boolean puedeCrear(String rolActual, String rolNuevo) {
-    return switch (rolActual) {
-        case "ROLE_ADMIN" -> List.of("PRODUCTORA", "GESTOR_LOCAL", "TAQUILLERO").contains(rolNuevo);
-        case "ROLE_PRODUCTORA" -> List.of("ORGANIZADOR_EVENTOS").contains(rolNuevo);
-        case "ROLE_GESTOR_LOCAL" -> List.of("DUENHO_LOCAL").contains(rolNuevo);
-        default -> false;
+        if(rolNuevo.equals("CLIENTE"))
+            return true;
+        return switch (rolActual) {
+            case "ROLE_ADMIN" -> List.of("PRODUCTORA", "GESTOR_LOCAL", "TAQUILLERO").contains(rolNuevo);
+            case "ROLE_PRODUCTORA" -> List.of("ORGANIZADOR_EVENTOS").contains(rolNuevo);
+            case "ROLE_GESTOR_LOCAL" -> List.of("DUENHO_LOCAL").contains(rolNuevo);   
+            default -> false;
     };
 }
 

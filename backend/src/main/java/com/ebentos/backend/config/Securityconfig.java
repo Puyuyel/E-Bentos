@@ -74,11 +74,12 @@ public class Securityconfig {
                         // Permite el registro y el login públicamente
                         .requestMatchers(
                                 "/api/auth/**",
+                                "/api/clientes/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
                         ).permitAll()
-                        .requestMatchers("/api/productoras/**").hasRole("ADMIN")
+                        .requestMatchers("/api/productoras/**", "/api/puntoventas/**").hasRole("ADMIN")
                         .requestMatchers("/api/gestores/**").hasAnyRole("ADMIN","GESTOR_LOCAL","PRODUCTORA")
                         // Protege todas las demás rutas
                         .anyRequest().authenticated())
@@ -103,6 +104,11 @@ public class Securityconfig {
                         // Handler para ÉXITO de login (devuelve 200 OK)
                         .successHandler((request, response, authentication) -> {
                             response.setStatus(HttpServletResponse.SC_OK);
+                            String sessionId = request.getSession().getId();
+                            response.setHeader(
+                                "Set-Cookie",
+                                "JSESSIONID=" + sessionId + "; Path=/; Secure; HttpOnly; SameSite=None"
+                            );
                         })
                         .failureHandler((request, response, exception) -> {
                             // ¡Añade esta línea para imprimir el error en tu consola de Spring!
