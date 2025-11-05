@@ -2,6 +2,7 @@ package com.ebentos.backend.controller;
 
 import com.ebentos.backend.dto.EventoActualizaDTO;
 import com.ebentos.backend.dto.EventoDTO;
+import com.ebentos.backend.dto.RegistroEventoDTO;
 import com.ebentos.backend.service.EventoService;
 import java.util.List;
 import java.util.Map;
@@ -60,8 +61,8 @@ public class EventoController {
     }
 
     @PostMapping
-    public EventoDTO insertar(@RequestBody EventoDTO eventoDTO) {
-        return eventoService.insertar(eventoDTO);
+    public EventoDTO insertar(@RequestBody RegistroEventoDTO regsitroEventoDTO) {
+        return eventoService.insertar(regsitroEventoDTO);
     }
 
     @PutMapping("/{id}")

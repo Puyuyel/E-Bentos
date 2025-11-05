@@ -4,6 +4,7 @@ import com.ebentos.backend.dto.EventoActualizaDTO;
 import com.ebentos.backend.dto.EventoDTO;
 import com.ebentos.backend.dto.GestorSimpleDTO;
 import com.ebentos.backend.dto.LocalSimpleDTO;
+import com.ebentos.backend.dto.RegistroEventoDTO;
 import com.ebentos.backend.model.CategoriaEvento;
 import com.ebentos.backend.model.EstadoEvento;
 import com.ebentos.backend.model.Evento;
@@ -73,34 +74,34 @@ public class EventoService {
                 .collect(Collectors.toList());
     }
     
-    public EventoDTO insertar(EventoDTO eventoDTO) {
+    public EventoDTO insertar(RegistroEventoDTO registroEventoDTO) {
         Evento evento = new Evento();
         // Campos simples
-        evento.setNombre(eventoDTO.getNombre());
-        evento.setDescripcion(eventoDTO.getDescripcion());
-        evento.setPoster(eventoDTO.getPoster());
-        evento.setFechaHorarioInicio(eventoDTO.getFechaHorarioInicio());
-        evento.setDuracionEstimada(eventoDTO.getDuracionEstimada());
-        evento.setCostoTotal(eventoDTO.getCostoTotal());
-        evento.setVisitas(eventoDTO.getVisitas());
+        evento.setNombre(registroEventoDTO.getNombre());
+        evento.setDescripcion(registroEventoDTO.getDescripcion());
+        evento.setPoster(registroEventoDTO.getPoster());
+        evento.setFechaHorarioInicio(registroEventoDTO.getFechaHorarioInicio());
+        evento.setDuracionEstimada(registroEventoDTO.getDuracionEstimada());
+        evento.setCostoTotal(registroEventoDTO.getCostoTotal());
+        evento.setVisitas(0);
         evento.setEstado(EstadoEvento.PENDIENTE);
         
         // Asociaciones (solo por ID)
-        if (eventoDTO.getLocal() != null && eventoDTO.getLocal().getLocalId() != null) {
+        if (registroEventoDTO.getLocal() != null && registroEventoDTO.getLocal().getLocalId() != null) {
             Local local = new Local();
-            local.setLocalId(eventoDTO.getLocal().getLocalId());
+            local.setLocalId(registroEventoDTO.getLocal().getLocalId());
             evento.setLocal(local);
         }
 
-        if (eventoDTO.getGestor() != null && eventoDTO.getGestor().getUsuarioId() != null) {
+        if (registroEventoDTO.getGestor() != null && registroEventoDTO.getGestor().getUsuarioId() != null) {
             Gestor gestor = new Gestor();
-            gestor.setUsuarioId(eventoDTO.getGestor().getUsuarioId());
+            gestor.setUsuarioId(registroEventoDTO.getGestor().getUsuarioId());
             evento.setGestor(gestor);
         }
 
-        if (eventoDTO.getCategoriaEvento() != null && eventoDTO.getCategoriaEvento().getCategoriaEventoId() != null) {
+        if (registroEventoDTO.getCategoriaEvento() != null && registroEventoDTO.getCategoriaEvento().getCategoriaEventoId() != null) {
             CategoriaEvento categoria = new CategoriaEvento();
-            categoria.setCategoriaEventoId(eventoDTO.getCategoriaEvento().getCategoriaEventoId());
+            categoria.setCategoriaEventoId(registroEventoDTO.getCategoriaEvento().getCategoriaEventoId());
             evento.setCategoriaEvento(categoria);
         }
 
@@ -147,9 +148,6 @@ public class EventoService {
         if (!Objects.equals(eventoActualizaDTO.getLocal(), eventoExistente.getLocal())){
             eventoExistente.setLocal(eventoActualizaDTO.getLocal());
         }
-        if (!Objects.equals(eventoActualizaDTO.getGestor(), eventoExistente.getGestor())){
-            eventoExistente.setGestor(eventoActualizaDTO.getGestor());
-        }
         if (!Objects.equals(eventoActualizaDTO.getCategoriaEvento(), eventoExistente.getCategoriaEvento())){
             eventoExistente.setCategoriaEvento(eventoActualizaDTO.getCategoriaEvento());
         }
@@ -175,6 +173,7 @@ public class EventoService {
         if (evento.getLocal() != null) {
             LocalSimpleDTO localDTO = new LocalSimpleDTO();
             localDTO.setLocalId(evento.getLocal().getLocalId());
+            localDTO.setAforo(evento.getLocal().getAforo());
             eventoDTO.setLocal(localDTO);
         }
 

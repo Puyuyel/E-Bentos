@@ -204,6 +204,7 @@ public class LocalService {
         localdto.setFoto(local.getFoto());
         localdto.setAforo(local.getAforo());
         localdto.setTipoLocal(local.getTipoLocal());
+        localdto.setActivo(local.getActivo());
         if (local.getGestor() != null) {
             GestorSimpleDTO gestorDTO = new GestorSimpleDTO();
             gestorDTO.setUsuarioId(local.getGestor().getUsuarioId());

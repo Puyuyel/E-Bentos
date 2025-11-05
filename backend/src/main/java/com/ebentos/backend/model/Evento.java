@@ -26,7 +26,7 @@ public class Evento {
     @JoinColumn(name = "GESTOR_USUARIO_ID", nullable = false)
     private Gestor gestor;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "CATEGORIA_EVENTO_ID", nullable = false)
     private CategoriaEvento categoriaEvento;
 

@@ -183,6 +183,8 @@ public class GestorService {
         if(gestor.getPuntoVenta()!=null){
             PuntoVentaDTO puntoVenta = new PuntoVentaDTO();
             puntoVenta.setPuntoVentaId(gestor.getPuntoVenta().getPuntoventaId());
+            puntoVenta.setNombre(gestor.getPuntoVenta().getNombre());
+            puntoVenta.setDireccion(gestor.getPuntoVenta().getDireccion());
             gestorDTO.setPuntoVenta(puntoVenta);
         }
         
