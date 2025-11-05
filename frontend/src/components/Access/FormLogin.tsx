@@ -48,6 +48,13 @@ const FormLogin: React.FC<FormLoginProps> = ({
     }));
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && !loading) {
+      console.log(" HOLA desde el ENTER ");
+      // handleLoginClick();
+    }
+  };
+
   return (
     <div className="form-login-container">
       {/* PARTE 1: No tienes cuenta - Registrate  */}
@@ -75,6 +82,7 @@ const FormLogin: React.FC<FormLoginProps> = ({
             labelText="Correo electrónico"
             placeholder="Ej: ebento@ebento.com"
             onChange={handleChange}
+            onKeyDown={handleKeyDown}
           />
         </div>
 
@@ -85,6 +93,7 @@ const FormLogin: React.FC<FormLoginProps> = ({
           type="password"
           placeholder="Ingrese su contraseña"
           onChange={handleChange}
+          onKeyDown={handleKeyDown}
         />
       </FluidForm>
 
