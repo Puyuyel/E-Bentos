@@ -2,15 +2,17 @@ package com.ebentos.backend.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 @Getter
 @Setter
-@Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-@Where(clause = "estado IN ('ACTIVO', 'PENDIENTE')")
+@SQLDelete(sql = "UPDATE usuario SET activo = 0 WHERE usuario_id = ?")
+@Where(clause = "activo = 1")
+@Entity
 @Table(name = "LOCAL")
 public class Local {
 
@@ -38,27 +40,6 @@ public class Local {
     @Column(name = "FOTO", length = 30, nullable = false)
     private String foto;
 
-    @Column(name = "DNI_PROPIETARIO", length = 8, nullable = false)
-    private String dniPropietario;
-
-    @Column(name = "NOMBRE_COMPLETO_PROPIETARIO", length = 100, nullable = false)
-    private String nombreCompletoPropietario;
-
-    @Column(name = "DNI_RESPONSABLE", length = 8, nullable = false)
-    private String dniResponsable;
-
-    @Column(name = "NOMBRE_COMPLETO_RESPONSABLE", length = 100, nullable = false)
-    private String nombreCompletoResponsable;
-
-    @Column(name = "TELEFONO_CONTACTO1", length = 9, nullable = false)
-    private String telefonoContacto1;
-
-    @Column(name = "TELEFONO_CONTACTO2", length = 9)
-    private String telefonoContacto2;
-
-    @Column(name = "CORREO_CONTACTO", length = 45, nullable = false)
-    private String correoContacto;
-
     @Column(name = "AFORO", nullable = false)
     private Integer aforo;
 
@@ -66,7 +47,6 @@ public class Local {
     @Column(name = "TIPO_LOCAL", nullable = false)
     private TipoLocal tipoLocal;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "ESTADO", nullable = false)
-    private EstadoLocal estado;
+    @Column(name = "ACTIVO", nullable = false, columnDefinition = "TINYINT")
+    private Integer activo;
 }

@@ -74,6 +74,7 @@ public class Securityconfig {
                         // Permite el registro y el login públicamente
                         .requestMatchers(
                                 "/api/auth/**",
+                                "/api/clientes/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"

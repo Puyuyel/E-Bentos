@@ -1,13 +1,6 @@
 package com.ebentos.backend.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
@@ -18,10 +11,10 @@ import org.hibernate.annotations.Where;
 @NoArgsConstructor
 @ToString
 @Builder
-@Entity
-@Table(name = "PUNTOVENTA")
 @SQLDelete(sql = "UPDATE puntoventa SET activo = 0 WHERE puntoventa_id = ?")
 @Where(clause = "activo = 1")
+@Entity
+@Table(name = "PUNTOVENTA")
 public class PuntoVenta {
     
     @Id
