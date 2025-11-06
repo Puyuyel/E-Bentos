@@ -2,6 +2,8 @@ package com.ebentos.backend.model;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @Getter
 @Setter
@@ -9,6 +11,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@SQLDelete(sql = "UPDATE EVENTO SET ESTADO = 'CANCELADO' WHERE EVENTO_ID = ?")
+@Where(clause = "ESTADO IN ('PENDIENTE', 'ACTIVO', 'SOLICITUD_RECHAZADA')")
 @Table(name = "EVENTO")
 public class Evento {
     

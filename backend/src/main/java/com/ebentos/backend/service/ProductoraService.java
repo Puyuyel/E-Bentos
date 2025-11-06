@@ -5,7 +5,6 @@ import com.ebentos.backend.dto.ProductoraDTO;
 import com.ebentos.backend.dto.RegistroProductoraDTO;
 import com.ebentos.backend.model.Productora;
 import com.ebentos.backend.model.Rol;
-import com.ebentos.backend.model.Usuario;
 import com.ebentos.backend.repository.ProductoraRepository;
 import com.ebentos.backend.repository.RolRepository;
 import com.ebentos.backend.repository.UsuarioRepository;
@@ -21,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.springframework.security.authentication.BadCredentialsException;
 
 @Service
 public class ProductoraService {
@@ -169,24 +169,7 @@ public class ProductoraService {
         Productora productoraActualizada = productoraRepository.save(productoraExistente);
 
         //  Mapear y devolver el DTO de respuesta
-        return mapToProductoraDTO(productoraActualizada);
-    }
-
-    private ProductoraDTO mapToProductoraDTO(Productora productora) {
-
-        //  Mapear la Productora al DTO principal (ProductoraDTO)
-        ProductoraDTO productoraDTO = new ProductoraDTO();
-
-        // Mapeamos los campos directos de Productora (asumiendo que estos existen
-        // en la entidad Productora además de los que heredó de Usuario)
-        productoraDTO.setRuc(productora.getRuc());
-        productoraDTO.setRazonSocial(productora.getRazonSocial());
-        productoraDTO.setNombreComercial(productora.getNombreComercial());
-        productoraDTO.setUsuarioId(productora.getUsuarioId());
-        productoraDTO.setTelefono(productora.getTelefono());
-        productoraDTO.setEmail(productora.getEmail());
-
-        return productoraDTO;
+        return llenarDTO(productoraActualizada);
     }
     
     public void eliminar(Integer id){
