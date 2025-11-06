@@ -2,6 +2,7 @@ package com.ebentos.backend.controller;
 
 import com.ebentos.backend.dto.LocalActualizaDTO;
 import com.ebentos.backend.dto.LocalDTO;
+import com.ebentos.backend.dto.RegistroLocalDTO;
 import com.ebentos.backend.service.LocalService;
 import java.util.List;
 import java.util.Map;
@@ -32,12 +33,13 @@ public class LocalController {
         return localService.listarTodas();
     }
     
-    @GetMapping("/paginado")
-    public Map<String, Object> listarPaginado(
+    @GetMapping("/paginadoPorBuscador")
+    public Map<String, Object> listarPaginadoPorBuscador(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int limit) {
+            @RequestParam(defaultValue = "10") int limit,
+            @RequestParam String buscador) {
 
-        Map<String, Object> response = localService.listarPaginado(page, limit);
+        Map<String, Object> response = localService.listarPaginadoPorBuscador(page, limit, buscador);
 
         // 🔹 Construir URLs completas usando el dominio actual
         Map<String, Object> pagination = (Map<String, Object>) response.get("pagination");
@@ -60,8 +62,8 @@ public class LocalController {
     }
 
     @PostMapping
-    public LocalDTO insertar(@RequestBody LocalDTO localDTO) {
-        return localService.insertar(localDTO);
+    public LocalDTO insertar(@RequestBody RegistroLocalDTO registroLocalDTO) {
+        return localService.insertar(registroLocalDTO);
     }
 
     @PutMapping("/{id}")
