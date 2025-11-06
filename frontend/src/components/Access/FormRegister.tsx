@@ -41,6 +41,7 @@ const FormRegister: React.FC<FormRegisterProps> = ({
 }) => {
   const navigate = useNavigate();
   const [showSuccess, setShowSuccess] = useState(false);
+  const [showError, setShowError] = useState(false);
 
   const [loading, setLoading] = useState(false);
 
@@ -202,29 +203,36 @@ const FormRegister: React.FC<FormRegisterProps> = ({
     setLoading(true);
     try {
       if (
-        isInvalidApeMat ||
-        isInvalidApePat ||
-        isInvalidContrasenha ||
-        isInvalidDNI ||
-        isInvalidEmail ||
-        isInvalidFechaNac ||
-        isInvalidGen ||
-        isInvalidNombres
+        isInvalidApeMat == 0 ||
+        isInvalidApePat == 0 ||
+        isInvalidContrasenha == 0 ||
+        isInvalidDNI == 0 ||
+        isInvalidEmail == 0 ||
+        isInvalidFechaNac == 0 ||
+        isInvalidGen == 0 ||
+        isInvalidNombres == 0
       ) {
-        alert("Inserte los datos o arregle los errores antes de registrarse.");
+        setShowError(true);
         return;
       }
       const respuesta = await onRegisterClick(formData);
       if (respuesta >= 200) {
         setShowSuccess(true);
         setTimeout(() => {
-          navigate("/login");
+          navigate("/login"); // Aquí, tengo que navegar hacia la página principal del cliente
         }, 2000); // 2000 ms = 2 segundos
       }
     } catch (error: any) {
       console.error("Error en FormRegister.tsx: ", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && !loading) {
+      e.preventDefault();
+      handleRegistrar();
     }
   };
 
@@ -266,6 +274,7 @@ const FormRegister: React.FC<FormRegisterProps> = ({
             placeholder="Ej: ebento@ebento.com"
             onChange={handleChange}
             invalid={isInvalidEmail}
+            onKeyDown={handleKeyDown}
             invalidText="El correo ingresado no es válido."
           />
         </div>
@@ -279,6 +288,7 @@ const FormRegister: React.FC<FormRegisterProps> = ({
             onChange={handleChange}
             invalid={isInvalidContrasenha}
             invalidText="La contraseña ingresada es inválida."
+            onKeyDown={handleKeyDown}
           />
         </div>
 
@@ -319,6 +329,7 @@ const FormRegister: React.FC<FormRegisterProps> = ({
             onChange={handleChange}
             invalid={isInvalidNombres}
             invalidText="El nombre proporcionado no es válido."
+            onKeyDown={handleKeyDown}
           />
         </div>
 
@@ -352,6 +363,7 @@ const FormRegister: React.FC<FormRegisterProps> = ({
             onChange={handleChange}
             invalid={isInvalidDNI}
             invalidText="DNI inválido"
+            onKeyDown={handleKeyDown}
           />
           <div>
             <p className="fecha-p">Fecha de nacimiento</p>
@@ -361,7 +373,11 @@ const FormRegister: React.FC<FormRegisterProps> = ({
               invalid={isInvalidFechaNac}
               invalidText="La fecha ingresada no es válida."
             >
-              <DatePickerInput id="fechaNacimiento" placeholder="mm/dd/aaaa" />
+              <DatePickerInput
+                onKeyDown={handleKeyDown}
+                id="fechaNacimiento"
+                placeholder="mm/dd/aaaa"
+              />
             </DatePicker>
           </div>
         </div>
@@ -376,6 +392,7 @@ const FormRegister: React.FC<FormRegisterProps> = ({
             onChange={handleChange}
             invalid={isInvalidTelf}
             invalidText="Teléfono inválido"
+            onKeyDown={handleKeyDown}
           />
           <div className="gen-p-ddl">
             <p className="genero-p">Género</p>
@@ -401,6 +418,14 @@ const FormRegister: React.FC<FormRegisterProps> = ({
 
         <p className="label-mandatory">Todos los campos son obligatorios</p>
       </FluidForm>
+
+      {showError && (
+        <Callout
+          kind="error"
+          statusIconDescription="notification"
+          title="¡Complete todos los campos para registrarse!"
+        />
+      )}
 
       {/* PARTE 2.2: BOTÓN DE REGISTRAR USUARIO */}
       <div className="btn-register">

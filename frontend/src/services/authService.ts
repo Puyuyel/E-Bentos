@@ -4,7 +4,7 @@ import api from "../services/apiBase";
 import type { LoginCredentials } from "../types/auth.types";
 const apiBaseUrl = import.meta.env.VITE_API_URL;
 
-const apiLog = axios.create({
+export const apiLog = axios.create({
   baseURL: `${apiBaseUrl}/api`, // puedes usar variables de entorno import.meta.env.VITE_API_URL ||
   withCredentials: true, // importante, porque el backend usa cookies de sesión
   headers: {

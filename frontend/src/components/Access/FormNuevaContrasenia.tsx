@@ -17,10 +17,24 @@ import { newPassService } from "../../services/newPassService";
 
 import { useResetPassStore } from "../../store/useResetPassStore";
 
+const TIPOS_NOTIFICACION = {
+  EXITO: "success",
+  ERROR: "error",
+};
+
+const MENSAJE_NOTIFICACION = {
+  EXITO:
+    "¡Contrasenha cambiada correctamente! Redirigiendo al Inicio de Sesión ... ",
+  ERROR: "¡Hubo un error en el sistema, por favor, inténtelo de nuevo!",
+};
+
 const FormNuevaContrasenia: React.FC = () => {
   const navigate = useNavigate();
   const { codigo, email } = useResetPassStore();
-  const [showSuccess, setShowSuccess] = useState(false);
+  const [showCallout, setShowCallout] = useState(false);
+  const [typeNotify, setTypeNotify] = useState(TIPOS_NOTIFICACION.ERROR);
+  const [titleNotify, setTitleNotify] = useState(MENSAJE_NOTIFICACION.ERROR);
+
   const [loading, setLoading] = useState(false);
   const [contrasenia, setContrasenia] = useState("");
   const [isInvalid, setIsInvalid] = useState(false);
@@ -48,27 +62,39 @@ const FormNuevaContrasenia: React.FC = () => {
     setContrasenia(contrasenia);
   };
 
-  const handleClick = async () => {
+  const handleNewPass = async () => {
+    setShowCallout(false);
     setLoading(true);
+    let success = false;
     try {
-      const llamadaAPI = await newPassService(email, codigo, contrasenia);
-      if (llamadaAPI === 200) {
-        setShowSuccess(true);
-        console.log("Llamado api satisfactoria?", llamadaAPI);
-        // Esperar 2-3 segundos antes de redirigir
-        setTimeout(() => {
-          navigate("/login");
-        }, 3000);
-      }
+      const respuestaAPI = await newPassService(email, codigo, contrasenia);
+      setShowCallout(true);
+      setTitleNotify(MENSAJE_NOTIFICACION.EXITO);
+      setTypeNotify(TIPOS_NOTIFICACION.EXITO);
+      // Debugeando
+      console.log("Llamado api satisfactoria?", respuestaAPI);
+      // Esperar 2-3 segundos antes de redirigir
+      setTimeout(() => {
+        navigate("/login");
+      }, 3000);
+      success = true;
     } catch (error: any) {
-      console.error("Error al cambiar contraseña:", error);
-    } finally {
-      setLoading(false);
+      setShowCallout(true);
+      setTitleNotify(MENSAJE_NOTIFICACION.ERROR);
+      setTypeNotify(TIPOS_NOTIFICACION.ERROR);
     }
+    if (!success) setLoading(false);
   };
 
   const handleRegister = () => {
     navigate("/register");
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && !loading) {
+      e.preventDefault();
+      handleNewPass();
+    }
   };
 
   return (
@@ -114,22 +140,22 @@ const FormNuevaContrasenia: React.FC = () => {
             labelText="Nueva contraseña:"
             placeholder="Ingrese su nueva contraseña."
             onChange={handleChange}
+            onKeyDown={handleKeyDown}
             invalid={isInvalid}
             invalidText="La contrasenia ingresada no cumple con el estándar de seguridad."
           />
         </div>
       </FluidForm>
 
-      <Button disabled={loading} onClick={handleClick}>
+      <Button disabled={loading || isInvalid} onClick={handleNewPass}>
         Cambiar contraseña
       </Button>
 
-      {showSuccess && (
+      {showCallout && (
         <Callout
-          kind="success"
+          kind={typeNotify}
           statusIconDescription="notification"
-          title="¡Contraseña cambiada exitosamente!"
-          subtitle="Redirigiendo al login ..."
+          title={titleNotify}
         />
       )}
     </div>

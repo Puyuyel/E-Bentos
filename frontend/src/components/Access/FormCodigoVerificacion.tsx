@@ -26,8 +26,10 @@ const FormCodigoVerificacion: React.FC = () => {
 
     if (!regex.test(codigoChange) && codigoChange.length > 0) {
       setIsInvalid(true);
+      setLoading(true); // para que no se pueda utilizar
       return;
     }
+    setLoading(false);
     setIsInvalid(false);
     setCodigo(codigoChange);
   };
@@ -51,6 +53,13 @@ const FormCodigoVerificacion: React.FC = () => {
 
   const handleRegister = () => {
     navigate("/register");
+  };
+
+  const handleKeyDown = (evento: React.KeyboardEvent<HTMLInputElement>) => {
+    if (evento.key == "Enter" && !loading) {
+      evento.preventDefault();
+      handleContinuarClick();
+    }
   };
 
   return (
@@ -81,6 +90,7 @@ const FormCodigoVerificacion: React.FC = () => {
             labelText="Código"
             placeholder="Ej: ABC123"
             onChange={handleChange}
+            onKeyDown={handleKeyDown}
             invalid={isInvalid}
             invalidText="El código ingresado es incorrecto."
           />

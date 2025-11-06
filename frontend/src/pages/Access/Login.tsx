@@ -4,10 +4,11 @@ import LoginBackground from "../../assets/concert-blue.png";
 import { AuthLayout } from "../../layouts/AuthLayout";
 import FormLogin from "../../components/Access/FormLogin";
 import { useNavigate } from "react-router-dom";
-import { login } from "../../services/authService";
 
 import type { LoginCredentials } from "../../types/auth.types";
 import { useAuthStore } from "../../store/useAuthStore";
+
+import { useState } from "react";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -19,14 +20,11 @@ const Login: React.FC = () => {
   const handleLoginClick = async (credentials: LoginCredentials) => {
     try {
       const rol = await login(credentials);
-      console.log(rol);
       switch (rol) {
         case "ADMIN":
-          alert("Administrador logueado ¡¡SATISFACTORIAMENTE!!.");
           navigate("/admin/gestionar-productora");
           break;
         case "CLIENTE":
-          alert("CLIENTE EXITOSAMENTE LOGEADO");
           navigate("/admin/gestionar-productora");
           break;
         case "PRODUCTORA":
@@ -45,7 +43,7 @@ const Login: React.FC = () => {
           navigate("/"); // por defecto
       }
     } catch (error: any) {
-      alert(error.message);
+      throw new Error(error.message + " ... Inténtelo nuevamente. :(");
     }
   };
 

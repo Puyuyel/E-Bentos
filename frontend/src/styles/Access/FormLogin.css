@@ -46,6 +46,10 @@
   color: #111;
 }
 
+.notify-p {
+  color: red;
+}
+
 .fluid-form {
   width: 17.8rem;
 }
