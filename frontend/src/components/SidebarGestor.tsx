@@ -1,21 +1,18 @@
 import React from "react";
 import {
-  DocumentReportIcon,
-  OfficeBuildingIcon,
-  TicketIcon,
-  ShoppingCartIcon,
-  CalendarIcon,
   UsersIcon,
-  ChartBarIcon,
   LogoutIcon,
+  UserCircleIcon,
+  GoalIcon,
 } from "./icons";
 
 import { Callout } from "@carbon/react";
 import { useNavigate } from "react-router-dom";
-import "../styles/Sidebar.css";
+import "../styles/SidebarGestor.css";
 
 import { useState } from "react";
 import { logoutService } from "../services/logoutService";
+import { useAuthStore } from "../store/useAuthStore";
 
 const LLAMADA_EXITOSA = 200;
 
@@ -55,10 +52,15 @@ interface SidebarProps {
   currentPath?: string;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ currentPath = "" }) => {
+const SidebarGestor: React.FC<SidebarProps> = ({ currentPath = "" }) => {
   const navigate = useNavigate();
   const [showSuccess, setShowSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { user } = useAuthStore();
+  const rol = user?.rol.toString().toLowerCase();
+  const rolCapitalized = rol
+    ? rol.charAt(0).toUpperCase() + rol.slice(1)
+    : "Desconocido";
 
   const handleCerrarSessionClick = async () => {
     try {
@@ -75,47 +77,21 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath = "" }) => {
       setLoading(false);
     }
   };
+
   const handleNavigate = (route?: string) => {
-    if (route) navigate(`/admin/${route}`);
+    if (route) navigate(`/${rol}/${route}`);
   };
   const manageItems: NavEntry[] = [
     {
-      icon: <DocumentReportIcon />,
-      label: "Productoras",
-      route: "gestionar-productora",
-    },
-    {
-      icon: <OfficeBuildingIcon />,
-      label: "Gestores de locales",
-      route: "gestionar-gestor-local",
-    },
-    {
-      icon: <TicketIcon />,
-      label: "Taquilleros",
-      route: "gestionar-taquillero",
-    },
-    {
-      icon: <ShoppingCartIcon />,
-      label: "Puntos de venta",
-      route: "gestionar-punto-venta",
-    },
-  ];
-
-  const reportItems: NavEntry[] = [
-    { icon: <CalendarIcon />, label: "Eventos", route: "reporte-evento" },
-    { icon: <OfficeBuildingIcon />, label: "Locales", route: "reporte-local" },
-    { icon: <UsersIcon />, label: "Clientes", route: "reporte-cliente" },
-    {
-      icon: <DocumentReportIcon />,
-      label: "Productoras",
-      route: "reporte-productora",
-    },
-    {
-      icon: <ChartBarIcon />,
+      icon: <UsersIcon />,
       label: "Organizadores",
-      route: "reporte-organizador",
+      route: "gestionar-organizador",
     },
-    { icon: <TicketIcon />, label: "Taquilleros", route: "reporte-taquillero" },
+    {
+      icon: <GoalIcon />,
+      label: "Metas",
+      route: "metas",
+    },
   ];
 
   return (
@@ -131,23 +107,21 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath = "" }) => {
 
       <nav className="sidebar-nav">
         <div>
-          <h3 className="nav-section-title">Gestionar</h3>
-          <div className="nav-group">
-            {manageItems.map((item, index) => (
-              <NavItem
-                key={index}
-                icon={item.icon}
-                label={item.label}
-                active={currentPath === item.route}
-                onClick={() => handleNavigate(item.route)}
-              />
-            ))}
+          <h3 className="nav-section-title">CUENTA</h3>
+          <div className="cuenta-container">
+            <div className="cuenta-content">
+              <UserCircleIcon className="cuenta-avatar" />
+              <div>
+                <p className="cuenta-nombre">José Reyes Chávez</p>
+                <p className="cuenta-rol">{rolCapitalized}</p>
+              </div>
+            </div>
           </div>
         </div>
         <div>
-          <h3 className="nav-section-title">Reportes</h3>
+          <h3 className="nav-section-title">HERRAMIENTAS</h3>
           <div className="nav-group">
-            {reportItems.map((item, index) => (
+            {manageItems.map((item, index) => (
               <NavItem
                 key={index}
                 icon={item.icon}
@@ -165,7 +139,6 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath = "" }) => {
           icon={<LogoutIcon />}
           label="Cerrar sesión"
           onClick={handleCerrarSessionClick}
-          disabled={loading}
         />
       </div>
       {showSuccess && (
@@ -180,4 +153,4 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath = "" }) => {
   );
 };
 
-export default Sidebar;
+export default SidebarGestor;

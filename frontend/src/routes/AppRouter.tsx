@@ -16,6 +16,8 @@ import ReporteProductora from "../pages/Reportes/ReporteProductora";
 import ReporteTaquillero from "../pages/Reportes/ReporteTaquillero";
 
 import { ProtectedRoute } from "./ProtectedRoute"; // importa tu wrapper
+import GestionarOrganizador from "../pages/GestionProductora/GestionarOrganizadores";
+import Metas from "../pages/GestionProductora/Metas";
 
 const AppRouter: React.FC = () => {
   return (
@@ -134,6 +136,26 @@ const AppRouter: React.FC = () => {
           element={
             <ProtectedRoute requiredRole="ADMIN">
               <ReporteTaquillero />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Ruta /gestionar organizador */}
+        <Route
+          path="/productora/gestionar-organizador"
+          element={
+            <ProtectedRoute requiredRole="PRODUCTORA">
+              <GestionarOrganizador />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Ruta /mostrar metas*/}
+        <Route
+          path="/productora/metas"
+          element={
+            <ProtectedRoute requiredRole="PRODUCTORA">
+              <Metas />
             </ProtectedRoute>
           }
         />

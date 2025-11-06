@@ -1,0 +1,40 @@
+/* Títulos (Metas Activas / Metas Pasadas) */
+.goalslist-title {
+  font-size: 1.5rem; /* text-2xl */
+  font-weight: 600; /* font-semibold */
+  color: #374151; /* text-gray-700 */
+  margin-bottom: 1rem; /* mb-4 */
+}
+
+.goalslist-title.mt {
+  margin-top: 2.5rem; /* mt-10 */
+}
+
+/* Contenedor en grid de cards */
+.goalslist-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr)); /* grid-cols-1 */
+  gap: 1.5rem; /* gap-6 */
+}
+
+@media (min-width: 768px) {
+  .goalslist-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)); /* md:grid-cols-2 */
+  }
+}
+
+@media (min-width: 1024px) {
+  .goalslist-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)); /* lg:grid-cols-3 */
+  }
+}
+
+/* Mensaje cuando no hay metas activas */
+.goalslist-empty {
+  text-align: center; /* text-center */
+  padding: 2.5rem 1.5rem; /* py-10 px-6 */
+  background-color: #f9fafb; /* bg-gray-50 */
+  border-radius: 0.5rem; /* rounded-lg */
+  color: #6b7280; /* text-gray-500 */
+  font-size: 0.95rem;
+}

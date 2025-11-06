@@ -5,15 +5,12 @@ import lombok.*;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @ToString
 public class UsuarioLogInDTO {
 
+    private Integer usuarioId;
     private String email;
     private String nombreRol;
-
-    public UsuarioLogInDTO(String email, String nombreRol) {
-        this.email = email;
-        this.nombreRol = nombreRol;
-    }
 
 }

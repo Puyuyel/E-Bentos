@@ -8,16 +8,13 @@ import lombok.*;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class LocalDTO {
 
-    private Integer localId;
+public class RegistroLocalDTO {
     private String nombre;
     private String direccion;
     private String foto;
     private Integer aforo;
     private TipoLocal tipoLocal;
-    private Integer activo;
     private GestorSimpleDTO gestor;
-    private DistritoDTO distrito;
-    
+    private DistritoSimpleDTO distrito;
 }

@@ -11,8 +11,8 @@ import org.hibernate.annotations.Where;
 @NoArgsConstructor
 @ToString
 @Builder
-@SQLDelete(sql = "UPDATE usuario SET activo = 0 WHERE usuario_id = ?")
-@Where(clause = "activo = 1")
+@SQLDelete(sql = "UPDATE USUARIO SET ACTIVO = 0 WHERE USUARIO_ID = ?")
+@Where(clause = "ACTIVO = 1")
 @Entity
 @Table(name = "GESTOR")
 public class Gestor extends Usuario {

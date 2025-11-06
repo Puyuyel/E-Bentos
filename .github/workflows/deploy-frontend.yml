@@ -28,7 +28,7 @@ jobs:
           echo "🚀 Iniciando despliegue del frontend..."
 
           # Ir al directorio del proyecto
-          cd ~/ebentos/frontend
+          cd ~/e-bentos/frontend
 
           # Traer últimos cambios
           git pull origin main

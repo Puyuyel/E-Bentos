@@ -48,23 +48,27 @@ export const OfficeBuildingIcon: React.FC<IconProps> = ({
 }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    className={`icon ${className}`}
+    width="24"
+    height="24"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth={2}
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={`icon ${className}`}
   >
-    <rect
-      x="4"
-      y="3"
-      width="16"
-      height="18"
-      rx="1"
-      ry="1"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <rect x="10" y="15" width="4" height="6" />
+    <rect width="16" height="20" x="4" y="2" rx="2" />
+    <path d="M9 22v-4h6v4" />
+    <path d="M8 6h.01" />
+    <path d="M16 6h.01" />
+    <path d="M12 6h.01" />
+    <path d="M12 10h.01" />
+    <path d="M12 14h.01" />
+    <path d="M16 10h.01" />
+    <path d="M8 10h.01" />
+    <path d="M8 14h.01" />
+    <path d="M16 14h.01" />
   </svg>
 );
 
@@ -126,18 +130,20 @@ export const CalendarIcon: React.FC<IconProps> = ({
 export const UsersIcon: React.FC<IconProps> = ({ className = "icon-md" }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    className={`icon ${className}`}
+    width="24"
+    height="24"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth={2}
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={`icon ${className}`}
   >
-    <circle cx="12" cy="7" r="4" strokeLinecap="round" strokeLinejoin="round" />
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M6 21v-2a6 6 0 0112 0v2"
-    />
+    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+    <circle cx="9" cy="7" r="4" />
+    <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
   </svg>
 );
 
@@ -228,6 +234,77 @@ export const ArrowsExpandIcon: React.FC<IconProps> = ({
       strokeLinecap="round"
       strokeLinejoin="round"
       d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 0h-4m4 0l-5-5"
+    />
+  </svg>
+);
+
+export const UserCircleIcon: React.FC<IconProps> = ({
+  className = "icon-md",
+}) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    className={`icon ${className}`}
+  >
+    <path
+      fillRule="evenodd"
+      d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"
+      clipRule="evenodd"
+    />
+  </svg>
+);
+
+export const GoalIcon: React.FC<React.SVGProps<SVGSVGElement>> = ({
+  className = "icon-md",
+}) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={`icon ${className}`}
+  >
+    <circle cx="12" cy="12" r="10" />
+    <circle cx="12" cy="12" r="6" />
+    <circle cx="12" cy="12" r="2" />
+  </svg>
+);
+
+export const TrashIcon: React.FC<React.SVGProps<SVGSVGElement>> = ({
+  className = "icon-md",
+}) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 20 20"
+    fill="currentColor"
+    className={`icon ${className}`}
+  >
+    <path
+      fillRule="evenodd"
+      d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z"
+      clipRule="evenodd"
+    />
+  </svg>
+);
+
+export const EditIcon: React.FC<React.SVGProps<SVGSVGElement>> = ({
+  className = "icon-md",
+}) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 20 20"
+    fill="currentColor"
+    className={`icon ${className}`}
+  >
+    <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
+    <path
+      fillRule="evenodd"
+      d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
+      clipRule="evenodd"
     />
   </svg>
 );

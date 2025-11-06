@@ -1,0 +1,79 @@
+/* Asegurar que la app ocupe toda la pantalla */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
+/* Contenedor principal con sidebar + main */
+.app-container {
+  display: flex;
+  min-height: 100vh; /* ocupa toda la ventana */
+  box-sizing: border-box;
+}
+
+/* Área principal donde está el título y la lista */
+.app-main {
+  flex: 1;
+  padding: 1.25rem; /* 20px */
+  overflow-y: auto; /* permite scroll vertical cuando hay muchas metas */
+  max-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* Título simple */
+.title {
+  margin: 0 0 1rem 0;
+  font-size: 2rem;
+}
+
+/* Opcional: si quieres que solo la lista haga scroll (header fijo) */
+.goals-wrapper {
+  /* Ajusta el cálculo si tu header ocupa otra altura */
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  padding-right: 0.5rem; /* espacio para evitar que el scrollbar tape contenido */
+  box-sizing: border-box;
+}
+
+/* Header que contiene título y botón */
+.metas-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* Mover el botón un poco hacia la izquierda sin separarlo demasiado del título */
+.metas-header .add-button {
+  margin-right: 12px; /* ajusta este valor si quieres moverlo más/menos */
+}
+
+/* Scroll en navegadores basados en WebKit (Chrome, Edge, Safari) */
+.app-main::-webkit-scrollbar,
+.goals-wrapper::-webkit-scrollbar {
+  width: 8px; /* Grosor de la barra */
+}
+
+.app-main::-webkit-scrollbar-track,
+.goals-wrapper::-webkit-scrollbar-track {
+  background: transparent; /* Fondo transparente */
+}
+
+.app-main::-webkit-scrollbar-thumb,
+.goals-wrapper::-webkit-scrollbar-thumb {
+  background-color: hsl(228, 95%, 66%); /* Morado (puedes cambiarlo) */
+  border-radius: 9999px; /* Redondeado */
+}
+
+/* Opcional: hover para que se vea más oscuro */
+.app-main::-webkit-scrollbar-thumb:hover,
+.goals-wrapper::-webkit-scrollbar-thumb:hover {
+  background-color: hsl(228, 95%, 66%); /* Morado más oscuro al pasar el mouse */
+}
+
+/* Firefox (usa scrollbar-color) */
+.app-main,
+.goals-wrapper {
+  scrollbar-color: hsl(228, 95%, 66%) transparent; /* thumb | track */
+  scrollbar-width: thin; /* delgado */
+}

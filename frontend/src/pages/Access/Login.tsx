@@ -28,7 +28,7 @@ const Login: React.FC = () => {
           navigate("/admin/gestionar-productora");
           break;
         case "PRODUCTORA":
-          navigate("/productora/home");
+          navigate("/productora/gestionar-organizador");
           break;
         case "GESTOR LOCAL":
           navigate("/gestorlocal/home");
@@ -40,6 +40,7 @@ const Login: React.FC = () => {
           navigate("/taquillero/home");
           break;
         default:
+          console.log("ROL NO RECONOCIDO");
           navigate("/"); // por defecto
       }
     } catch (error: any) {
