@@ -68,7 +68,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath = "" }) => {
         setShowSuccess(true);
         setTimeout(() => {
           navigate("/login");
-        }, 3000); // 1000 ms = 1 segundo
+        }, 1000); // 1000 ms = 1 segundo
       }
     } catch (error: any) {
     } finally {

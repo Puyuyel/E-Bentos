@@ -5,7 +5,7 @@ import "../../styles/GestionProductora/GestionarOrganizadores.css";
 const GestionarOrganizador: React.FC = () => {
   return (
     <div className="app-container">
-      <SidebarGestor currentPath="gestionar-organizadores" />
+      <SidebarGestor currentPath="gestionar-organizador" />
       <main className="app-main">
         <h1 className="title">Panel de Gestión de Organizadores</h1>
       </main>

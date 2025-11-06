@@ -1,13 +1,9 @@
 import React from "react";
 import {
-  DocumentReportIcon,
-  OfficeBuildingIcon,
-  TicketIcon,
-  ShoppingCartIcon,
-  CalendarIcon,
   UsersIcon,
-  ChartBarIcon,
   LogoutIcon,
+  UserCircleIcon,
+  GoalIcon,
 } from "./icons";
 
 import { Callout } from "@carbon/react";
@@ -16,6 +12,7 @@ import "../styles/SidebarGestor.css";
 
 import { useState } from "react";
 import { logoutService } from "../services/logoutService";
+import { useAuthStore } from "../store/useAuthStore";
 
 const LLAMADA_EXITOSA = 200;
 
@@ -59,6 +56,11 @@ const SidebarGestor: React.FC<SidebarProps> = ({ currentPath = "" }) => {
   const navigate = useNavigate();
   const [showSuccess, setShowSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { user } = useAuthStore();
+  const rol = user?.rol.toString().toLowerCase();
+  const rolCapitalized = rol
+    ? rol.charAt(0).toUpperCase() + rol.slice(1)
+    : "Desconocido";
 
   const handleCerrarSessionClick = async () => {
     try {
@@ -68,24 +70,25 @@ const SidebarGestor: React.FC<SidebarProps> = ({ currentPath = "" }) => {
         setShowSuccess(true);
         setTimeout(() => {
           navigate("/login");
-        }, 3000); // 1000 ms = 1 segundo
+        }, 1000); // 1000 ms = 1 segundo
       }
     } catch (error: any) {
     } finally {
       setLoading(false);
     }
   };
+
   const handleNavigate = (route?: string) => {
-    if (route) navigate(`/admin/${route}`);
+    if (route) navigate(`/${rol}/${route}`);
   };
   const manageItems: NavEntry[] = [
     {
-      icon: <DocumentReportIcon />,
+      icon: <UsersIcon />,
       label: "Organizadores",
       route: "gestionar-organizador",
     },
     {
-      icon: <TicketIcon />,
+      icon: <GoalIcon />,
       label: "Metas",
       route: "metas",
     },
@@ -103,6 +106,18 @@ const SidebarGestor: React.FC<SidebarProps> = ({ currentPath = "" }) => {
       </div>
 
       <nav className="sidebar-nav">
+        <div>
+          <h3 className="nav-section-title">CUENTA</h3>
+          <div className="cuenta-container">
+            <div className="cuenta-content">
+              <UserCircleIcon className="cuenta-avatar" />
+              <div>
+                <p className="cuenta-nombre">José Reyes Chávez</p>
+                <p className="cuenta-rol">{rolCapitalized}</p>
+              </div>
+            </div>
+          </div>
+        </div>
         <div>
           <h3 className="nav-section-title">HERRAMIENTAS</h3>
           <div className="nav-group">
@@ -124,7 +139,6 @@ const SidebarGestor: React.FC<SidebarProps> = ({ currentPath = "" }) => {
           icon={<LogoutIcon />}
           label="Cerrar sesión"
           onClick={handleCerrarSessionClick}
-          disabled={loading}
         />
       </div>
       {showSuccess && (

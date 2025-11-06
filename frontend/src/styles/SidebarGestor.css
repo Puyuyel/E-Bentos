@@ -133,3 +133,79 @@
   padding-top: 1rem;
   border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
+
+/* === USER PROFILE SECTION === */
+.user-profile {
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.05);
+  margin: 0.5rem 1rem;
+}
+
+.profile-image {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.profile-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-info {
+  flex: 1;
+}
+
+.profile-info h6 {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #fff;
+}
+
+.user-role {
+  font-size: 0.875rem;
+  color: #a0aec0;
+  text-transform: capitalize;
+}
+
+.cuenta-container {
+  padding-left: 0.6rem;
+}
+
+.cuenta-title {
+  font-size: 0.75rem; /* text-xs */
+  font-weight: bold;
+  color: #6b7280; /* text-gray-500 */
+  text-transform: uppercase;
+  letter-spacing: 0.05em; /* tracking-wider */
+  margin-bottom: 1rem; /* mb-4 */
+}
+
+.cuenta-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem; /* space-x-3 */
+}
+
+.cuenta-avatar {
+  width: 2.5rem; /* w-10 */
+  height: 2.5rem; /* h-10 */
+  color: #4b5563; /* text-gray-600 */
+}
+
+.cuenta-nombre {
+  font-weight: 600; /* font-semibold */
+}
+
+.cuenta-rol {
+  font-size: 0.875rem; /* text-sm */
+  color: #6b7280; /* text-gray-500 */
+  font-style: italic;
+}
+
