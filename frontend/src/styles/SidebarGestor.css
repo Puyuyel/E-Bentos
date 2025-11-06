@@ -1,0 +1,211 @@
+/* === SIDEBAR GENERAL === */
+.sidebar {
+  width: 15rem; /* 288px, tamaño equilibrado */
+  background-color: hsl(220.33, 67.03%, 82.16%);
+  color: hsl(0, 0%, 0%);
+  display: flex;
+  flex-direction: column;
+  padding: 0.25rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  box-sizing: border-box;
+  font-family: "Sarabun", sans-serif;
+  border-top-right-radius: 0.75rem;
+  border-bottom-right-radius: 0.75rem;
+  border-right: 1px solid #e0e0e0;
+  z-index: 1000;
+}
+
+/* === LOGO SECTION === */
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 2rem;
+  padding: 0 0.5rem;
+}
+
+.logo {
+  height: 4rem; /* 32px */
+  width: 4rem;
+  object-fit: contain;
+  background: transparent;
+  padding: 0.25rem;
+}
+
+.logo-text {
+  font-size: 1.25rem; /* 20px */
+  font-weight: 700;
+  color: hsl(228, 95%, 66%);
+}
+
+/* === BACK BUTTON === */
+.back-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  padding: 0 0.5rem;
+  color: #4b5563;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.back-button:hover {
+  color: #4338ca;
+}
+
+.back-text {
+  font-weight: 600;
+}
+
+/* === NAVIGATION === */
+.sidebar-nav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db transparent;
+}
+
+/* Scrollbar estilizado */
+.sidebar-nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background-color: #d1d5db;
+  border-radius: 3px;
+}
+
+.nav-section-title {
+  padding: 0 1rem;
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #6b7280;
+  margin-bottom: 0.4rem;
+}
+
+.nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+/* === NAV ITEMS === */
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  color: #4b5563;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.nav-item:hover {
+  background-color: #eef2ff;
+  color: #3730a3;
+}
+
+.nav-item-active {
+  background-color: #d6d6f5;
+  color: #4338ca;
+  font-weight: 600;
+}
+
+.nav-label {
+  font-size: 0.9rem;
+}
+
+/* === LOGOUT SECTION === */
+.logout-container {
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* === USER PROFILE SECTION === */
+.user-profile {
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.05);
+  margin: 0.5rem 1rem;
+}
+
+.profile-image {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.profile-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-info {
+  flex: 1;
+}
+
+.profile-info h6 {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #fff;
+}
+
+.user-role {
+  font-size: 0.875rem;
+  color: #a0aec0;
+  text-transform: capitalize;
+}
+
+.cuenta-container {
+  padding-left: 0.6rem;
+}
+
+.cuenta-title {
+  font-size: 0.75rem; /* text-xs */
+  font-weight: bold;
+  color: #6b7280; /* text-gray-500 */
+  text-transform: uppercase;
+  letter-spacing: 0.05em; /* tracking-wider */
+  margin-bottom: 1rem; /* mb-4 */
+}
+
+.cuenta-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem; /* space-x-3 */
+}
+
+.cuenta-avatar {
+  width: 2.5rem; /* w-10 */
+  height: 2.5rem; /* h-10 */
+  color: #4b5563; /* text-gray-600 */
+}
+
+.cuenta-nombre {
+  font-weight: 600; /* font-semibold */
+}
+
+.cuenta-rol {
+  font-size: 0.875rem; /* text-sm */
+  color: #6b7280; /* text-gray-500 */
+  font-style: italic;
+}
+
