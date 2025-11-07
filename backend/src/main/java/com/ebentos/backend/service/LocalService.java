@@ -4,6 +4,7 @@ import com.ebentos.backend.dto.DistritoDTO;
 import com.ebentos.backend.dto.GestorSimpleDTO;
 import com.ebentos.backend.dto.LocalActualizaDTO;
 import com.ebentos.backend.dto.LocalDTO;
+import com.ebentos.backend.dto.RegistroLocalDTO;
 import com.ebentos.backend.model.Distrito;
 import com.ebentos.backend.model.Gestor;
 import com.ebentos.backend.model.Local;
@@ -38,9 +39,38 @@ public class LocalService {
         return localDTO;
     }
     
-    public Map<String, Object> listarPaginado(int page, int size) {
+    public Map<String, Object> listarPaginadoPorBuscador(int page, int size, String buscador) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Local> localesPage = localReporsitory.findAll(pageable);
+        buscador = "%" + buscador.toLowerCase() + "%";
+        Page<Local> localesPage = localReporsitory.buscarPorBuscador(buscador,pageable);
+
+        List<LocalDTO> localesDTO = localesPage.getContent().stream()
+                .map(this::llenarDTO)
+                .collect(Collectors.toList());
+
+        // Construimos la respuesta con la estructura pedida
+        Map<String, Object> response = new HashMap<>();
+        response.put("data", localesDTO);
+
+        Map<String, Object> pagination = new HashMap<>();
+        pagination.put("totalItems", localesPage.getTotalElements());
+        pagination.put("totalPages", localesPage.getTotalPages());
+        pagination.put("currentPage", localesPage.getNumber());
+        pagination.put("pageSize", localesPage.getSize());
+        pagination.put("hasNextPage", localesPage.hasNext());
+        pagination.put("hasPreviousPage", localesPage.hasPrevious());
+        pagination.put("nextPage", localesPage.hasNext() ? "/api/locales?page=" + (page + 1) + "&limit=" + size : null);
+        pagination.put("prevPage", localesPage.hasPrevious() ? "/api/locales?page=" + (page - 1) + "&limit=" + size : null);
+
+        response.put("pagination", pagination);
+
+        return response;
+    }
+    
+    public Map<String, Object> listarPaginadoPorBuscadorYDuenho(int page, int size, String buscador, Integer duenhoId) {
+        Pageable pageable = PageRequest.of(page, size);
+        buscador = "%" + buscador.toLowerCase() + "%";
+        Page<Local> localesPage = localReporsitory.buscarPorBuscadorYDuenho(buscador,duenhoId,pageable);
 
         List<LocalDTO> localesDTO = localesPage.getContent().stream()
                 .map(this::llenarDTO)
@@ -78,38 +108,36 @@ public class LocalService {
                 .collect(Collectors.toList());
     }
     
-    public LocalDTO insertar(LocalDTO localDTO) {
+    public LocalDTO insertar(RegistroLocalDTO registroLocalDTO) {
         
         Local local = new Local();
 
         // Mapeo desde el DTO hacia la entidad
-        local.setNombre(localDTO.getNombre());
-        local.setDireccion(localDTO.getDireccion());
-        local.setFoto(localDTO.getFoto());
-        local.setAforo(localDTO.getAforo());
-        local.setTipoLocal(localDTO.getTipoLocal());
+        local.setNombre(registroLocalDTO.getNombre());
+        local.setDireccion(registroLocalDTO.getDireccion());
+        local.setFoto(registroLocalDTO.getFoto());
+        local.setAforo(registroLocalDTO.getAforo());
+        local.setTipoLocal(registroLocalDTO.getTipoLocal());
         local.setActivo(1);
 
         // Asociar Gestor (solo con el ID)
-        if (localDTO.getGestor() != null && localDTO.getGestor().getUsuarioId() != null) {
+        if (registroLocalDTO.getGestor() != null && registroLocalDTO.getGestor().getUsuarioId() != null) {
             Gestor gestor = new Gestor();
-            gestor.setUsuarioId(localDTO.getGestor().getUsuarioId());
+            gestor.setUsuarioId(registroLocalDTO.getGestor().getUsuarioId());
             local.setGestor(gestor);
         }
 
         // Asociar Distrito (solo con el ID)
-        if (localDTO.getDistrito() != null && localDTO.getDistrito().getDistritoId() != null) {
+        if (registroLocalDTO.getDistrito() != null && registroLocalDTO.getDistrito().getDistritoId() != null) {
             Distrito distrito = new Distrito();
-            distrito.setDistritoId(localDTO.getDistrito().getDistritoId());
+            distrito.setDistritoId(registroLocalDTO.getDistrito().getDistritoId());
             local.setDistrito(distrito);
         }
 
         // Guardar en BD
         Local localGuardado = localReporsitory.save(local);
         
-        LocalDTO localDevuelto = mapToLocalDTO(localGuardado);
-        
-        localDevuelto.setLocalId(localGuardado.getLocalId());
+        LocalDTO localDevuelto = llenarDTO(localGuardado);
 
         // Devolver DTO
         return localDevuelto;
@@ -153,46 +181,26 @@ public class LocalService {
         if (!Objects.equals(localActualizaDTO.getDistrito(), localExistente.getDistrito())) {
             localExistente.setDistrito(localActualizaDTO.getDistrito());
         }
-        
-        if (!Objects.equals(localActualizaDTO.getGestor(), localExistente.getGestor())) {
-            localExistente.setGestor(localActualizaDTO.getGestor());
-        }
 
         //  GUARDAR y devolver
         Local localActualizado = localReporsitory.save(localExistente);
 
         //  Mapear y devolver el DTO de respuesta
-        return mapToLocalDTO(localActualizado);
+        return llenarDTO(localActualizado);
     }
 
-    private LocalDTO mapToLocalDTO(Local local) {
+    public LocalDTO modificarAInactivo(Integer id){
+        // Buscar el local existente
+        Local localExistente = localReporsitory.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Local no encontrado con ID: " + id));
 
-        //  Mapear el Local al DTO principal (LocalDTO)
-        LocalDTO localDTO = new LocalDTO();
-        
-        localDTO.setLocalId(local.getLocalId());
-        localDTO.setNombre(local.getNombre());
-        localDTO.setDireccion(local.getDireccion());
-        localDTO.setFoto(local.getFoto());
-        localDTO.setAforo(local.getAforo());
-        localDTO.setTipoLocal(local.getTipoLocal());
+        localExistente.setActivo(0);
 
-        // Gestor
-        if (local.getGestor() != null) {
-            GestorSimpleDTO gestorDTO = new GestorSimpleDTO();
-            gestorDTO.setUsuarioId(local.getGestor().getUsuarioId());
-            localDTO.setGestor(gestorDTO);
-        }
+        //  Guardo y devolver
+        Local localActualizado = localReporsitory.save(localExistente);
 
-        // Distrito
-        if (local.getDistrito() != null) {
-            DistritoDTO distritoDTO = new DistritoDTO();
-            distritoDTO.setDistritoId(local.getDistrito().getDistritoId());
-            distritoDTO.setNombre(local.getDistrito().getNombre());
-            localDTO.setDistrito(distritoDTO);
-        }
-
-        return localDTO;
+        //  Mapeo y devuelvo el DTO de respuesta
+        return llenarDTO(localActualizado);
     }
 
     private LocalDTO llenarDTO(Local local) {
@@ -205,6 +213,7 @@ public class LocalService {
         localdto.setAforo(local.getAforo());
         localdto.setTipoLocal(local.getTipoLocal());
         localdto.setActivo(local.getActivo());
+        
         if (local.getGestor() != null) {
             GestorSimpleDTO gestorDTO = new GestorSimpleDTO();
             gestorDTO.setUsuarioId(local.getGestor().getUsuarioId());

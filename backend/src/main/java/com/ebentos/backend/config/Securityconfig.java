@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.http.HttpMethod;
 
 @Configuration
 @EnableWebSecurity
@@ -50,7 +51,8 @@ public class Securityconfig {
                     SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + nombreRol);
 
                     // Crea el usuario de Spring con su rol
-                    return new org.springframework.security.core.userdetails.User(
+                    return new UsuarioDetails(
+                            usuario.getUsuarioId(),
                             usuario.getEmail(),
                             usuario.getContrasenha(),
                             // 5. Le pasa la lista con la autoridad
@@ -72,13 +74,23 @@ public class Securityconfig {
                 // Autorización de Rutas
                 .authorizeHttpRequests(authz -> authz
                         // Permite el registro y el login públicamente
+                        .requestMatchers(HttpMethod.POST, "/api/clientes").permitAll()
                         .requestMatchers(
                                 "/api/auth/**",
-                                "/api/clientes/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
                         ).permitAll()
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/productoras/*"
+                        ).hasAnyRole("ADMIN","PRODUCTORA")
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/gestores/*"
+                        ).hasAnyRole("ADMIN","PRODUCTORA","GESTOR_LOCAL",
+                                "DUENHO_LOCAL","TAQUILLERO","ORGANIZADOR_EVENTOS")
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/clientes/*"
+                        ).hasAnyRole("CLIENTE","TAQUILLERO")
                         .requestMatchers("/api/productoras/**", "/api/puntoventas/**").hasRole("ADMIN")
                         .requestMatchers("/api/gestores/**").hasAnyRole("ADMIN","GESTOR_LOCAL","PRODUCTORA")
                         // Protege todas las demás rutas

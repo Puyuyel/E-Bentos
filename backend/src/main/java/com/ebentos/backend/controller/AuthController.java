@@ -6,11 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.ebentos.backend.dto.ContrasenhaResetDTO;
-import com.ebentos.backend.dto.RegistroUsuarioDTO;
-import com.ebentos.backend.model.Usuario;
 import com.ebentos.backend.service.UsuarioService;
-import java.util.List;
-import org.springframework.security.core.Authentication;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -45,16 +41,5 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al actualizar la contraseña.");
         }
     }
-    
-    private boolean puedeCrear(String rolActual, String rolNuevo) {
-        if(rolNuevo.equals("CLIENTE"))
-            return true;
-        return switch (rolActual) {
-            case "ROLE_ADMIN" -> List.of("PRODUCTORA", "GESTOR_LOCAL", "TAQUILLERO").contains(rolNuevo);
-            case "ROLE_PRODUCTORA" -> List.of("ORGANIZADOR_EVENTOS").contains(rolNuevo);
-            case "ROLE_GESTOR_LOCAL" -> List.of("DUENHO_LOCAL").contains(rolNuevo);   
-            default -> false;
-    };
-}
 
 }

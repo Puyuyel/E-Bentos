@@ -10,8 +10,8 @@ import org.hibernate.annotations.Where;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-@SQLDelete(sql = "UPDATE usuario SET activo = 0 WHERE usuario_id = ?")
-@Where(clause = "activo = 1")
+@SQLDelete(sql = "UPDATE LOCAL SET ACTIVO = 0 WHERE LOCAL_ID = ?")
+@Where(clause = "ACTIVO = 1")
 @Entity
 @Table(name = "LOCAL")
 public class Local {
