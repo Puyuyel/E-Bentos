@@ -112,6 +112,7 @@ const Metas: React.FC = () => {
   const [goals, setGoals] = useState<Goal[]>(initialGoals);
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   // Abre el modal para crear una nueva meta
   const handleOpenAddModal = () => {
@@ -163,8 +164,9 @@ const Metas: React.FC = () => {
   };
 
   return (
-    <div className="app-container">
-      <SidebarGestor currentPath="metas" />
+    <div className={`app-container ${sidebarOpen ? "sidebar-visible" : "sidebar-hidden"}`}>
+
+      <SidebarGestor currentPath="metas" onToggleSidebar={setSidebarOpen} />
       <main className="app-main">
         {/* ... (tu header con el botón "Agregar") ... */}
         <div className="metas-header">

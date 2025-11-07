@@ -1,29 +1,48 @@
-/* Asegurar que la app ocupe toda la pantalla */
-html, body, #root {
-  height: 100%;
-  margin: 0;
+/* Área principal donde está el título y la lista */
+.app-main {
+  padding: 1.25rem;
+  overflow-y: auto;
+  max-height: 100vh;
+  box-sizing: border-box;
+  transition: margin-left 0.3s ease;
 }
 
+@media (min-width: 768px) {
+  /* Cuando el sidebar está oculto */
+  .app-container.sidebar-hidden .app-main,
+  .app-container.sidebar-visible .app-main {
+    width: calc(100vw - 15rem);
+  }
+  /* Título simple */
+  .title {
+    margin: 0 0 1rem 0;
+    font-size: 2rem;
+  }
+}
+
+/* En móvil, ignora el margen */
+@media (max-width: 768px) {
+  .app-container.sidebar-visible .app-main {
+    width: 100vw;
+  }
+
+  .app-container.sidebar-hidden .app-main {
+    width: 100vw;
+    margin: 0;
+  }
+
+  /* Título simple */
+  .title {
+    margin: 0 0 1rem 3rem;
+    font-size: 2rem;
+    
+  }
+}
 /* Contenedor principal con sidebar + main */
 .app-container {
   display: flex;
   min-height: 100vh; /* ocupa toda la ventana */
   box-sizing: border-box;
-}
-
-/* Área principal donde está el título y la lista */
-.app-main {
-  flex: 1;
-  padding: 1.25rem; /* 20px */
-  overflow-y: auto; /* permite scroll vertical cuando hay muchas metas */
-  max-height: 100vh;
-  box-sizing: border-box;
-}
-
-/* Título simple */
-.title {
-  margin: 0 0 1rem 0;
-  font-size: 2rem;
 }
 
 /* Opcional: si quieres que solo la lista haga scroll (header fijo) */
@@ -45,7 +64,8 @@ html, body, #root {
 
 /* Mover el botón un poco hacia la izquierda sin separarlo demasiado del título */
 .metas-header .add-button {
-  margin-right: 12px; /* ajusta este valor si quieres moverlo más/menos */
+  margin-right: 1rem; /* ajusta este valor si quieres moverlo más/menos */
+  margin-bottom: 0.5rem;
 }
 
 /* Scroll en navegadores basados en WebKit (Chrome, Edge, Safari) */
@@ -68,7 +88,11 @@ html, body, #root {
 /* Opcional: hover para que se vea más oscuro */
 .app-main::-webkit-scrollbar-thumb:hover,
 .goals-wrapper::-webkit-scrollbar-thumb:hover {
-  background-color: hsl(228, 95%, 66%); /* Morado más oscuro al pasar el mouse */
+  background-color: hsl(
+    228,
+    95%,
+    66%
+  ); /* Morado más oscuro al pasar el mouse */
 }
 
 /* Firefox (usa scrollbar-color) */
