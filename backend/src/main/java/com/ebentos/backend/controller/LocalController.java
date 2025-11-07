@@ -54,8 +54,8 @@ public class LocalController {
         }
 
         return response;
-    } 
-    
+    }
+
     @GetMapping("/{id}")
     public LocalDTO obtenerPorId(@PathVariable Integer id) {
         return localService.obtenerPorId(id);
@@ -73,6 +73,6 @@ public class LocalController {
 
     @DeleteMapping("/{id}")
     public void eliminar(@PathVariable Integer id) {
-        localService.eliminar(id);
+        localService.modificarAInactivo(id);
     }
 }

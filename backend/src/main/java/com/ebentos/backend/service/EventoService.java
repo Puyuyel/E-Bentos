@@ -1,16 +1,9 @@
 package com.ebentos.backend.service;
 
-import com.ebentos.backend.dto.EventoActualizaDTO;
-import com.ebentos.backend.dto.EventoDTO;
-import com.ebentos.backend.dto.GestorSimpleDTO;
-import com.ebentos.backend.dto.LocalSimpleDTO;
-import com.ebentos.backend.dto.RegistroEventoDTO;
-import com.ebentos.backend.model.CategoriaEvento;
-import com.ebentos.backend.model.EstadoEvento;
-import com.ebentos.backend.model.Evento;
-import com.ebentos.backend.model.Gestor;
-import com.ebentos.backend.model.Local;
+import com.ebentos.backend.dto.*;
+import com.ebentos.backend.model.*;
 import com.ebentos.backend.repository.EventoRepository;
+import com.ebentos.backend.repository.SolicitudRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.HashMap;
 import java.util.List;
@@ -26,10 +19,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class EventoService {
     private final EventoRepository eventoRepository;
-    
-    @Autowired
-    public EventoService(EventoRepository eventoRepository) {
+    private final SolicitudService solicitudService;
+
+    public EventoService(EventoRepository eventoRepository, SolicitudService solicitudService) {
         this.eventoRepository = eventoRepository;
+        this.solicitudService = solicitudService;
     }
     
     public EventoDTO obtenerPorId(Integer id) {
@@ -106,6 +100,14 @@ public class EventoService {
         }
 
         Evento guardado = eventoRepository.save(evento);
+
+        //Insertamos la solicitud del local
+          SolicitudDTO solicitudDTO = new SolicitudDTO();
+          solicitudDTO.setLocalId(registroEventoDTO.getLocal().getLocalId());
+          solicitudDTO.setEventoId(guardado.getEventoId());
+          solicitudDTO.setEstado(EstadoSolicitud.EN_REVISION);
+          solicitudService.insertar(solicitudDTO);
+
         return mapToEventoDTO(guardado);
     }
     
@@ -145,8 +147,17 @@ public class EventoService {
         if (!Objects.equals(eventoActualizaDTO.getEstado(), eventoExistente.getEstado())){
             eventoExistente.setEstado(eventoActualizaDTO.getEstado());
         }
-        if (!Objects.equals(eventoActualizaDTO.getLocal(), eventoExistente.getLocal())){
+        if (!Objects.equals(eventoActualizaDTO.getLocal().getLocalId(), eventoExistente.getLocal().getLocalId())){
             eventoExistente.setLocal(eventoActualizaDTO.getLocal());
+
+            //Se envía otra solicitud
+            SolicitudDTO solicitudDTO = new SolicitudDTO();
+            solicitudDTO.setLocalId(eventoActualizaDTO.getLocal().getLocalId());
+            solicitudDTO.setEventoId(eventoExistente.getEventoId());
+            solicitudDTO.setEstado(EstadoSolicitud.EN_REVISION);
+            solicitudService.insertar(solicitudDTO); // Dicen que sí o sí se va a cambiar el id del local, por lo que podría fallar si es que otra vez intentamos
+                                                     // con el mismo local, podríamos hacer un insert o update en el caso que ese local y evento ya fueron solicitados pero rechazados
+
         }
         if (!Objects.equals(eventoActualizaDTO.getCategoriaEvento(), eventoExistente.getCategoriaEvento())){
             eventoExistente.setCategoriaEvento(eventoActualizaDTO.getCategoriaEvento());
@@ -185,5 +196,28 @@ public class EventoService {
 
         return eventoDTO;
     }
-        
+
+    public EventoActualizaDTO eventoDTOParaSolicitud(Integer eventoId) {
+        Evento evento = eventoRepository.findById(eventoId)
+                .orElseThrow(() -> new EntityNotFoundException("Evento no encontrado con ID: " + eventoId));
+        EventoActualizaDTO eventoActualizaDTO = new EventoActualizaDTO();
+        eventoActualizaDTO.setNombre(evento.getNombre());
+        eventoActualizaDTO.setDescripcion(evento.getDescripcion());
+        eventoActualizaDTO.setPoster(evento.getPoster());
+        eventoActualizaDTO.setFechaHorarioInicio(evento.getFechaHorarioInicio());
+        eventoActualizaDTO.setDuracionEstimada(evento.getDuracionEstimada());
+        eventoActualizaDTO.setCostoTotal(evento.getCostoTotal());
+        eventoActualizaDTO.setVisitas(evento.getVisitas());
+        eventoActualizaDTO.setEstado(evento.getEstado());
+        eventoActualizaDTO.setCategoriaEvento(evento.getCategoriaEvento());
+
+        if (evento.getLocal() != null) {
+            Local localDTO = new Local();
+            localDTO.setLocalId(evento.getLocal().getLocalId());
+            localDTO.setAforo(evento.getLocal().getAforo());
+            eventoActualizaDTO.setLocal(localDTO);
+        }
+        return eventoActualizaDTO;
+    }
+
 }
