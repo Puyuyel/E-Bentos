@@ -221,6 +221,14 @@ public class GestorService {
             gestorExistente.setContrasenha(passwordEncoder.encode(gestorActualizaDTO.getContrasenha()));
         }
 
+        if (!Objects.equals(gestorActualizaDTO.getDni(), gestorExistente.getDni())) {
+            gestorExistente.setDni(gestorActualizaDTO.getDni());
+        }
+
+        if (!Objects.equals(gestorActualizaDTO.getActivo(), gestorExistente.getActivo())) {
+            gestorExistente.setActivo(gestorActualizaDTO.getActivo());
+        }
+
         //  GUARDAR y devolver
         Gestor gestorActualizado = gestorRepository.save(gestorExistente);
 
@@ -256,6 +264,20 @@ public class GestorService {
         } else {
             throw new RuntimeException("Gestor no encontrado con id: " + id);
         }
+    }
+
+    public GestorDTO modificarAInactivo(Integer id){
+        // BUSCAR la entidad existente
+        Gestor gestorExistente = gestorRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Gestor no encontrado con ID: " + id));
+
+        gestorExistente.setActivo(0);
+
+        //  GUARDAR y devolver
+        Gestor gestorActualizado = gestorRepository.save(gestorExistente);
+
+        //  Mapear y devolver el DTO de respuesta
+        return mapToGestorDTO(gestorActualizado);
     }
     
     
