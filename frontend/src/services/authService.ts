@@ -22,8 +22,9 @@ export async function login(credentials: LoginCredentials) {
       withCredentials: true,
     });
     const roleUser = await api.get("/users/me");
+    
     const cleanRole = roleUser.data.nombreRol.replace("ROLE_", "");
-    return { response: response.data, role: cleanRole }; // El backend debería devolver info del usuario o un mensaje
+    return { response: response.data, role: cleanRole , id: roleUser.data.usuarioId}; // El backend debería devolver info del usuario o un mensaje
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "Error al iniciar sesión");
   }
