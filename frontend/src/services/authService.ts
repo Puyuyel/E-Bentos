@@ -30,6 +30,15 @@ export async function login(credentials: LoginCredentials) {
   }
 }
 
+export async function getUser() {
+  try {
+    const response = await api.get("/users/me");
+    return response.data; // El backend debería devolver info del nuevo registro o un mensaje
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || "Error al obtener usuario");
+  }
+}
+
 /*
 import axios from "axios";
 

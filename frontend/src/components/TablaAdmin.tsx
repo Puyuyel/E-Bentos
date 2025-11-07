@@ -1,36 +1,33 @@
-import { DataTable, IconButton, Link, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Pagination } from "@carbon/react";
+import { DataTable, IconButton, Link, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Pagination, Search, Button, Loading } from "@carbon/react";
 import { useEffect, useMemo, useState } from "react";
 import TablaCrudButtons from "./TablaCrudButtons";
+import { listarProductoras } from "../services/productoraService";
+import { listarGestoresLocales, listarTaquilleros } from "../services/gestorLocalService";
+import { listarPuntosVenta } from "../services/puntoVentaService";
+import '../styles/CargaSpinner.css'
+
+
+// Sección de modelos
+import type { GestorLocal } from "../types/gestorLocal.types";
+import type { PuntoVenta } from "../types/puntoVenta.types";
+import TablaCrudButtonDialog from "./TablaCrudButtonDialog";
+import type { Productora } from "../types/productora.types";
+// Fin sección de modelos
 
 interface TablaGestorProductorasProps{
   tipoGestor: string;
 }
 
 interface DataRow{
-  data: string[]
+  id: number;
+  data: string[];
+  raw?: any;
 }
 
 /**********************************
 Sección de modelos
 ***********************************/
 
-// Representa un solo usuario
-interface GestorLocal {
-  id: number;
-  name: string;
-}
-
-interface Productora {
-  id: number;
-  nombre: string;
-  ruc: string;
-}
-
-interface PuntoDeVenta {
-  id: number;
-  nombre: string;
-  direccion: string;
-}
 
 interface Taquillero {
   id: number;
@@ -68,7 +65,7 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
   ***********************************/
   const [allRows, setAllRows] = useState<DataRow[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(2);
+  const [pageSize, setPageSize] = useState(5);
   /**********************************
   Fin de Sección de paginación de la tabla
   ***********************************/
@@ -79,39 +76,13 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
   const headers: string[] = useMemo(() => {
     switch (tipoGestor) {
       case 'GestorLocal':
-        return ['Local ID', 'Nombre', 'Dirección'];
+        return ['Nombres', 'Apellidos', 'DNI', 'Email', 'Teléfono'];
       case 'Productora':
-        return ['Productora ID', 'Nombre', 'Contacto'];
-      case 'PuntoDeVenta':
-        return ['Punto ID', 'Nombre', 'Ubicación'];
+        return ['RUC', 'Razon Social', 'Nombre Comercial','Email','Teléfono'];
+      case 'PuntoVenta':
+        return ['Nombre', 'Dirección', 'Departamento', 'Provincia', 'Distrito', 'Estado'];
       case 'Taquillero':
-        return ['Taquillero ID', 'Nombres', 'DNI'];
-      default:
-        return [];
-    }
-  }, [tipoGestor]);
-  const rows: DataRow[] = useMemo(() => {
-    switch (tipoGestor) {
-      case 'GestorLocal':
-        return [
-          { data: ['1', 'Juan', 'Tamaulipas'] },
-          { data: ['2', 'Mr. Sanguchito', 'Av. Universitaria'] }
-        ];
-      case 'Productora':
-        return [
-          { data: ['1', 'Juan', 'Tamaulipas'] },
-          { data: ['2', 'Mr. Sanguchito', 'Av. Universitaria'] }
-        ];
-      case 'PuntoDeVenta':
-        return [
-          { data: ['1', 'Juan', 'Tamaulipas'] },
-          { data: ['2', 'Mr. Sanguchito', 'Av. Universitaria'] }
-        ];
-      case 'Taquillero':
-        return [
-          { data: ['1', 'Juan', 'Tamaulipas'] },
-          { data: ['2', 'Mr. Sanguchito', 'Av. Universitaria'] }
-        ];
+        return ['Nombres', 'Apellidos', 'DNI', 'Email', 'Teléfono', 'Punto de Venta'];
       default:
         return [];
     }
@@ -123,76 +94,91 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
   /**********************************
   Sección APIs
   ***********************************/
-  /*
-  let headers: string[] = [];
+  const [isLoading, setIsLoading] = useState(true);
   const [rows, setRows] = useState<DataRow[]> ([]);
-  const [camposGestorLocal, setCamposGestorLocal] = useState<ApiResponse<GestorLocal> | null>(null);
-  const [camposProductoras, setCamposProductoras] = useState<ApiResponse<Productora> | null>(null);
-  const [camposPuntoDeVenta, setCamposPuntoDeVenta] = useState<ApiResponse<PuntoDeVenta> | null>(null);
-  const [camposTaquillero, setCamposTaquillero] = useState<ApiResponse<Taquillero> | null>(null);
-  switch (tipoGestor) {
-    case 'GestorLocal':
-      useEffect((): void => {
-        fetch('/api/gestor-local')
-          .then((res: Response): Promise<ApiResponse<GestorLocal>> => res.json())
-          .then((data) => {
-            const formatted: ApiResponse<GestorLocal> = 
-            {
-              data: data.data.map((item: any) => ({
-                id: item.distritoId.toString(),
-                name: item.nombre
-              })),
-              pagination: data.pagination
-            };
-            setCamposGestorLocal(formatted);
-            //setCamposGestorLocal(data);  --> en caso la api devuelva el resultado esperado directo
-          })
-          .catch((err: Error): void => console.error('Error al cargar los distritos', err));
-      }, []);
-      headers = ['Local ID', 'Nombre', 'Dirección'];      //Cambiar según requisitos
-      break;
-    case 'Productora':
-      useEffect((): void => {
-        fetch('/api/productoras')
-          .then((res: Response): Promise<ApiResponse<Productora>> => res.json())
-          .then((data: ApiResponse<Productora>) => {
-            setCamposProductoras(data);
-          })
-          .catch((err: Error): void => console.error('Error al cargar los distritos', err));
-      }, []);
-      headers = ['Productora ID', 'Nombre', 'Contacto'];  //Cambiar según requisitos
-      break;
-    case 'PuntoDeVenta':
-      useEffect((): void => {
-        fetch('/api/punto-de-venta')
-          .then((res: Response): Promise<ApiResponse<PuntoDeVenta>> => res.json())
-          .then((data: ApiResponse<PuntoDeVenta>) => {
-            setCamposPuntoDeVenta(data);
-          })
-          .catch((err: Error): void => console.error('Error al cargar los distritos', err));
-      }, []);
-      headers = ['Punto ID', 'Nombre', 'Ubicación'];      //Cambiar según requisitos
-      break;
-    case 'Taquillero':
-      useEffect((): void => {
-        fetch('/api/taquillero')
-          .then((res: Response): Promise<ApiResponse<Taquillero>> => res.json())
-          .then((data: ApiResponse<Taquillero>) => {
-            setCamposTaquillero(data);
-          })
-          .catch((err: Error): void => console.error('Error al cargar los distritos', err));
-      }, []);
-      headers = ['Taquillero ID', 'Nombres', 'DNI'];      //Cambiar según requisitos
-      break;
-    default:
-      break;
-  }
-  
-  setRows(
-    camposProductoras!.data.map((item): DataRow => ({
-      data: [String(item.id), item.nombre, item.ruc]
-    }))
-  );*/
+  useEffect(() => {
+    const fetchers: Record<string, () => Promise<any[]>> = {
+      Productora: listarProductoras,
+      GestorLocal: listarGestoresLocales,
+      Taquillero: listarTaquilleros,
+      PuntoVenta: listarPuntosVenta,
+    };
+
+    const transformadores: Record<string, (item: any, index: number) => DataRow> = {
+      Productora: (item, index) => ({
+        id: index,
+        data: [
+          String(item.usuarioId),
+          item.ruc,
+          item.razonSocial,
+          item.nombreComercial,
+          item.email,
+          item.telefono
+        ],
+        raw: item
+      }),
+      GestorLocal: (item: GestorLocal, index) => ({
+        id: index,
+        data: [
+          String(item.usuarioId), // índice 0 (oculto)
+          item.nombres,
+          item.apellidos,
+          item.dni,
+          item.email,
+          item.telefono,
+          //item.puntoVenta?.nombre || '—'
+        ],
+        raw: item
+      }),
+      // Taquillero: (item, index) => ({ id: index, data: [item.nombre, item.cedula] }),
+      PuntoVenta: (item: PuntoVenta, index) => ({
+        id: index,
+        data: [
+          String(item.puntoventaId),
+          item.nombre,
+          item.direccion,
+          item.distrito?.provincia?.departamento?.nombre || '—',
+          item.distrito?.provincia?.nombre || '—',
+          item.distrito?.nombre || '—',
+          item.activo ? 'Activo' : 'Inactivo'
+        ],
+        raw: item
+      }),
+      Taquillero: (item: GestorLocal, index) => ({
+        id: index,
+        data: [
+          String(item.usuarioId),
+          item.nombres,
+          item.apellidos,
+          item.dni,
+          item.email,
+          item.telefono,
+          item.puntoVenta.nombre  // Taquillero siempre tiene un Punto de venta
+        ]
+      }),
+    };
+
+    const fetchAndMap = async () => {
+      const fetcher = fetchers[tipoGestor];
+      const transform = transformadores[tipoGestor];
+
+      if (!fetcher || !transform) return;
+
+      setIsLoading(true);
+      try {
+        const data = await fetcher();
+        const mapped: DataRow[] = data.map(transform);
+        setRows(mapped);
+      } catch (err: any) {
+        console.error(`Error al listar ${tipoGestor}:`, err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAndMap();
+  }, [tipoGestor]);
+
   /**********************************
   Fin de Sección APIs
   ***********************************/
@@ -200,14 +186,104 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
   /**********************************
   Sección de actualización de Paginación de la tabla
   ***********************************/
-  useEffect(() => {
-    const start = (currentPage - 1) * pageSize;
-    const end = start + pageSize;
-    setAllRows(rows.slice(start, end));
-  }, [currentPage, pageSize, rows]);
+  // IMPLEMENTAR <--------
   /**********************************
   Fin de Sección de actualización de Paginación de la tabla
   ***********************************/
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const filteredRows = useMemo(() => {
+    if (!searchTerm.trim()) return rows;
+    return rows.filter(({ data }) =>
+      data.some((col) =>
+        col.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    );
+  }, [searchTerm, rows]);
+  
+  useEffect(() => {
+    const start = (currentPage - 1) * pageSize;
+    const end = start + pageSize;
+    setAllRows(filteredRows.slice(start, end));
+  }, [currentPage, pageSize, filteredRows]);
+  
+  // En esta sección se actualizan los objetos tras haber modificado o agregado un objeto //
+
+  const actualizarTabla = async () => {
+    const fetchers: Record<string, () => Promise<any[]>> = {
+      Productora: listarProductoras,
+      GestorLocal: listarGestoresLocales,
+      PuntoVenta: listarPuntosVenta,
+      Taquillero: listarTaquilleros,
+    };
+    console.log(fetchers.Productora);
+    const transformadores: Record<string, (item: any, index: number) => DataRow> = {
+      Productora: (item: Productora, index) => ({
+        id: index,
+        data: [
+          String(item.usuarioId),
+          item.ruc,
+          item.razonSocial,
+          item.nombreComercial,
+          item.email,
+          item.telefono
+        ]
+      }),
+      GestorLocal: (item: GestorLocal, index) => ({
+        id: index,
+        data: [
+          String(item.usuarioId),
+          item.nombres,
+          item.apellidos,
+          item.dni,
+          item.email,
+          item.telefono,
+          //item.puntoVenta?.nombre || '—'  //Cambiar despues porque el gestor de locales no tiene punto de venta
+        ]
+      }),
+      PuntoVenta: (item: PuntoVenta, index) => ({
+        id: index,
+        data: [
+          String(item.puntoventaId),
+          item.nombre,
+          item.direccion,
+          item.distrito?.provincia?.departamento?.nombre || '—',
+          item.distrito?.provincia?.nombre || '—',
+          item.distrito?.nombre || '—',
+          item.activo ? 'Activo' : 'Inactivo'
+        ]
+      }),
+      Taquillero: (item: GestorLocal, index) => ({
+        id: index,
+        data: [
+          String(item.usuarioId),
+          item.nombres,
+          item.apellidos,
+          item.dni,
+          item.email,
+          item.telefono,
+          item.puntoVenta.nombre  // Taquillero siempre tiene un Punto de venta
+        ]
+      }),
+    };
+
+    const fetcher = fetchers[tipoGestor];
+    const transform = transformadores[tipoGestor];
+
+    if (!fetcher || !transform) return;
+
+    try {
+      const data = await fetcher();
+      const mapped: DataRow[] = data.map(transform);
+      setRows(mapped);
+
+      const start = (currentPage - 1) * pageSize;
+      const end = start + pageSize;
+      setAllRows(mapped.slice(start, end));
+    } catch (err: any) {
+      console.error(`Error al actualizar ${tipoGestor}:`, err.message);
+    }
+  };
 
   /**********************************
   División de la tabla:
@@ -215,9 +291,28 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
   - Data de las filas --> Para los botones de acciones ver 'TablaCrudButtons.tsx'
   - Paginación
   ***********************************/
-
+  if (isLoading) {
+    return (
+      <div className="loader">
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
+    );
+  }
   return(
     <div style={{ overflow: 'visible' }}>
+      <div style={{ display: "flex", gap: "1rem", alignItems: "center", marginBottom: "1rem" }}>
+        <div style={{ flexGrow: 1 }}>
+          <Search
+            id="buscador"
+            labelText="Buscar"
+            placeholder="Buscar por nombre, RUC, etc."
+            size="lg"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        <TablaCrudButtonDialog entidad={tipoGestor} accion="Agregar" datos={[]} onActualizar={()=>{}}></TablaCrudButtonDialog>
+      </div>
       <Table
         aria-label="sample table"
         size="lg"
@@ -233,17 +328,18 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
           </TableRow>
         </TableHead>
         <TableBody>
-          {allRows.map(({data}) => (
-            <TableRow>                      
-              {data.map((col: string) => (
-                <TableCell>
-                  {col}
-                </TableCell>
+          {allRows.map((row) => (
+            <TableRow key={row.id}>
+              {row.data.slice(1).map((col: string, i: number) => (
+                <TableCell key={i}>{col}</TableCell>
               ))}
               <TableCell>
-                <TablaCrudButtons 
+                <TablaCrudButtons
                   entidad={tipoGestor}
-                ></TablaCrudButtons>
+                  datos={row.data}
+                  raw={row.raw}
+                  onActualizar={actualizarTabla}
+                />
               </TableCell>
             </TableRow>
           ))}
@@ -253,7 +349,7 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
         page={currentPage}
         pageSize={pageSize}
         totalItems={rows.length}
-        pageSizes={[1, 2, 15, 20]}
+        pageSizes={[5, 10, 15, 20]}
         onChange={({ page, pageSize }) => {
           setCurrentPage(page);
           setPageSize(pageSize);
