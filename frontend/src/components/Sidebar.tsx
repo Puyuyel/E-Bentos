@@ -13,6 +13,7 @@ import {
 import { Callout } from "@carbon/react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Sidebar.css";
+const imageBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL;
 
 import { useState } from "react";
 import { logoutService } from "../services/logoutService";
@@ -122,7 +123,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath = "" }) => {
     <aside className="sidebar">
       <div className="logo-container">
         <img
-          src="/images/ebentos-logo-morado.png"
+          src={`${imageBaseUrl}/ebentos-logo-morado.png`}
           alt="e-Bentos Logo"
           className="logo"
         />
