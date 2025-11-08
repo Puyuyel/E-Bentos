@@ -1,11 +1,17 @@
 package com.ebentos.backend.config;
 
-import jakarta.servlet.http.HttpServletResponse;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -14,15 +20,11 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
 import com.ebentos.backend.model.Rol;
 import com.ebentos.backend.repository.UsuarioRepository;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import java.util.Collections;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-import org.springframework.http.HttpMethod;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Configuration
 @EnableWebSecurity
@@ -84,6 +86,7 @@ public class Securityconfig {
                         .requestMatchers(HttpMethod.GET,
                                 "/api/productoras/*"
                         ).hasAnyRole("ADMIN","PRODUCTORA")
+                        .requestMatchers("/api/metas/**").hasRole("PRODUCTORA")
                         .requestMatchers(HttpMethod.GET,
                                 "/api/gestores/*"
                         ).hasAnyRole("ADMIN","PRODUCTORA","GESTOR_LOCAL",
