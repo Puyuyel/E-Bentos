@@ -3,6 +3,7 @@ import Sidebar from "../../../components/Sidebar";
 import "../../../styles/Gestion/GestionarGestorLocal.css";
 import VenueCRUD from "./VenueCRUD";
 import VenueList from "./VenueList";
+import TablaAdmin from "../../components/TablaAdmin";
 
 const GestionarGestorLocal: React.FC = () => {
   return (

@@ -109,10 +109,8 @@ public class GestorController {
         // Llama al servicio con el ID y el DTO
         return gestorService.modificar(id, gestorActualizaDTO);
     }
-    
+
     @DeleteMapping("/{id}")
-    public void eliminar(@PathVariable Integer id) {
-        gestorService.eliminar(id);
-    }
+    public GestorDTO eliminar(@PathVariable Integer id) { return gestorService.modificarAInactivo(id);} // Es actualizar a inactivo
     
 }

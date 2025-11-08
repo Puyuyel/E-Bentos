@@ -26,6 +26,7 @@ services:
     container_name: ebentos-frontend
     environment:
       VITE_API_URL: http://localhost:8080
+      VITE_IMAGE_BASE_URL: https://ebentos.blob.core.windows.net/images
     ports:
       - "5173:5173"
     volumes:

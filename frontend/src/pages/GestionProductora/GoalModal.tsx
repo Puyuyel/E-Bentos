@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   Modal,
   Button,
@@ -7,8 +7,9 @@ import {
   TextInput,
   Grid,
   Column,
-} from '@carbon/react';
-import type { Goal } from './Metas';
+} from "@carbon/react";
+import type { Goal } from "./Metas";
+import "../../styles/GestionProductora/GoalModal.css";
 
 type EventoItem = {
   id: string;
@@ -25,9 +26,9 @@ interface SalesGoalModalProps {
 
 // Datos de ejemplo para el ComboBox
 const eventos = [
-  { id: 'evento-1', text: 'Concierto de Rock 2025' },
-  { id: 'evento-2', text: 'Feria Gastronómica Local' },
-  { id: 'evento-3', text: 'Maratón de la Ciudad' },
+  { id: "evento-1", text: "Concierto de Rock 2025" },
+  { id: "evento-2", text: "Feria Gastronómica Local" },
+  { id: "evento-3", text: "Maratón de la Ciudad" },
 ];
 
 const GoalModal: React.FC<SalesGoalModalProps> = ({
@@ -42,6 +43,10 @@ const GoalModal: React.FC<SalesGoalModalProps> = ({
   const [incomeGoal, setIncomeGoal] = useState("");
   const [conversionRateGoal, setConversionRateGoal] = useState("");
   const [ticketsToSell, setTicketsToSell] = useState("");
+  const [incomeGoalInvalid, setIncomeGoalInvalid] = useState(false);
+  const [conversionRateInvalid, setConversionRateInvalid] = useState(false);
+  const [ticketsToSellInvalid, setTicketsToSellInvalid] = useState(false);
+
   // ... (añade aquí el "Precio promedio" si lo incluyes)
 
   // Determina el modo basado en la prop
@@ -52,11 +57,11 @@ const GoalModal: React.FC<SalesGoalModalProps> = ({
     if (open) {
       if (isEditMode && goalToEdit) {
         // MODO EDITAR: Poblar campos desde 'goalToEdit'
-        
+
         // Encuentra el objeto EventoItem que coincide con el nombre en la meta
         const matchingEvent =
           eventosList.find((e) => e.text === goalToEdit.eventName) || null;
-        
+
         setSelectedEvent(matchingEvent);
         setIncomeGoal(goalToEdit.incomeGoal.toString());
         setConversionRateGoal(goalToEdit.conversionRateGoal.toString());
@@ -73,63 +78,91 @@ const GoalModal: React.FC<SalesGoalModalProps> = ({
 
   // --- MANEJAR EL ENVÍO ---
   const handleSubmit = () => {
-    if (!selectedEvent) {
-      // (Aquí puedes añadir validación, ej: mostrar un error)
-      console.error("Seleccione un evento");
-      return;
-    }
+  const income = parseFloat(incomeGoal);
+  const conversion = parseFloat(conversionRateGoal);
+  const tickets = parseInt(ticketsToSell);
 
-    // Prepara los datos para enviar al padre (Metas)
-    const formData: Partial<Goal> = {
-      eventName: selectedEvent.text,
-      incomeGoal: parseFloat(incomeGoal) || 0,
-      conversionRateGoal: parseFloat(conversionRateGoal) || 0,
-      ticketsToSell: parseInt(ticketsToSell) || 0,
-    };
+  const isIncomeInvalid = isNaN(income) || income < 0;
+  const isConversionInvalid = isNaN(conversion) || conversion < 0 || conversion > 1;
+  const isTicketsInvalid = isNaN(tickets) || tickets < 0;
 
-    onSave(formData); // Llama a la función onSave del padre
+  setIncomeGoalInvalid(isIncomeInvalid);
+  setConversionRateInvalid(isConversionInvalid);
+  setTicketsToSellInvalid(isTicketsInvalid);
+
+  if (!selectedEvent || isIncomeInvalid || isConversionInvalid || isTicketsInvalid) {
+    console.error("Formulario inválido. Corrija los errores antes de continuar.");
+    return;
+  }
+
+  const formData: Partial<Goal> = {
+    eventName: selectedEvent.text,
+    incomeGoal: income,
+    conversionRateGoal: conversion,
+    ticketsToSell: tickets,
   };
+
+  onSave(formData);
+};
+
 
   return (
     <Modal
       open={open}
       onRequestClose={onClose}
       onRequestSubmit={handleSubmit}
-      modalHeading={isEditMode ? "Editar meta de ventas" : "Nueva meta de ventas"}
+      modalHeading={
+        isEditMode ? "Editar meta de ventas" : "Nueva meta de ventas"
+      }
       primaryButtonText="Aceptar"
       secondaryButtonText="Cancelar"
     >
       <Form>
-        <div style={{ marginBottom: "1rem" }}>
+        <div className="form-grid-combobox">
           <ComboBox
             id="evento-combobox"
             titleText="Seleccione un evento"
             placeholder="Buscar..."
             items={eventosList}
             itemToString={(item) => (item ? item.text : "")}
-            onChange={({ selectedItem }) => setSelectedEvent(selectedItem || null)}
+            onChange={({ selectedItem }) =>
+              setSelectedEvent(selectedItem || null)
+            }
             selectedItem={selectedEvent}
-            disabled={isEditMode} 
+            disabled={isEditMode}
           />
         </div>
 
         <Grid>
-          <Column lg={8} md={4} sm={4}>
+          <Column lg={8} md={4} sm={4} className="form-grid">
             <TextInput
               id="meta-ingresos"
               labelText="Meta de ingresos"
               placeholder="Ej: 50.000"
               value={incomeGoal}
-              onChange={(e) => setIncomeGoal(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                setIncomeGoal(value);
+                setIncomeGoalInvalid(parseFloat(value) < 0);
+              }}
+              invalid={incomeGoalInvalid}
+              invalidText="Debe ser un número positivo"
             />
           </Column>
-          <Column lg={8} md={4} sm={4}>
+          <Column lg={8} md={4} sm={4} className="form-grid">
             <TextInput
               id="tasa-conversion"
               labelText="Tasa de conversión (Ej: 0.80)"
               placeholder="Ej: 0.80"
               value={conversionRateGoal}
-              onChange={(e) => setConversionRateGoal(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                setConversionRateGoal(value);
+                const num = parseFloat(value);
+                setConversionRateInvalid(num < 0 || num > 1);
+              }}
+              invalid={conversionRateInvalid}
+              invalidText="Debe estar entre 0 y 1"
             />
           </Column>
           <Column lg={8} md={4} sm={4}>
@@ -138,7 +171,13 @@ const GoalModal: React.FC<SalesGoalModalProps> = ({
               labelText="Cantidad de tickets por vender"
               placeholder="Ej: 300"
               value={ticketsToSell}
-              onChange={(e) => setTicketsToSell(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                setTicketsToSell(value);
+                setTicketsToSellInvalid(parseInt(value) < 0);
+              }}
+              invalid={ticketsToSellInvalid}
+              invalidText="Debe ser un número positivo"
             />
           </Column>
           {/* Aquí iría el "Precio promedio del ticket" si lo tuvieras 

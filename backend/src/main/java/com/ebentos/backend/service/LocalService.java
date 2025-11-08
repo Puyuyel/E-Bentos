@@ -189,6 +189,20 @@ public class LocalService {
         return llenarDTO(localActualizado);
     }
 
+    public LocalDTO modificarAInactivo(Integer id){
+        // Buscar el local existente
+        Local localExistente = localReporsitory.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Local no encontrado con ID: " + id));
+
+        localExistente.setActivo(0);
+
+        //  Guardo y devolver
+        Local localActualizado = localReporsitory.save(localExistente);
+
+        //  Mapeo y devuelvo el DTO de respuesta
+        return llenarDTO(localActualizado);
+    }
+
     private LocalDTO llenarDTO(Local local) {
         LocalDTO localdto = new LocalDTO();
         
