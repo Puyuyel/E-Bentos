@@ -28,20 +28,38 @@ import { useNavigate } from "react-router-dom";
 
 import type { RegisterData } from "../../types/register.types";
 
+import { useAuthStore } from "../../store/useAuthStore";
+
 interface FormRegisterProps {
   onIniciarSesionClick: () => void;
   onRegisterClick: () => void;
 }
 
+/* CONSTANTES */
+
 const STEP_PASS_COMPLETED = 20;
+
+const MENSAJES_NOTIFICACION = {
+  EXITO: "¡Registro exitoso!",
+  ERROR_CAMPOS_REQUERIDOS: "¡Complete adecuadamente los campos requeridos!",
+  ERROR_LLAMADA_API: "¡Ocurrió un error en el Sistema!",
+};
+
+const TIPOS_NOTIFICACION = {
+  EXITO: "success",
+  ERROR: "error",
+};
 
 const FormRegister: React.FC<FormRegisterProps> = ({
   onIniciarSesionClick,
   onRegisterClick,
 }) => {
   const navigate = useNavigate();
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [showError, setShowError] = useState(false);
+  const [typeNotify, setTypeNotify] = useState(TIPOS_NOTIFICACION.ERROR);
+  const [titleNotify, setTitleNotify] = useState(
+    MENSAJES_NOTIFICACION.ERROR_CAMPOS_REQUERIDOS
+  );
+  const [showNotify, setShowNotify] = useState(false);
 
   const [loading, setLoading] = useState(false);
 
@@ -72,6 +90,8 @@ const FormRegister: React.FC<FormRegisterProps> = ({
     telefono: 0,
     genero: "",
   });
+
+  const { login } = useAuthStore();
 
   const calcularProgresoContrasenha = (contrasenha: string): number => {
     let total: number = 0;
@@ -112,8 +132,10 @@ const FormRegister: React.FC<FormRegisterProps> = ({
           setIsInvalidTelf(true);
           break;
       }
+      setLoading(true);
       return;
     }
+    setLoading(false);
 
     switch (id) {
       case "email":
@@ -149,8 +171,10 @@ const FormRegister: React.FC<FormRegisterProps> = ({
     const fechaUTC = date.toISOString().split("T")[0];
     if (!verifyData("fechaNacimiento", fechaUTC)) {
       setIsInvalidFechaNac(true);
+      setLoading(true);
       return;
     }
+    setLoading(false);
     setIsInvalidFechaNac(false);
     setFormData((prev: RegisterData) => ({
       ...prev,
@@ -163,8 +187,10 @@ const FormRegister: React.FC<FormRegisterProps> = ({
     const newPat = e.target.value;
     if (!verifyData("apePat", newPat)) {
       setIsInvalidApePat(true);
+      setLoading(true);
       return;
     }
+    setLoading(false);
     setIsInvalidApePat(false);
     setApePat(newPat);
     setFormData((prev: RegisterData) => ({
@@ -177,8 +203,10 @@ const FormRegister: React.FC<FormRegisterProps> = ({
     const newMat = e.target.value;
     if (!verifyData("apeMat", newMat)) {
       setIsInvalidApeMat(true);
+      setLoading(true);
       return;
     }
+    setLoading(false);
     setIsInvalidApeMat(false);
     setApeMat(newMat);
     setFormData((prev: RegisterData) => ({
@@ -190,8 +218,10 @@ const FormRegister: React.FC<FormRegisterProps> = ({
   const handleGeneroChange = ({ selectedItem }: { selectedItem: any }) => {
     if (!verifyData("genero", selectedItem?.text)) {
       setIsInvalidGen(true);
+      setLoading(true);
       return;
     }
+    setLoading(false);
     setIsInvalidGen(false);
     setFormData((prev: RegisterData) => ({
       ...prev,
@@ -200,33 +230,59 @@ const FormRegister: React.FC<FormRegisterProps> = ({
   };
 
   const handleRegistrar = async () => {
+    let success = false;
+    setShowNotify(false);
     setLoading(true);
     try {
-      if (
-        isInvalidApeMat == 0 ||
-        isInvalidApePat == 0 ||
-        isInvalidContrasenha == 0 ||
-        isInvalidDNI == 0 ||
-        isInvalidEmail == 0 ||
-        isInvalidFechaNac == 0 ||
-        isInvalidGen == 0 ||
-        isInvalidNombres == 0
-      ) {
-        setShowError(true);
+      const dataInvalida =
+        isInvalidApeMat == true ||
+        isInvalidApePat == true ||
+        isInvalidContrasenha == true ||
+        isInvalidDNI == true ||
+        isInvalidEmail == true ||
+        isInvalidFechaNac == true ||
+        isInvalidGen == true ||
+        isInvalidNombres == true;
+
+      const ningunDatoLleno =
+        !formData.email ||
+        !formData.contrasenha ||
+        !formData.nombres ||
+        !formData.apellidos ||
+        !formData.dni ||
+        !formData.fechaNacimiento ||
+        !formData.telefono ||
+        !formData.genero;
+      if (dataInvalida || ningunDatoLleno) {
+        console.log("eNTRÉ");
+        setShowNotify(true);
+        setTypeNotify(TIPOS_NOTIFICACION.ERROR);
+        setTitleNotify(MENSAJES_NOTIFICACION.ERROR_CAMPOS_REQUERIDOS);
+        setLoading(false);
         return;
       }
-      const respuesta = await onRegisterClick(formData);
-      if (respuesta >= 200) {
-        setShowSuccess(true);
-        setTimeout(() => {
-          navigate("/login"); // Aquí, tengo que navegar hacia la página principal del cliente
-        }, 2000); // 2000 ms = 2 segundos
-      }
+      await onRegisterClick(formData);
+      success = true;
+      await login({
+        email: formData.email,
+        contrasenha: formData.contrasenha,
+      });
+      setTypeNotify(TIPOS_NOTIFICACION.EXITO);
+      setTitleNotify(MENSAJES_NOTIFICACION.EXITO);
+      setShowNotify(true);
+      setTimeout(() => {
+        navigate("/admin/gestionar-productora"); // Aquí, tengo que navegar hacia la página principal del cliente
+      }, 2000); // 2000 ms = 2 segundos
     } catch (error: any) {
-      console.error("Error en FormRegister.tsx: ", error);
-    } finally {
-      setLoading(false);
+      setShowNotify(true);
+      setTypeNotify(TIPOS_NOTIFICACION.ERROR);
+      setTitleNotify(
+        MENSAJES_NOTIFICACION.ERROR_LLAMADA_API + ": " + error.message
+      );
+      // Para debugear
+      console.error("Dev... -> Error en FormRegister.tsx: ", error.message);
     }
+    if (!success) setLoading(false);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -419,11 +475,11 @@ const FormRegister: React.FC<FormRegisterProps> = ({
         <p className="label-mandatory">Todos los campos son obligatorios</p>
       </FluidForm>
 
-      {showError && (
+      {showNotify && (
         <Callout
-          kind="error"
+          kind={typeNotify}
           statusIconDescription="notification"
-          title="¡Complete todos los campos para registrarse!"
+          title={titleNotify}
         />
       )}
 
@@ -433,14 +489,6 @@ const FormRegister: React.FC<FormRegisterProps> = ({
           Registrar
         </Button>
       </div>
-
-      {showSuccess && (
-        <Callout
-          kind="success"
-          statusIconDescription="notification"
-          title="¡Registro exitoso!"
-        />
-      )}
     </div>
   );
 };

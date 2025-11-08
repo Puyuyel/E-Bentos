@@ -1,6 +1,8 @@
 import React from "react";
-import Sidebar from "../../components/Sidebar";
-import "../../styles/Gestion/GestionarGestorLocal.css";
+import Sidebar from "../../../components/Sidebar";
+import "../../../styles/Gestion/GestionarGestorLocal.css";
+import VenueCRUD from "./VenueCRUD";
+import VenueList from "./VenueList";
 
 const GestionarGestorLocal: React.FC = () => {
   return (
@@ -8,6 +10,7 @@ const GestionarGestorLocal: React.FC = () => {
       <Sidebar currentPath="gestionar-gestor-local" />
       <main className="app-main">
         <h1 className="title">Panel de Gestión de Gestores Locales</h1>
+        <VenueList />
       </main>
     </div>
   );

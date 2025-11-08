@@ -4,7 +4,7 @@ import Register from "../pages/Access/Register"; // tu componente Login
 import ForgetPass from "../pages/Access/ForgetPass";
 import CodigoVerificacion from "../pages/Access/CodigoVerificacion";
 import NewPassword from "../pages/Access/NewPassword";
-import GestionarGestorLocal from "../pages/Gestion/GestionarGestorLocal";
+import GestionarGestorLocal from "../pages/Gestion/GestorLocal/GestionarGestorLocal";
 import GestionarProductora from "../pages/Gestion/GestionarProductora";
 import GestionarPuntoDeVenta from "../pages/Gestion/GestionarPuntoDeVenta";
 import GestionarTaquillero from "../pages/Gestion/GestionarTaquillero";
