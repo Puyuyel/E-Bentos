@@ -1,10 +1,9 @@
-'use client';
-import { Button, Stack } from '@carbon/react';
-
+"use client";
+import { Button, Stack } from "@carbon/react";
 
 interface ButtonConfig {
   text: string;
-  kind: 'primary' | 'secondary' | 'tertiary' | 'ghost' | 'danger';
+  kind: "primary" | "secondary" | "tertiary" | "ghost" | "danger";
   onClick?: () => void;
 }
 
@@ -13,15 +12,18 @@ interface BottomButtonsProps {
   buttons: ButtonConfig[];
 }
 
-export default function BottomButtons({ gap = 4, buttons }: BottomButtonsProps) {
+export default function BottomButtons({
+  gap = 4,
+  buttons,
+}: BottomButtonsProps) {
   return (
     <Stack
       orientation="horizontal"
       gap={gap}
       style={{
-        justifyContent: 'center',
-        width: '100%',
-        alignItems: 'center',
+        justifyContent: "center",
+        width: "100%",
+        alignItems: "center",
       }}
     >
       {buttons.map((btn, index) => (
@@ -32,6 +34,3 @@ export default function BottomButtons({ gap = 4, buttons }: BottomButtonsProps) 
     </Stack>
   );
 }
-
-
-

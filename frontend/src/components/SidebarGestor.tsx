@@ -8,6 +8,7 @@ import {
   CalendarIcon,
   OfficeBuildingIcon,
   ClipboardIcon,
+  DocumentReportIcon,
 } from "./icons";
 
 import { Callout } from "@carbon/react";
@@ -58,7 +59,10 @@ interface SidebarProps {
   onToggleSidebar?: (open: boolean) => void;
 }
 
-const SidebarGestor: React.FC<SidebarProps> = ({ currentPath = "" , onToggleSidebar}) => {
+const SidebarGestor: React.FC<SidebarProps> = ({
+  currentPath = "",
+  onToggleSidebar,
+}) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
   const [showSuccess, setShowSuccess] = useState(false);
@@ -105,6 +109,7 @@ const SidebarGestor: React.FC<SidebarProps> = ({ currentPath = "" , onToggleSide
           case "duenho_local":
           case "organizador_eventos":
             const dataGestor = await useGetGestor(user.id);
+            console.log("dataGestor: ", dataGestor);
             fetchedName =
               dataGestor.response.nombres + " " + dataGestor.response.apellidos;
             break;
@@ -136,7 +141,7 @@ const SidebarGestor: React.FC<SidebarProps> = ({ currentPath = "" , onToggleSide
           navigate("/login");
         }, 1000); // 1000 ms = 1 segundo
       }
-    } catch (error: any) { 
+    } catch (error: any) {
     } finally {
       setLoading(false);
     }
@@ -170,6 +175,11 @@ const SidebarGestor: React.FC<SidebarProps> = ({ currentPath = "" , onToggleSide
             icon: <OfficeBuildingIcon />,
             label: "Locales",
             route: "gestionar-local",
+          },
+          {
+            icon: <DocumentReportIcon />,
+            label: "Registro de locales",
+            route: "registrar-local",
           },
         ];
 
@@ -211,10 +221,7 @@ const SidebarGestor: React.FC<SidebarProps> = ({ currentPath = "" , onToggleSide
   return (
     <>
       {/* Botón hamburguesa visible solo en móvil */}
-      <button
-        className="hamburger-button"
-        onClick={toggleSidebar}
-      >
+      <button className="hamburger-button" onClick={toggleSidebar}>
         ☰
       </button>
       <aside className={`sidebar ${sidebarOpen ? "open" : "closed"}`}>

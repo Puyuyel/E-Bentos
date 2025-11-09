@@ -13,7 +13,9 @@ import {
   FileUploaderItem,
 } from "@carbon/react";
 import { useRef, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import BottomButtons from "../../../components/Gestion/BottomButtons";
+import SidebarGestor from "../../../components/SidebarGestor.tsx";
 
 interface Lookup {
   value: string;
@@ -21,9 +23,13 @@ interface Lookup {
 }
 
 export default function OwnerCRUD() {
+  const navigate = useNavigate();
   //const fileUploaderRef = useRef<HTMLButtonElement>(null);
   return (
-    <div style={{ marginTop: "20px", marginRight: "20px", marginLeft: "20px" }}>
+    <div
+      style={{ marginTop: "20px", marginRight: "20px", marginLeft: "18rem" }}
+    >
+      <SidebarGestor currentPath="registrar-local" />
       <Form>
         <Stack gap={8}>
           <VenueForm></VenueForm>
@@ -31,7 +37,11 @@ export default function OwnerCRUD() {
           <BottomButtons
             gap={7}
             buttons={[
-              { text: "Cancelar", kind: "secondary" },
+              {
+                text: "Cancelar",
+                kind: "secondary",
+                onClick: () => navigate("/gestor_local/gestionar-local"),
+              },
               {
                 text: "Aplicar",
                 kind: "primary",
@@ -46,7 +56,6 @@ export default function OwnerCRUD() {
 }
 
 function VenueForm() {
-  //const [tiposLocales, setTiposLocales] = useState<Lookup[]>([]);
   const [distritos, setDistritos] = useState<Lookup[]>([]);
   const [provincias, setProvincias] = useState<Lookup[]>([]);
   const [departamentos, setDepartamentos] = useState<Lookup[]>([]);
@@ -55,35 +64,11 @@ function VenueForm() {
     { value: "bar", label: "Bar" },
     { value: "restaurante", label: "Restaurante" },
     { value: "cafe", label: "Café" },
-  ]; /*
-  const distritos = [
-    { value: 'publo_libre', label: 'Publo Libre' },
-    { value: 'miraflores', label: 'Miraflores' },
-    { value: 'ventanilla', label: 'Ventanilla' },
-    { value: 'san_miguel', label: 'San Miguel' }
   ];
-  const provincias = [
-    { value: 'chachapoyas', label: 'Chachapoyas' },
-    { value: 'bagua', label: 'Bagua' },
-    { value: 'huaraz', label: 'Huaraz' },
-    { value: 'abancay', label: 'Abancay' }
-  ];
-  const departamentos = [
-    { value: 'amazonas', label: 'Amazonas' },
-    { value: 'ancash', label: 'Áncash' },
-    { value: 'apurimac', label: 'Apurímac' },
-    { value: 'arequipa', label: 'Arequipa' }
-  ];*/
+
   const fileUploaderRef = useRef<HTMLButtonElement>(null);
   const [files, setFiles] = useState<File[]>([]);
 
-  /*
-  useEffect((): void => {
-    fetch('/api/tipos-local')
-      .then((res: Response): Promise<Lookup[]> => res.json())
-      .then((data: Lookup[]): void => setTiposLocales(data))
-      .catch((err: Error): void => console.error('Error al cargar los tipos de locales', err));
-  }, []);*/
   useEffect((): void => {
     fetch("/api/distritos")
       .then((res: Response): Promise<Lookup[]> => res.json())
@@ -251,7 +236,7 @@ function VenueForm() {
           <FormItem>
             <p className="cds--file--label">Upload files</p>
             <p className="cds--label-description">
-              Max file size is 500 KB. Supported file types are .jpg and .png.
+              El peso máximo es de 500KB. Utilice los formatos .jpg y .png.
             </p>
             <FileUploaderDropContainer
               accept={["image/jpeg", "image/png"]}
@@ -285,21 +270,13 @@ function VenueForm() {
 }
 
 function OwnerForm() {
-  //const [tipoDocumento, setTiposDocumentos] = useState<Lookup[]>([]);
   const tipoDocumento = [
     { value: "dni", label: "DNI (Documento Nacional de Identidad)" },
     { value: "ce", label: "Carné de Extranjería" },
     { value: "pasaporte", label: "Pasaporte" },
     { value: "ptp", label: "Permiso Temporal de Permanencia (PTP)" },
   ];
-  /*
-  useEffect((): void => {
-    fetch('/api/tipos-documentos')
-      .then((res: Response): Promise<Lookup[]> => res.json())
-      .then((data: Lookup[]): void => setTiposDocumentos(data))
-      .catch((err: Error): void => console.error('Error al cargar los tipos de documentos', err));
-  }, []);
-  */
+
   return (
     <FormGroup legendText="Datos de propietarios y responsables">
       <Grid>

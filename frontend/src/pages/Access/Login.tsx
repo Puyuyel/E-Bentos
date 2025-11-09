@@ -30,10 +30,10 @@ const Login: React.FC = () => {
         case "PRODUCTORA":
           navigate("/productora/gestionar-organizador");
           break;
-        case "GESTOR LOCAL":
-          navigate("/gestorlocal/home");
+        case "GESTOR_LOCAL":
+          navigate("/gestor_local/gestionar-local");
           break;
-        case "DUENHO LOCAL":
+        case "DUENHO_LOCAL":
           navigate("/duenholocal/home");
           break;
         case "TAQUILLERO":

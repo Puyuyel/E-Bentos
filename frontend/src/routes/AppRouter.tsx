@@ -5,6 +5,7 @@ import ForgetPass from "../pages/Access/ForgetPass";
 import CodigoVerificacion from "../pages/Access/CodigoVerificacion";
 import NewPassword from "../pages/Access/NewPassword";
 import GestionarGestorLocal from "../pages/Gestion/GestorLocal/GestionarGestorLocal";
+import VenueCRUD from "../pages/Gestion/GestorLocal/VenueCRUD";
 import GestionarProductora from "../pages/Gestion/GestionarProductora";
 import GestionarPuntoDeVenta from "../pages/Gestion/GestionarPuntoDeVenta";
 import GestionarTaquillero from "../pages/Gestion/GestionarTaquillero";
@@ -156,6 +157,27 @@ const AppRouter: React.FC = () => {
           element={
             <ProtectedRoute requiredRole="PRODUCTORA">
               <Metas />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* RUTAS para GESTOR DE LOCAL */}
+        {/* Ruta /listado locales*/}
+        <Route
+          path="/gestor_local/gestionar-local"
+          element={
+            <ProtectedRoute requiredRole="GESTOR_LOCAL">
+              <GestionarGestorLocal />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Ruta /registro locales*/}
+        <Route
+          path="/gestor_local/registrar-local"
+          element={
+            <ProtectedRoute requiredRole="GESTOR_LOCAL">
+              <VenueCRUD />
             </ProtectedRoute>
           }
         />

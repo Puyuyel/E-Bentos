@@ -2,20 +2,52 @@ import { Grid, Column, Stack, Tag, ClickableTile } from "@carbon/react";
 import { Location, Calendar } from "@carbon/react/icons";
 import CardVenueTag from "./CardVenueTag";
 import type { Local } from "../../types/locales.types";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 // CONSTANTES
 const MENSAJES_TIPO = {
   HABILITADO: "Habilitado",
   EN_REVISION: "En revisión",
   ELIMINADO: "De baja",
-};
+} as const;
 
-export default function CardVenue(children: Local) {
-  const [mensaje, setMensaje] = useState();
-  const nombreLocal = children.nombre;
-  const fechaEvento = "Fecha evento de la fiesta de marzo";
-  const ubicacion = "data.direccion";
+const COLORES_TIPO = {
+  HABILITADO: "#4CAF50", // verde
+  EN_REVISION: "#FFC107", // amarillo
+  ELIMINADO: "#F44336", // rojo
+} as const;
+
+interface CardVenueProps {
+  local: Local;
+}
+
+export default function CardVenue({ local }: CardVenueProps) {
+  const [mensaje, setMensaje] = useState<string>("");
+  const [color, setColor] = useState<string>("gray");
+
+  useEffect(() => {
+    switch (local.activo) {
+      case 1:
+        setMensaje(MENSAJES_TIPO.HABILITADO);
+        setColor(COLORES_TIPO.HABILITADO);
+        break;
+      case 2:
+        setMensaje(MENSAJES_TIPO.EN_REVISION);
+        setColor(COLORES_TIPO.EN_REVISION);
+        break;
+      case 0:
+        setMensaje(MENSAJES_TIPO.ELIMINADO);
+        setColor(COLORES_TIPO.ELIMINADO);
+        break;
+      default:
+        setMensaje("Desconocido");
+        setColor("gray");
+        break;
+    }
+  }, [local]); // <- se ejecuta cada vez que 'local' cambie
+
+  const nombreLocal = local.nombre;
+  const ubicacion = local.direccion;
   return (
     <div>
       <ClickableTile className="back_card">
@@ -31,10 +63,7 @@ export default function CardVenue(children: Local) {
               </div>
               <div
                 style={{ display: "flex", alignItems: "left", gap: "0.5rem" }}
-              >
-                <Calendar size={25}></Calendar>
-                <p>{fechaEvento}</p>
-              </div>
+              ></div>
             </Stack>
           </Column>
           <Column sm={4} md={4} lg={4} xlg={4} max={4}>
@@ -46,11 +75,11 @@ export default function CardVenue(children: Local) {
               }}
             >
               <img
-                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS_lgROAzNtkzHWNBsAzCCxwLUEIqUN98CZ0g&s"
-                alt="descripción"
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS_lgROAzNtkzHWNBsAzCCxwLUEIqUN98CZ0g&s" // local.foto
+                alt="Imagen del local"
                 style={{ width: "100%", objectFit: "cover" }}
               ></img>
-              <CardVenueTag mensaje={mensaje}></CardVenueTag>
+              <CardVenueTag mensaje={mensaje} color={color}></CardVenueTag>
             </div>
           </Column>
         </Grid>
