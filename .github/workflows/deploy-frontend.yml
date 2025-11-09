@@ -33,13 +33,18 @@ jobs:
           # Traer últimos cambios
           git pull origin main
 
+          # Asegurar permisos correctos ANTES del build
+          sudo chown -R ubuntu:ubuntu .
+          sudo chmod -R 755 .
+
           # Instalar dependencias (si cambió algo)
           npm ci --force
 
           # Construir el proyecto
           npm run build
 
-          # Asignar permisos (por si acaso)
+          # Asegurar permisos en dist por si el build los crea como root
+          sudo chown -R ubuntu:ubuntu dist
           sudo chmod -R 755 dist
 
           # Reiniciar nginx para aplicar cambios

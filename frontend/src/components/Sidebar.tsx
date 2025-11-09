@@ -9,12 +9,16 @@ import {
   ChartBarIcon,
   LogoutIcon,
 } from "./icons";
+
 import { Callout } from "@carbon/react";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
-import { logoutService } from "../services/logoutService";
 import "../styles/Sidebar.css";
 const imageBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL;
+
+import { useState } from "react";
+import { logoutService } from "../services/logoutService";
+import { useAuthStore } from "../store/useAuthStore"; // AÑADIR ESTA IMPORTACIÓN
+
 const LLAMADA_EXITOSA = 200;
 
 interface NavItemProps {
@@ -23,6 +27,7 @@ interface NavItemProps {
   active?: boolean;
   route?: string;
   onClick?: () => void;
+  disabled?: boolean; // AÑADIR ESTA PROP
 }
 
 type NavEntry = {
@@ -36,12 +41,15 @@ const NavItem: React.FC<NavItemProps> = ({
   label,
   active = false,
   onClick,
+  disabled = false,
 }) => {
   return (
     <a
-      onClick={onClick}
-      className={`nav-item ${active ? "nav-item-active" : ""}`}
-      style={{ cursor: "pointer" }}
+      onClick={disabled ? undefined : onClick}
+      className={`nav-item ${active ? "nav-item-active" : ""} ${
+        disabled ? "nav-item-disabled" : ""
+      }`}
+      style={{ cursor: disabled ? "not-allowed" : "pointer" }}
     >
       {icon}
       <span className="nav-label">{label}</span>
@@ -51,12 +59,11 @@ const NavItem: React.FC<NavItemProps> = ({
 
 interface SidebarProps {
   currentPath?: string;
-  onToggleSidebar?: (open: boolean) => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ currentPath = "" , onToggleSidebar}) => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+const Sidebar: React.FC<SidebarProps> = ({ currentPath = "" }) => {
   const navigate = useNavigate();
+  const { logout } = useAuthStore();
   const [showSuccess, setShowSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -64,27 +71,27 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath = "" , onToggleSidebar}) 
     try {
       setLoading(true);
       const llamadaAPI = await logoutService();
+
       if (llamadaAPI === LLAMADA_EXITOSA) {
         setShowSuccess(true);
+        
+        // Esperar 1 segundo antes de limpiar y redirigir
         setTimeout(() => {
-          navigate("/login");
-        }, 1000); // 1000 ms = 1 segundo
+          logout();
+        }, 1000);
       }
     } catch (error: any) {
+      console.error("Error al cerrar sesión:", error);
+      // Si falla, redirigir 
+      logout();
     } finally {
       setLoading(false);
     }
   };
+
   const handleNavigate = (route?: string) => {
     if (route) navigate(`/admin/${route}`);
   };
-
-  const toggleSidebar = () => {
-    const newState = !sidebarOpen;
-    setSidebarOpen(newState);
-    onToggleSidebar?.(newState); // Notifica al padre
-  };
-
   const manageItems: NavEntry[] = [
     {
       icon: <DocumentReportIcon />,
@@ -126,15 +133,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath = "" , onToggleSidebar}) 
   ];
 
   return (
-    <>
-    {/* Botón hamburguesa visible solo en móvil */}
-      <button
-        className="hamburger-button"
-        onClick={toggleSidebar}
-      >
-        ☰
-      </button>
-    <aside className={`sidebar ${sidebarOpen ? "open" : "closed"}`}>
+    <aside className="sidebar">
       <div className="logo-container">
         <img
           src={`${imageBaseUrl}/ebentos-logo-morado.png`}
@@ -187,12 +186,11 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath = "" , onToggleSidebar}) 
         <Callout
           kind="success"
           statusIconDescription="notification"
-          title="¡Session cerrada exitosamente!"
-          subtitle="Redirigiendo ..."
+          title="¡Sesión cerrada exitosamente!"
+          subtitle="Redirigiendo..."
         />
       )}
     </aside>
-    </>
   );
 };
 

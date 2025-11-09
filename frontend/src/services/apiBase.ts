@@ -20,7 +20,6 @@ api.interceptors.response.use(
       // Limpiar storage y redirigir al login
       const { logout } = useAuthStore.getState();
       logout();
-      window.location.href = '/login';
     }
     return Promise.reject(error);
   }
