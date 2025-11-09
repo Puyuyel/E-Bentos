@@ -82,7 +82,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath = "" }) => {
       }
     } catch (error: any) {
       console.error("Error al cerrar sesión:", error);
-      // Si falla, redirigir inmediatamente
+      // Si falla, redirigir 
       logout();
     } finally {
       setLoading(false);

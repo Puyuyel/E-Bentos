@@ -65,24 +65,3 @@ export const useAuthStore = create<AuthState>()(
   )
 );
 
-const handleCerrarSessionClick = async () => {
-  try {
-    setLoading(true);
-    const llamadaAPI = await logoutService();
-
-    if (llamadaAPI === LLAMADA_EXITOSA) {
-      setShowSuccess(true);
-      
-      // Esperar 1 segundo antes de limpiar y redirigir
-      setTimeout(() => {
-        logout();
-      }, 1000);
-    }
-  } catch (error: any) {
-    console.error("Error al cerrar sesión:", error);
-    // Si falla, redirigir inmediatamente
-    logout();
-  } finally {
-    setLoading(false);
-  }
-};
