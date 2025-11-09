@@ -1,5 +1,7 @@
 // src/services/api.ts
 import axios from "axios";
+import { useAuthStore } from "../store/useAuthStore";
+
 const apiBaseUrl = import.meta.env.VITE_API_URL;
 
 const api = axios.create({
@@ -9,5 +11,18 @@ const api = axios.create({
     "Content-Type": "application/json",
   },
 });
+
+// Interceptor de respuesta para manejar errores 401
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Limpiar storage y redirigir al login
+      const { logout } = useAuthStore.getState();
+      logout();
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default api;
