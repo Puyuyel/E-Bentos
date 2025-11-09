@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Sidebar from '../../components/Sidebar';
 import Lollipop from '../../components/Lollipop';
 import GroupedBar from '../../components/GroupedBar';
@@ -6,31 +6,113 @@ import Donut from '../../components/Donut';
 import Gauge from '../../components/Gauge';
 import FilterBar from '../../components/FilterBar.tsx';
 import '../../styles/Reportes/Reporte.css';
-import type { ChartDatum } from "../../components/types.ts";
+import { getReporteLocales } from "../../services/reporteLocalService.ts";
+import type { ChartDatum } from "../../components/util/types.ts";
+
+interface ReporteLocalItem {
+  categoriaEvento: string;
+  nombreProductora: string;
+  idEvento: number;
+  fechaEvento: string;
+  idLocal: number;
+  nombreLocal: string;
+  aforoLocal: number;
+  idProductora: number;
+  montoRecaudado: number;
+  asistentes: number;
+}
 
 const ReporteLocal: React.FC = () => {
-  const sampleData: ChartDatum[] = [
-    { key: "Local 1", value: 65000 },
-    { key: "Local 2", value: 32000 },
-    { key: "Local 3", value: 42000 },
-    { key: "Local 4", value: 18000 },
-  ];
 
-  const groupedData: ChartDatum[] = [
-    { group: "Local 1", key: "Enero", value: 65000 },
-    { group: "Local 1", key: "Febrero", value: 29123 },
-    { group: "Local 2", key: "Enero", value: 32432 },
-    { group: "Local 2", key: "Febrero", value: 21312 },
-  ];
-
+  const [reportes, setReportes] = useState<ReporteLocalItem[]>([]);
   const [filters, setFilters] = useState<Record<string, any>>({});
+  const [loading, setLoading] = useState(true);
 
-  // Esta función recibe los cambios desde el FilterBar
-  const handleFilterChange = (newFilters: Record<string, any>) => {
-    setFilters((prev) => ({ ...prev, ...newFilters }));
-    console.log("Filtros aplicados:", { ...filters, ...newFilters });
-  };
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const data = await getReporteLocales();
+        console.log("Datos del backend:", data);
+        setReportes(data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
+
+  if (loading) return <p>Cargando datos...</p>;
+
+  const filteredReportes = reportes.filter((r) => {
+    const fecha = new Date(r.fechaEvento);
+    const fechaInicio = filters.fechaInicio ? new Date(filters.fechaInicio) : null;
+    const fechaFin = filters.fechaFin ? new Date(filters.fechaFin) : null;
+
+    // Filtrar por fecha
+    if (fechaInicio && fechaFin) {
+      // Si hay ambas fechas, debe estar entre ambas (inclusive)
+      if (fecha < fechaInicio || fecha > fechaFin) return false;
+    } else if (fechaInicio) {
+      // Si solo hay fecha de inicio, tomar desde esa fecha en adelante
+      if (fecha < fechaInicio) return false;
+    } else if (fechaFin) {
+      // Si solo hay fecha de fin, tomar hasta esa fecha
+      if (fecha > fechaFin) return false;
+    }
+
+    // Filtrar por categoría
+    if (filters.categoriaEvento && filters.categoriaEvento !== 'default') {
+      if (r.categoriaEvento?.toLowerCase() !== filters.categoriaEvento.toLowerCase()) {
+        return false;
+      }
+    }
+
+    // Filtrar por local
+    if (filters.local && filters.local !== 'default') {
+      if (r.nombreLocal?.toLowerCase() !== filters.local.toLowerCase()) {
+        return false;
+      }
+    }
+
+    // Filtrar por productora
+    if (filters.productora && filters.productora !== 'default') {
+      if (r.nombreProductora?.toLowerCase() !== filters.productora.toLowerCase()) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+
+  const dataToDisplay = filteredReportes.length > 0 ? filteredReportes : reportes;
   
+  const totalAforo = dataToDisplay.reduce((acc, r) => acc + Number(r.aforoLocal), 0);
+  const totalAsistentes = dataToDisplay.reduce((acc, r) => acc + Number(r.asistentes), 0);
+
+  const ingresosPorLocal = dataToDisplay.reduce<Record<number, number>>((acc, r) => {
+    acc[r.idLocal] = (acc[r.idLocal] || 0) + Number(r.montoRecaudado);
+    return acc;
+  }, {});
+
+  const incomeData: ChartDatum[] = Object.entries(ingresosPorLocal).map(
+    ([idLocal, montoTotal]) => {
+      const local = dataToDisplay.find((r) => r.idLocal === Number(idLocal));
+      return {
+        group: local?.nombreLocal || `Local ${idLocal}`,
+        key: idLocal,
+        value: montoTotal,
+      };
+    }
+  );
+  
+  const groupedData: ChartDatum[] = dataToDisplay.map((r) => ({
+    group: r.categoriaEvento,
+    key: r.nombreLocal,
+    value: r.montoRecaudado,
+  }));
+
   return (
     <div className="reporte-container">
       <Sidebar currentPath="reporte-local" />
@@ -40,20 +122,20 @@ const ReporteLocal: React.FC = () => {
           Visión General de <span className="highlight">Locales</span>
         </h1>
 
-        <FilterBar onFilterChange={handleFilterChange} />
+        <FilterBar onFilterChange={(newFilter) => {setFilters((prev) => ({ ...prev, ...newFilter }));}} />
         
         <div className="chart-container">
           <div className="chart-item">
-            <Gauge totalCapacity={1000} usedCapacity={720} />
+            <Gauge totalCapacity={totalAforo} usedCapacity={totalAsistentes} />
           </div>
           <div className="chart-item">
-            <Donut data={groupedData}/>
+            <Donut data={incomeData}/>
           </div>
           <div className="chart-item">
             <GroupedBar data={groupedData}/>
           </div>
           <div className="chart-item">
-            <Lollipop data={sampleData}/>
+            <Lollipop data={incomeData}/>
           </div>
         </div>
       </div>
