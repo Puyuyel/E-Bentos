@@ -1,56 +1,67 @@
 // src/store/useAuthStore.ts
 import { create } from "zustand";
-import { login } from "../services/authService"; // tu servicio API
+import { persist } from "zustand/middleware";
+import { login } from "../services/authService";
 import type { LoginCredentials } from "../types/auth.types";
 
 interface User {
   id?: string;
   loginCreds: LoginCredentials;
-  rol: string; // o "role" según tu backend
+  rol: string;
 }
 
 interface AuthState {
   user: User | null;
   isLoggedIn: boolean;
   displayName: string | null;
-  login: (email: string, password: string) => Promise<void>;
+  login: (loginCreds: LoginCredentials) => Promise<string>;
   logout: () => void;
   setUser: (user: User | null) => void;
   setDisplayName: (name: string) => void;
 }
 
-export const useAuthStore = create<AuthState>((set : any) => ({
-  user: null,
-  isLoggedIn: false,
-  displayName: null,
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set) => ({
+      user: null,
+      isLoggedIn: false,
+      displayName: null,
 
-  // Llama al backend real
-  login: async (loginCreds: LoginCredentials) => {
-    try {
-      const response = await login(loginCreds); // devuelve { email, rol, ... }
-      const userResponse = {
-        id: response.id,
-        email: loginCreds.email,
-        rol: response.role,
-      };
-      set({ user: userResponse, isLoggedIn: true , dispatchEvent: null});
-      return userResponse.rol;
-    } catch (error) {
-      console.error("Error en login:", error);
-      throw error;
+      login: async (loginCreds: LoginCredentials) => {
+        try {
+          const response = await login(loginCreds);
+          const userResponse = {
+            id: response.id,
+            email: loginCreds.email,
+            rol: response.role,
+          };
+          set({ user: userResponse, isLoggedIn: true });
+          return userResponse.rol;
+        } catch (error) {
+          console.error("Error en login:", error);
+          throw error;
+        }
+      },
+
+      logout: () => {
+        console.log("🚪 Ejecutando logout...");
+        set({ user: null, isLoggedIn: false, displayName: null });
+        localStorage.removeItem("auth-storage");
+        console.log("🔄 Redirigiendo a /login");
+        window.location.href = "/login";
+      },
+
+      setUser: (user: User | null) => {
+        set({ user, isLoggedIn: !!user });
+      },
+
+      setDisplayName: (name: string) => {
+        set({ displayName: name });
+      },
+    }),
+    {
+      name: "auth-storage",
     }
-  },
+  )
+);
 
-  logout: () => {
-    // opcional: llamar a /logout en tu API
-    set({ user: null, isLoggedIn: false, displayName: null });
-  },
-
-  setUser: (user : any) => {
-    set({ user, isLoggedIn: !!user });
-  },
-
-  setDisplayName: (name: any) => {
-    set({ displayName: name });
-  },
-}));
