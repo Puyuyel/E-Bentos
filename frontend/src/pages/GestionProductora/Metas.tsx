@@ -81,51 +81,53 @@ const Metas: React.FC = () => {
       if (editingGoal) {
         // 🟡 MODO EDICIÓN
         await editarMeta(editingGoal.id, {
-          evento: { eventoId: editingGoal.id },
+          evento: { eventoId: editingGoal.id }, // o el id real del evento si lo guardas
           metaIngresos: formData.incomeGoal || 0,
           tasaConversion: formData.conversionRateGoal || 0,
           ticketsObjetivo: formData.ticketsToSell || 0,
           activo: 1,
         });
 
-        // 🔁 Actualiza localmente en lugar de volver a llamar a la API
-        setGoals((prevGoals) =>
-          prevGoals.map((goal) =>
-            goal.id === editingGoal.id
-              ? {
-                  ...goal,
-                  incomeGoal: formData.incomeGoal || goal.incomeGoal,
-                  conversionRateGoal:
-                    formData.conversionRateGoal || goal.conversionRateGoal,
-                  ticketsToSell: formData.ticketsToSell || goal.ticketsToSell,
-                }
-              : goal
-          )
-        );
+        // Refresca la lista desde la API
+        const metas = await listarMetasProductora();
+        const goalsAdapted: Goal[] = metas.map((m) => ({
+          id: m.metaId,
+          eventName: m.nombreEvento,
+          eventEndDate: m.fechaHorarioInicio.split("T")[0],
+          incomeGoal: m.metaIngresos,
+          incomeAchieved: m.montoTotalRecaudado,
+          conversionRateGoal: m.tasaConversion,
+          conversionRateAchieved:
+            m.visitas > 0 ? (m.entradasVendidas / m.visitas) * 100 : 0,
+          ticketsToSell: m.ticketsObjetivo,
+          ticketsSold: m.entradasVendidas,
+        }));
+        setGoals(goalsAdapted);
       } else {
         // 🟢 MODO CREACIÓN
-        const response = await crearMeta({
-          evento: { eventoId: formData.id ?? 0 },
+        await crearMeta({
+          evento: { eventoId: Number(formData.id) || 0 }, // id del evento seleccionado
           metaIngresos: formData.incomeGoal || 0,
           tasaConversion: formData.conversionRateGoal || 0,
           ticketsObjetivo: formData.ticketsToSell || 0,
           activo: 1,
         });
 
-        // 🔁 Agrega la nueva meta al front (sin volver a listar)
-        const newGoal: Goal = {
-          id: response?.metaId || Date.now(), // usa el id real si lo devuelve la API, o un temporal
-          eventName: formData.eventName || "Evento sin nombre",
-          eventEndDate: new Date().toISOString().split("T")[0], // temporal
-          incomeGoal: formData.incomeGoal || 0,
-          incomeAchieved: 0,
-          conversionRateGoal: formData.conversionRateGoal || 0,
-          conversionRateAchieved: 0,
-          ticketsToSell: formData.ticketsToSell || 0,
-          ticketsSold: 0,
-        };
-
-        setGoals((prevGoals) => [...prevGoals, newGoal]);
+        // Refresca la lista
+        const metas = await listarMetasProductora();
+        const goalsAdapted: Goal[] = metas.map((m) => ({
+          id: m.metaId,
+          eventName: m.nombreEvento,
+          eventEndDate: m.fechaHorarioInicio.split("T")[0],
+          incomeGoal: m.metaIngresos,
+          incomeAchieved: m.montoTotalRecaudado,
+          conversionRateGoal: m.tasaConversion * 100,
+          conversionRateAchieved:
+            m.visitas > 0 ? (m.entradasVendidas / m.visitas) * 100 : 0,
+          ticketsToSell: m.ticketsObjetivo,
+          ticketsSold: m.entradasVendidas,
+        }));
+        setGoals(goalsAdapted);
       }
 
       handleCloseModal();
