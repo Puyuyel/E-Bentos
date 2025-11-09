@@ -44,11 +44,11 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: () => {
+        console.log("🚪 Ejecutando logout...");
         set({ user: null, isLoggedIn: false, displayName: null });
         localStorage.removeItem("auth-storage");
-        setTimeout(() => {
-          window.location.href = "/login";
-        }, 100);
+        console.log("🔄 Redirigiendo a /login");
+        window.location.href = "/login";
       },
 
       setUser: (user: User | null) => {
@@ -64,3 +64,25 @@ export const useAuthStore = create<AuthState>()(
     }
   )
 );
+
+const handleCerrarSessionClick = async () => {
+  try {
+    setLoading(true);
+    const llamadaAPI = await logoutService();
+
+    if (llamadaAPI === LLAMADA_EXITOSA) {
+      setShowSuccess(true);
+      
+      // Esperar 1 segundo antes de limpiar y redirigir
+      setTimeout(() => {
+        logout();
+      }, 1000);
+    }
+  } catch (error: any) {
+    console.error("Error al cerrar sesión:", error);
+    // Si falla, redirigir inmediatamente
+    logout();
+  } finally {
+    setLoading(false);
+  }
+};

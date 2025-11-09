@@ -17,6 +17,7 @@ const imageBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL;
 
 import { useState } from "react";
 import { logoutService } from "../services/logoutService";
+import { useAuthStore } from "../store/useAuthStore"; // AÑADIR ESTA IMPORTACIÓN
 
 const LLAMADA_EXITOSA = 200;
 
@@ -26,6 +27,7 @@ interface NavItemProps {
   active?: boolean;
   route?: string;
   onClick?: () => void;
+  disabled?: boolean; // AÑADIR ESTA PROP
 }
 
 type NavEntry = {
@@ -39,12 +41,15 @@ const NavItem: React.FC<NavItemProps> = ({
   label,
   active = false,
   onClick,
+  disabled = false,
 }) => {
   return (
     <a
-      onClick={onClick}
-      className={`nav-item ${active ? "nav-item-active" : ""}`}
-      style={{ cursor: "pointer" }}
+      onClick={disabled ? undefined : onClick}
+      className={`nav-item ${active ? "nav-item-active" : ""} ${
+        disabled ? "nav-item-disabled" : ""
+      }`}
+      style={{ cursor: disabled ? "not-allowed" : "pointer" }}
     >
       {icon}
       <span className="nav-label">{label}</span>
@@ -58,6 +63,7 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ currentPath = "" }) => {
   const navigate = useNavigate();
+  const { logout } = useAuthStore();
   const [showSuccess, setShowSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -65,17 +71,24 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath = "" }) => {
     try {
       setLoading(true);
       const llamadaAPI = await logoutService();
+
       if (llamadaAPI === LLAMADA_EXITOSA) {
         setShowSuccess(true);
+        
+        // Esperar 1 segundo antes de limpiar y redirigir
         setTimeout(() => {
-          navigate("/login");
-        }, 1000); // 1000 ms = 1 segundo
+          logout();
+        }, 1000);
       }
     } catch (error: any) {
+      console.error("Error al cerrar sesión:", error);
+      // Si falla, redirigir inmediatamente
+      logout();
     } finally {
       setLoading(false);
     }
   };
+
   const handleNavigate = (route?: string) => {
     if (route) navigate(`/admin/${route}`);
   };
@@ -173,8 +186,8 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath = "" }) => {
         <Callout
           kind="success"
           statusIconDescription="notification"
-          title="¡Session cerrada exitosamente!"
-          subtitle="Redirigiendo ..."
+          title="¡Sesión cerrada exitosamente!"
+          subtitle="Redirigiendo..."
         />
       )}
     </aside>

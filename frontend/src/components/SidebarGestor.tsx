@@ -27,6 +27,7 @@ interface NavItemProps {
   active?: boolean;
   route?: string;
   onClick?: () => void;
+  disabled?: boolean;
 }
 
 type NavEntry = {
@@ -40,12 +41,13 @@ const NavItem: React.FC<NavItemProps> = ({
   label,
   active = false,
   onClick,
+  disabled = false,
 }) => {
   return (
     <a
-      onClick={onClick}
-      className={`nav-item ${active ? "nav-item-active" : ""}`}
-      style={{ cursor: "pointer" }}
+      onClick={disabled ? undefined : onClick}
+      className={`nav-item ${active ? "nav-item-active" : ""} ${disabled ? "nav-item-disabled" : ""}`}
+      style={{ cursor: disabled ? "not-allowed" : "pointer" }}
     >
       {icon}
       <span className="nav-label">{label}</span>
@@ -61,6 +63,7 @@ interface SidebarProps {
 const SidebarGestor: React.FC<SidebarProps> = ({ currentPath = "" , onToggleSidebar}) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
+  const { logout } = useAuthStore(); // AÑADIR ESTA LÍNEA
   const [showSuccess, setShowSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const { user, displayName, setDisplayName } = useAuthStore();
@@ -130,13 +133,19 @@ const SidebarGestor: React.FC<SidebarProps> = ({ currentPath = "" , onToggleSide
     try {
       setLoading(true);
       const llamadaAPI = await logoutService();
+      
       if (llamadaAPI === LLAMADA_EXITOSA) {
         setShowSuccess(true);
+        
+        // Esperar 1 segundo antes de limpiar y redirigir
         setTimeout(() => {
-          navigate("/login");
-        }, 1000); // 1000 ms = 1 segundo
+          logout();
+        }, 1000);
       }
-    } catch (error: any) { 
+    } catch (error: any) {
+      console.error("Error al cerrar sesión:", error);
+      // Si falla, redirigir inmediatamente
+      logout();
     } finally {
       setLoading(false);
     }
@@ -265,14 +274,15 @@ const SidebarGestor: React.FC<SidebarProps> = ({ currentPath = "" , onToggleSide
             icon={<LogoutIcon />}
             label="Cerrar sesión"
             onClick={handleCerrarSessionClick}
+            disabled={loading}
           />
         </div>
         {showSuccess && (
           <Callout
             kind="success"
             statusIconDescription="notification"
-            title="¡Session cerrada exitosamente!"
-            subtitle="Redirigiendo ..."
+            title="¡Sesión cerrada exitosamente!"
+            subtitle="Redirigiendo..."
           />
         )}
       </aside>
