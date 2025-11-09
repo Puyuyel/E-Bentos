@@ -42,7 +42,7 @@ const Metas: React.FC = () => {
           eventEndDate: m.fechaHorarioInicio.split("T")[0],
           incomeGoal: m.metaIngresos,
           incomeAchieved: m.montoTotalRecaudado,
-          conversionRateGoal: m.tasaConversion,
+          conversionRateGoal: m.tasaConversion * 100,
           conversionRateAchieved:
             m.visitas > 0 ? (m.entradasVendidas / m.visitas) * 100 : 0,
           ticketsToSell: m.ticketsObjetivo,

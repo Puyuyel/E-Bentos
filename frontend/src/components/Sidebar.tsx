@@ -9,15 +9,12 @@ import {
   ChartBarIcon,
   LogoutIcon,
 } from "./icons";
-
 import { Callout } from "@carbon/react";
 import { useNavigate } from "react-router-dom";
-import "../styles/Sidebar.css";
-const imageBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL;
-
 import { useState } from "react";
 import { logoutService } from "../services/logoutService";
-
+import "../styles/Sidebar.css";
+const imageBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL;
 const LLAMADA_EXITOSA = 200;
 
 interface NavItemProps {
@@ -54,9 +51,11 @@ const NavItem: React.FC<NavItemProps> = ({
 
 interface SidebarProps {
   currentPath?: string;
+  onToggleSidebar?: (open: boolean) => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ currentPath = "" }) => {
+const Sidebar: React.FC<SidebarProps> = ({ currentPath = "" , onToggleSidebar}) => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
   const [showSuccess, setShowSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -79,6 +78,13 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath = "" }) => {
   const handleNavigate = (route?: string) => {
     if (route) navigate(`/admin/${route}`);
   };
+
+  const toggleSidebar = () => {
+    const newState = !sidebarOpen;
+    setSidebarOpen(newState);
+    onToggleSidebar?.(newState); // Notifica al padre
+  };
+
   const manageItems: NavEntry[] = [
     {
       icon: <DocumentReportIcon />,
@@ -120,7 +126,15 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath = "" }) => {
   ];
 
   return (
-    <aside className="sidebar">
+    <>
+    {/* Botón hamburguesa visible solo en móvil */}
+      <button
+        className="hamburger-button"
+        onClick={toggleSidebar}
+      >
+        ☰
+      </button>
+    <aside className={`sidebar ${sidebarOpen ? "open" : "closed"}`}>
       <div className="logo-container">
         <img
           src={`${imageBaseUrl}/ebentos-logo-morado.png`}
@@ -178,6 +192,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath = "" }) => {
         />
       )}
     </aside>
+    </>
   );
 };
 
