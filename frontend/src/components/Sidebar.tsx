@@ -59,22 +59,31 @@ const NavItem: React.FC<NavItemProps> = ({
 
 interface SidebarProps {
   currentPath?: string;
+  onToggleSidebar?: (open: boolean) => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ currentPath = "" }) => {
+
+const Sidebar: React.FC<SidebarProps> = ({ currentPath = "" , onToggleSidebar})  => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
   const { logout } = useAuthStore();
   const [showSuccess, setShowSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const toggleSidebar = () => {
+    const newState = !sidebarOpen;
+    setSidebarOpen(newState);
+    onToggleSidebar?.(newState); // Notifica al padre
+  };
+
   const handleCerrarSessionClick = async () => {
     try {
       setLoading(true);
       const llamadaAPI = await logoutService();
-
+      //llamada a la api
       if (llamadaAPI === LLAMADA_EXITOSA) {
         setShowSuccess(true);
-        
+
         // Esperar 1 segundo antes de limpiar y redirigir
         setTimeout(() => {
           logout();
@@ -82,7 +91,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath = "" }) => {
       }
     } catch (error: any) {
       console.error("Error al cerrar sesión:", error);
-      // Si falla, redirigir 
+      // Si falla, redirigir
       logout();
     } finally {
       setLoading(false);
@@ -133,64 +142,69 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath = "" }) => {
   ];
 
   return (
-    <aside className="sidebar">
-      <div className="logo-container">
-        <img
-          src={`${imageBaseUrl}/ebentos-logo-morado.png`}
-          alt="e-Bentos Logo"
-          className="logo"
-        />
-        <span className="logo-text">e-Bentos</span>
-      </div>
-
-      <nav className="sidebar-nav">
-        <div>
-          <h3 className="nav-section-title">Gestionar</h3>
-          <div className="nav-group">
-            {manageItems.map((item, index) => (
-              <NavItem
-                key={index}
-                icon={item.icon}
-                label={item.label}
-                active={currentPath === item.route}
-                onClick={() => handleNavigate(item.route)}
-              />
-            ))}
-          </div>
+    <>
+      <button className="hamburger-button" onClick={toggleSidebar}>
+        ☰
+      </button>
+      <aside className={`sidebar ${sidebarOpen ? "open" : "closed"}`}>
+        <div className="logo-container">
+          <img
+            src={`${imageBaseUrl}/ebentos-logo-morado.png`}
+            alt="e-Bentos Logo"
+            className="logo"
+          />
+          <span className="logo-text">e-Bentos</span>
         </div>
-        <div>
-          <h3 className="nav-section-title">Reportes</h3>
-          <div className="nav-group">
-            {reportItems.map((item, index) => (
-              <NavItem
-                key={index}
-                icon={item.icon}
-                label={item.label}
-                active={currentPath === item.route}
-                onClick={() => handleNavigate(item.route)}
-              />
-            ))}
-          </div>
-        </div>
-      </nav>
 
-      <div className="logout-container">
-        <NavItem
-          icon={<LogoutIcon />}
-          label="Cerrar sesión"
-          onClick={handleCerrarSessionClick}
-          disabled={loading}
-        />
-      </div>
-      {showSuccess && (
-        <Callout
-          kind="success"
-          statusIconDescription="notification"
-          title="¡Sesión cerrada exitosamente!"
-          subtitle="Redirigiendo..."
-        />
-      )}
-    </aside>
+        <nav className="sidebar-nav">
+          <div>
+            <h3 className="nav-section-title">Gestionar</h3>
+            <div className="nav-group">
+              {manageItems.map((item, index) => (
+                <NavItem
+                  key={index}
+                  icon={item.icon}
+                  label={item.label}
+                  active={currentPath === item.route}
+                  onClick={() => handleNavigate(item.route)}
+                />
+              ))}
+            </div>
+          </div>
+          <div>
+            <h3 className="nav-section-title">Reportes</h3>
+            <div className="nav-group">
+              {reportItems.map((item, index) => (
+                <NavItem
+                  key={index}
+                  icon={item.icon}
+                  label={item.label}
+                  active={currentPath === item.route}
+                  onClick={() => handleNavigate(item.route)}
+                />
+              ))}
+            </div>
+          </div>
+        </nav>
+
+        <div className="logout-container">
+          <NavItem
+            icon={<LogoutIcon />}
+            label="Cerrar sesión"
+            onClick={handleCerrarSessionClick}
+            disabled={loading}
+          />
+        </div>
+        {showSuccess && (
+          <Callout
+            kind="success"
+            statusIconDescription="notification"
+            title="¡Sesión cerrada exitosamente!"
+            subtitle="Redirigiendo..."
+          />
+        )}
+      </aside>
+    </>
   );
 };
 
