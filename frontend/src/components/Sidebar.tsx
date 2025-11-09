@@ -80,7 +80,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath = "" , onToggleSidebar}) 
     try {
       setLoading(true);
       const llamadaAPI = await logoutService();
-
+      //llamada a la api
       if (llamadaAPI === LLAMADA_EXITOSA) {
         setShowSuccess(true);
 
