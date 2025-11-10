@@ -27,6 +27,7 @@ export interface FormDataLocal {
 }
 
 export interface FormDataLocalUpdate {
+  localId: number;
   nombre: string;
   direccion: string;
   foto: string;

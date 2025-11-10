@@ -3,6 +3,7 @@ import {
   Column,
   Stack,
   TextInput,
+  TextArea,
   ClickableTile,
   FileUploaderDropContainer,
   FileUploaderItem,
@@ -12,12 +13,12 @@ import {
 } from "@carbon/react";
 import { Location } from "@carbon/react/icons";
 import CardVenueTag from "../../../components/Gestion/CardVenueTag";
-import type { FormDataLocalUpdate, Local } from "../../types/locales.types";
+import type { FormDataLocalUpdate, Local } from "../../../types/locales.types";
 import { useState, useEffect, useRef, type MouseEvent } from "react";
 import { useForm } from "react-hook-form";
 import editarLocal from "../../../services/LocalesServices/editarLocalService";
 import uploadImage from "../../../services/LocalesServices/uploadImageService";
-import { eliminarGestorLocal } from "../../../services/gestorLocalService";
+import eliminarLocal from "../../../services/LocalesServices/eliminarLocalService";
 
 const imageBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL;
 
@@ -66,6 +67,8 @@ export default function CardVenue({ local }: CardVenueProps) {
     },
   });
   const [mensaje, setMensaje] = useState<string>("");
+  const [motivo, setMotivo] = useState<string>("");
+  const [isInvalidMotive, setIsInvalidMotive] = useState(false);
   const [color, setColor] = useState<string>("gray");
   const fileUploaderRef = useRef<HTMLButtonElement>(null);
   const [files, setFiles] = useState<File[]>([]);
@@ -132,28 +135,63 @@ export default function CardVenue({ local }: CardVenueProps) {
     // Lógica para dar de baja el local
     console.log(`Dar de baja el local con ID: ${local.localId}`);
     try {
-      const response = await eliminarGestorLocal(local.localId);
-      if (response.status === 200) {
-        return (
-          <Modal>
-            <p style={{ color: "green" }}>Local dado de baja con éxito.</p>
-          </Modal>
-        );
-      }
+      const response = await eliminarLocal(local.localId);
+      return response;
     } catch (error) {
-      return (
-        <Modal>
-          <p style={{ color: "red" }}>Error al dar de baja el local.</p>
-        </Modal>
-      );
-      console.log("Error al dar de baja el local:", error);
-    } finally {
-      setIsModalOpen(false);
+      console.error("Error al dar de baja el local:", error);
+      throw error;
     }
   };
   const onDarBajaClick = async (e: MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    await handleDarLocalBaja();
+    // open confirmation modal
+    setConfirmOpen(true);
+  };
+
+  // Confirmation + deletion states
+  const [confirmOpen, setConfirmOpen] = useState<boolean>(false);
+  const [deleting, setDeleting] = useState<boolean>(false);
+  const [resultOpen, setResultOpen] = useState<boolean>(false);
+  const [resultMessage, setResultMessage] = useState<string>("");
+  const [resultSuccess, setResultSuccess] = useState<boolean | null>(null);
+
+  const handleConfirmCancel = () => {
+    setConfirmOpen(false);
+  };
+
+  const handleConfirmYes = async () => {
+    if (motivo.trim() === "") {
+      setIsInvalidMotive(true);
+      return;
+    }
+    setConfirmOpen(false);
+    setDeleting(true);
+    setResultOpen(true);
+    setResultMessage("Eliminando el local...");
+    try {
+      const response = await handleDarLocalBaja();
+      setDeleting(false);
+      if (response && response.status === 200) {
+        setResultSuccess(true);
+        setResultMessage("Local eliminado exitosamente.");
+      } else {
+        setResultSuccess(false);
+        setResultMessage("El local no se pudo eliminar.");
+      }
+    } catch {
+      setDeleting(false);
+      setResultSuccess(false);
+      setResultMessage("El local no se pudo eliminar.");
+    }
+  };
+
+  const handleResultClose = () => {
+    setResultOpen(false);
+    // If deletion was successful, reload the page so parent list updates
+    if (resultSuccess) {
+      // small timeout to ensure modal finishes closing visually
+      setTimeout(() => window.location.reload(), 150);
+    }
   };
 
   return (
@@ -327,6 +365,51 @@ export default function CardVenue({ local }: CardVenueProps) {
           </div>
         </div>
       </Modal>
+
+      {/* Confirm deletion modal */}
+      {confirmOpen && (
+        <Modal
+          aria-label="Confirmar eliminación"
+          modalHeading="Confirmación"
+          open={confirmOpen}
+          onRequestClose={handleConfirmCancel}
+          onRequestSubmit={handleConfirmYes}
+          onSecondarySubmit={handleConfirmCancel}
+          primaryButtonText="Sí"
+          secondaryButtonText="No"
+        >
+          <p style={{ marginBottom: "1rem" }}>
+            ¿Está seguro de eliminar el Local?
+          </p>
+          <TextArea
+            enableCounter
+            id="motivo-eliminacion"
+            invalid={isInvalidMotive}
+            invalidText="El motivo es obligatorio."
+            labelText="Motivo de eliminación"
+            maxCount={500}
+            placeholder="Ingrese un motivo para la elminación."
+            rows={4}
+            onChange={(e) => setMotivo(e.target.value)}
+          />
+        </Modal>
+      )}
+
+      {/* Result / loading modal */}
+      {resultOpen && (
+        <Modal
+          aria-label="Resultado eliminación"
+          modalHeading={
+            deleting ? "Eliminando..." : resultSuccess ? "Éxito" : "Error"
+          }
+          open={resultOpen}
+          onRequestClose={handleResultClose}
+          onRequestSubmit={handleResultClose}
+          primaryButtonText={deleting ? undefined : "Aceptar"}
+        >
+          <p>{resultMessage}</p>
+        </Modal>
+      )}
 
       <ClickableTile
         className="back_card"

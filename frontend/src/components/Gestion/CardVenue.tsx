@@ -8,6 +8,7 @@ import {
   FileUploaderItem,
   FormItem,
   Modal,
+  InlineLoading,
 } from "@carbon/react";
 import { Location } from "@carbon/react/icons";
 import CardVenueTag from "./CardVenueTag";
@@ -44,6 +45,7 @@ export default function CardVenue({ local }: CardVenueProps) {
     setValue,
   } = useForm<FormDataLocalUpdate>({
     defaultValues: {
+      localId: local.localId,
       nombre: local.nombre,
       direccion: local.direccion,
       foto: local.foto,
@@ -97,32 +99,55 @@ export default function CardVenue({ local }: CardVenueProps) {
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
-  const submitModal = async (data: FormDataLocalUpdate) => {
-    // TODO: manejar acción de submit si se requiere
-    try {
-      if (!data.fotoFile) {
-        console.log("No se ha seleccionado ninguna imagen.");
-        return;
-      }
-      await uploadImage(data);
+  // Processing / result state for submit flow
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [resultOpen, setResultOpen] = useState<boolean>(false);
+  const [resultMessage, setResultMessage] = useState<string>("");
+  const [resultSuccess, setResultSuccess] = useState<boolean>(false);
 
+  const handleResultClose = () => {
+    setResultOpen(false);
+    // If the API call was successful, refresh the page to show updated data.
+    if (resultSuccess) {
+      // small delay so the modal can visually close before reload
+      setTimeout(() => {
+        window.location.reload();
+      }, 150);
+    }
+  };
+
+  const submitModal = async (data: FormDataLocalUpdate) => {
+    if (isProcessing) return; // evita envíos dobles
+    setIsProcessing(true);
+    try {
+      if (data.fotoFile) {
+        console.log(
+          "Subiendo nueva imagen del local...",
+          data.foto,
+          data.fotoFile
+        );
+        await uploadImage(data);
+        data.foto = `${data.direccion}-${data.foto}`;
+      } else data.foto = `${data.foto}`;
       data.distrito.distritoId = Number(data.distrito.distritoId);
-      data.foto = `${data.direccion}-${data.foto}`;
       // Registrar el local (llamada al backend o API)
       console.log("Datos del local a enviar:", data);
       const response = await editarLocal(data);
-      if (response.status === 200) {
-        return (
-          <Modal primaryButtonText="Aceptar" open={true} modalHeading="Éxito">
-            <p style={{ color: "green" }}>Local modificado con éxito.</p>
-          </Modal>
-        );
+      if (response && response.status === 200) {
+        setResultMessage("Local modificado con éxito.");
+        setResultSuccess(true);
+      } else {
+        setResultMessage("El local no se pudo modificar.");
+        setResultSuccess(false);
       }
-      // Navegar al final
     } catch (error) {
       console.error("Error al modificar el local:", error);
+      setResultMessage("El local no se pudo modificar.");
+      setResultSuccess(false);
     } finally {
+      setIsProcessing(false);
       setIsModalOpen(false);
+      setResultOpen(true);
     }
   };
 
@@ -296,6 +321,31 @@ export default function CardVenue({ local }: CardVenueProps) {
             </FormItem>
           </div>
         </div>
+      </Modal>
+
+      {/* Processing modal (shows while API request is in progress) */}
+      <Modal
+        open={isProcessing}
+        modalHeading="Procesando..."
+        passiveModal
+        onRequestClose={() => {}}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+          <InlineLoading description="Procesando..." status="active" />
+        </div>
+      </Modal>
+
+      {/* Result modal: success / error */}
+      <Modal
+        open={resultOpen}
+        modalHeading={resultSuccess ? "Éxito" : "Error"}
+        onRequestClose={handleResultClose}
+        onRequestSubmit={handleResultClose}
+        primaryButtonText="Aceptar"
+      >
+        <p style={{ color: resultSuccess ? "green" : "red" }}>
+          {resultMessage}
+        </p>
       </Modal>
 
       <ClickableTile className="back_card" onClick={openModal}>
