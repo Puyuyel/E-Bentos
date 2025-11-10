@@ -143,3 +143,118 @@ html {
   background-color: #fff;
 }
 
+
+/* ===== FormCodigoVerificacion ======== */
+.form-forgetpass-container {
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  background-color: #ffffff;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+/* Sección que contiene “¿No tienes cuenta?” y el botón */
+.signup-area {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+}
+
+/* Fila con texto a la izquierda y botón a la derecha */
+.signup-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 360px;
+  flex-wrap: nowrap;
+  gap: 0.5rem;
+  margin-bottom: 2.5rem;
+  box-sizing: border-box;
+  margin: 0 auto;
+}
+
+.signup p {
+  margin: 0;
+  color: #333;
+  font-weight: 500;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* Título */
+.title {
+  font-size: 1.89rem;
+  font-weight: 700;
+  margin: 1rem 0 3rem 0;
+  color: #111;
+  text-align: center;
+}
+
+/* Inputs */
+.fluid-form {
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* Espaciado entre inputs */
+.input-codigo {
+  margin-bottom: 2rem; /* 🔥 más espacio debajo del input */
+}
+
+/* Botón continuar */
+button[disabled],
+button[disabled]:hover {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+button.bx--btn {
+  display: block;
+  margin: 0 auto;
+}
+
+/* --- Responsive --- */
+@media (max-width: 1200px) {
+  .signup-row {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+
+  .signup p {
+    text-align: center;
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .form-forgetpass-container {
+    padding: 0.75rem;
+  }
+
+  .signup-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+
+  .fluid-form {
+    max-width: 100%;
+    padding: 0 0.5rem;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+}

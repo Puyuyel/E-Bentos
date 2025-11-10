@@ -103,7 +103,7 @@ const GoalModal: React.FC<SalesGoalModalProps> = ({
 
     const isIncomeInvalid = isNaN(income) || income < 0;
     const isConversionInvalid =
-      isNaN(conversion) || conversion < 0 || conversion > 1;
+      isNaN(conversion) || conversion < 0 || conversion > 100;
     const isTicketsInvalid = isNaN(tickets) || tickets < 0;
 
     setIncomeGoalInvalid(isIncomeInvalid);
@@ -126,7 +126,7 @@ const GoalModal: React.FC<SalesGoalModalProps> = ({
       id: Number(selectedEvent.id), // ← enviamos el id real del evento
       eventName: selectedEvent.text,
       incomeGoal: income,
-      conversionRateGoal: conversion,
+      conversionRateGoal: conversion / 100,
       ticketsToSell: tickets,
     };
 
@@ -155,6 +155,8 @@ const GoalModal: React.FC<SalesGoalModalProps> = ({
             onChange={({ selectedItem }) =>
               setSelectedEvent(selectedItem || null)
             }
+            invalid={!selectedEvent}
+            invalidText="Debe seleccionar un evento"
             selectedItem={selectedEvent}
             disabled={isEditMode || loadingEventos}
           />
@@ -179,17 +181,17 @@ const GoalModal: React.FC<SalesGoalModalProps> = ({
           <Column lg={8} md={4} sm={4} className="form-grid">
             <TextInput
               id="tasa-conversion"
-              labelText="Tasa de conversión (Ej: 0.80)"
-              placeholder="Ej: 0.80"
+              labelText="Tasa de conversión (Ej: 80)"
+              placeholder="Ej: 80"
               value={conversionRateGoal}
               onChange={(e) => {
                 const value = e.target.value;
                 setConversionRateGoal(value);
                 const num = parseFloat(value);
-                setConversionRateInvalid(num < 0 || num > 1);
+                setConversionRateInvalid(num < 0 || num > 100);
               }}
               invalid={conversionRateInvalid}
-              invalidText="Debe estar entre 0 y 1"
+              invalidText="Debe estar entre 0 y 100"
             />
           </Column>
           <Column lg={8} md={4} sm={4}>

@@ -16,6 +16,7 @@ import { verifyData } from "../util/verifiers";
 import { newPassService } from "../../services/newPassService";
 
 import { useResetPassStore } from "../../store/useResetPassStore";
+import "../../styles/Access/FormNuevaContrasenia.css";
 
 const FormNuevaContrasenia: React.FC = () => {
   const navigate = useNavigate();
