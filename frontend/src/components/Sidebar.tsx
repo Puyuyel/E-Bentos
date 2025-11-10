@@ -74,7 +74,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath = "" }) => {
 
       if (llamadaAPI === LLAMADA_EXITOSA) {
         setShowSuccess(true);
-        
+
         // Esperar 1 segundo antes de limpiar y redirigir
         setTimeout(() => {
           logout();
@@ -82,7 +82,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath = "" }) => {
       }
     } catch (error: any) {
       console.error("Error al cerrar sesión:", error);
-      // Si falla, redirigir 
+      // Si falla, redirigir
       logout();
     } finally {
       setLoading(false);

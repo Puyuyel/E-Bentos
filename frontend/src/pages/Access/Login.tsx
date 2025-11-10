@@ -20,8 +20,8 @@ const Login: React.FC = () => {
       ADMIN: "/admin/gestionar-productora",
       CLIENTE: "/admin/gestionar-productora",
       PRODUCTORA: "/productora/gestionar-organizador",
-      "GESTOR LOCAL": "/gestor_local/gestionar-local",
-      "DUENHO LOCAL": "/duenholocal/home",
+      GESTOR_LOCAL: "/gestor_local/gestionar-local",
+      DUENHO_LOCAL: "/duenho_local/gestionar-local",
       TAQUILLERO: "/taquillero/home",
     };
 

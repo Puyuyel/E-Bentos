@@ -9,6 +9,7 @@ import VenueCRUD from "../pages/Gestion/GestorLocal/VenueCRUD";
 import GestionarProductora from "../pages/Gestion/GestionarProductora";
 import GestionarPuntoDeVenta from "../pages/Gestion/GestionarPuntoDeVenta";
 import GestionarTaquillero from "../pages/Gestion/GestionarTaquillero";
+import GestionarDuenhoLocal from "../pages/Gestion/DuenhoLocal/GestionarDuenhoLocal";
 import ReporteCliente from "../pages/Reportes/ReporteCliente";
 import ReporteEvento from "../pages/Reportes/ReporteEvento";
 import ReporteLocal from "../pages/Reportes/ReporteLocal";
@@ -178,6 +179,17 @@ const AppRouter: React.FC = () => {
           element={
             <ProtectedRoute requiredRole="GESTOR_LOCAL">
               <VenueCRUD />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* RUTAS para DUEÑO DE LOCAL */}
+        {/* Ruta /listado locales*/}
+        <Route
+          path="/duenho_local/gestionar-local"
+          element={
+            <ProtectedRoute requiredRole="DUENHO_LOCAL">
+              <GestionarDuenhoLocal />
             </ProtectedRoute>
           }
         />

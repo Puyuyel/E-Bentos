@@ -1,5 +1,5 @@
 import { Column, Grid, Button } from "@carbon/react";
-import CardVenue from "../../../components/Gestion/CardVenue";
+import CardVenueDuenho from "../../Gestion/DuenhoLocal/CardVenueDuenho";
 import SearchBar from "../../../components/Gestion/SearchBar";
 
 import { useState, useEffect } from "react";
@@ -30,10 +30,6 @@ export default function VenueList() {
     getLocales();
   }, []);
 
-  const handleClick = () => {
-    navigate("/gestor_local/registrar-local");
-  };
-
   return (
     <div>
       <div
@@ -44,21 +40,11 @@ export default function VenueList() {
         }}
       >
         <SearchBar onChange={(e) => setSearch(e.target.value)} />
-        <Button
-          kind="tertiary"
-          onClick={handleClick}
-          style={{
-            justifyContent: "center",
-            paddingRight: "1.3rem",
-          }}
-        >
-          Agregar Local
-        </Button>
       </div>
-      <Grid style={{ marginRight: "15rem" }}>
+      <Grid>
         {filteredLocales.map((local: Local) => (
           <Column key={local.localId} sm={4} md={4} lg={8} xlg={8} max={8}>
-            <CardVenue local={local}></CardVenue>
+            <CardVenueDuenho local={local}></CardVenueDuenho>
           </Column>
         ))}
       </Grid>

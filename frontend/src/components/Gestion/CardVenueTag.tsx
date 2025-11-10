@@ -13,10 +13,10 @@ export default function CardVenueTag({ mensaje, color }: CardVenueTagProps) {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        width: "75px",
+        width: "100px",
         height: "35px",
         backgroundColor: color,
-        border: "2px solid #999",
+        border: "2px solid #fafafaff",
         borderRadius: "8px",
       }}
     >

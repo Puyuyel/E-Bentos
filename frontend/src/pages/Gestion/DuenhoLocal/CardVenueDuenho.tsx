@@ -8,14 +8,16 @@ import {
   FileUploaderItem,
   FormItem,
   Modal,
+  Button,
 } from "@carbon/react";
 import { Location } from "@carbon/react/icons";
-import CardVenueTag from "./CardVenueTag";
+import CardVenueTag from "../../../components/Gestion/CardVenueTag";
 import type { FormDataLocalUpdate, Local } from "../../types/locales.types";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, type MouseEvent } from "react";
 import { useForm } from "react-hook-form";
-import editarLocal from "../../services/LocalesServices/editarLocalService";
-import uploadImage from "../../services/LocalesServices/uploadImageService";
+import editarLocal from "../../../services/LocalesServices/editarLocalService";
+import uploadImage from "../../../services/LocalesServices/uploadImageService";
+import { eliminarGestorLocal } from "../../../services/gestorLocalService";
 
 const imageBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL;
 
@@ -124,6 +126,34 @@ export default function CardVenue({ local }: CardVenueProps) {
     } finally {
       setIsModalOpen(false);
     }
+  };
+
+  const handleDarLocalBaja = async () => {
+    // Lógica para dar de baja el local
+    console.log(`Dar de baja el local con ID: ${local.localId}`);
+    try {
+      const response = await eliminarGestorLocal(local.localId);
+      if (response.status === 200) {
+        return (
+          <Modal>
+            <p style={{ color: "green" }}>Local dado de baja con éxito.</p>
+          </Modal>
+        );
+      }
+    } catch (error) {
+      return (
+        <Modal>
+          <p style={{ color: "red" }}>Error al dar de baja el local.</p>
+        </Modal>
+      );
+      console.log("Error al dar de baja el local:", error);
+    } finally {
+      setIsModalOpen(false);
+    }
+  };
+  const onDarBajaClick = async (e: MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    await handleDarLocalBaja();
   };
 
   return (
@@ -298,7 +328,33 @@ export default function CardVenue({ local }: CardVenueProps) {
         </div>
       </Modal>
 
-      <ClickableTile className="back_card" onClick={openModal}>
+      <ClickableTile
+        className="back_card"
+        onClick={openModal}
+        style={{ position: "relative" }}
+      >
+        {/* Dar de baja button inside the tile but stopPropagation to avoid triggering the tile click */}
+        <Button
+          onClick={onDarBajaClick}
+          aria-label="Dar de baja"
+          style={{
+            position: "absolute",
+            bottom: "2px",
+            left: "5px",
+            zIndex: 3,
+            background: "#ffffff",
+            color: "#c62828",
+            border: "1px solid #c62828",
+            borderRadius: "4px",
+            fontSize: "0.8rem",
+            lineHeight: "1.5",
+            boxShadow: "0 1px 2px rgba(0,0,0,0.06)",
+            cursor: "pointer",
+            pointerEvents: "auto",
+          }}
+        >
+          Dar de baja
+        </Button>
         <Grid>
           <Column sm={4} md={4} lg={4} xlg={4} max={4}>
             <Stack gap={3}>
