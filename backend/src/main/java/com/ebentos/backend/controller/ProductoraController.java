@@ -39,7 +39,7 @@ public class ProductoraController {
     }
     
     @GetMapping("/paginadoPorBuscador")
-    public Map<String, Object> listarPaginado(
+    public Map<String, Object> listarPaginadoPorBuscador(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int limit,
             @RequestParam String buscador) {

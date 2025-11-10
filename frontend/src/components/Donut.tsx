@@ -1,6 +1,6 @@
 import React from "react";
 import { DonutChart } from "@carbon/charts-react";
-import type { ChartProps } from "./types.ts";
+import type { ChartProps } from "./util/types.ts";
 import "@carbon/charts-react/styles.css";
 
 const Donut: React.FC<ChartProps> = ({ data }) => {

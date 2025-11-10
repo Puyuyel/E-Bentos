@@ -24,6 +24,7 @@ interface ReporteLocalItem {
 
 const ReporteLocal: React.FC = () => {
 
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [reportes, setReportes] = useState<ReporteLocalItem[]>([]);
   const [filters, setFilters] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(true);
@@ -114,12 +115,12 @@ const ReporteLocal: React.FC = () => {
   }));
 
   return (
-    <div className="reporte-container">
-      <Sidebar currentPath="reporte-local" />
+    <div className={`app-container ${sidebarOpen ? "sidebar-visible" : "sidebar-hidden"}`}>
+      <Sidebar currentPath="reporte-local" onToggleSidebar={setSidebarOpen}/>
 
-      <div className="content">
-        <h1 className="page-title">
-          Visión General de <span className="highlight">Locales</span>
+      <main className="app-main">
+        <h1 className="title">
+          Visión General de Locales
         </h1>
 
         <FilterBar onFilterChange={(newFilter) => {setFilters((prev) => ({ ...prev, ...newFilter }));}} />
@@ -138,7 +139,7 @@ const ReporteLocal: React.FC = () => {
             <Lollipop data={incomeData}/>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

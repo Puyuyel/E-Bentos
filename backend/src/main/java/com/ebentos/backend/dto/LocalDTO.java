@@ -1,6 +1,5 @@
 package com.ebentos.backend.dto;
 
-import com.ebentos.backend.model.EstadoLocal;
 import com.ebentos.backend.model.TipoLocal;
 import lombok.*;
 

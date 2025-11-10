@@ -3,7 +3,6 @@ package com.ebentos.backend.dto;
 
 import com.ebentos.backend.model.CategoriaEvento;
 import com.ebentos.backend.model.EstadoEvento;
-import com.ebentos.backend.model.Gestor;
 import com.ebentos.backend.model.Local;
 import java.time.LocalDateTime;
 import lombok.*;

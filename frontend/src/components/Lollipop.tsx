@@ -2,7 +2,7 @@ import React from "react";
 import { LollipopChart } from "@carbon/charts-react";
 import { ScaleTypes } from "@carbon/charts";
 import type{ LollipopChartOptions } from "@carbon/charts";
-import type { ChartProps } from "./types.ts";
+import type { ChartProps } from "./util/types.ts";
 import "@carbon/charts-react/styles.css";
 
 const Lollipop: React.FC<ChartProps> = ({ data }) => {
@@ -22,7 +22,7 @@ const Lollipop: React.FC<ChartProps> = ({ data }) => {
     points: { radius: 6 },
     height: "400px",
     resizable: true,
-    legend: { enabled: false },
+    legend: { enabled: true, position: "bottom" },
   };
 
   return (

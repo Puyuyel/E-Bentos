@@ -1,11 +1,17 @@
 package com.ebentos.backend.config;
 
-import jakarta.servlet.http.HttpServletResponse;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -14,14 +20,11 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
 import com.ebentos.backend.model.Rol;
 import com.ebentos.backend.repository.UsuarioRepository;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import java.util.Collections;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Configuration
 @EnableWebSecurity
@@ -50,7 +53,8 @@ public class Securityconfig {
                     SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + nombreRol);
 
                     // Crea el usuario de Spring con su rol
-                    return new org.springframework.security.core.userdetails.User(
+                    return new UsuarioDetails(
+                            usuario.getUsuarioId(),
                             usuario.getEmail(),
                             usuario.getContrasenha(),
                             // 5. Le pasa la lista con la autoridad
@@ -72,13 +76,24 @@ public class Securityconfig {
                 // Autorización de Rutas
                 .authorizeHttpRequests(authz -> authz
                         // Permite el registro y el login públicamente
+                        .requestMatchers(HttpMethod.POST, "/api/clientes").permitAll()
                         .requestMatchers(
                                 "/api/auth/**",
-                                "/api/clientes/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
                         ).permitAll()
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/productoras/*"
+                        ).hasAnyRole("ADMIN","PRODUCTORA")
+                        .requestMatchers("/api/metas/**").hasRole("PRODUCTORA")
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/gestores/*"
+                        ).hasAnyRole("ADMIN","PRODUCTORA","GESTOR_LOCAL",
+                                "DUENHO_LOCAL","TAQUILLERO","ORGANIZADOR_EVENTOS")
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/clientes/*"
+                        ).hasAnyRole("CLIENTE","TAQUILLERO")
                         .requestMatchers("/api/productoras/**", "/api/puntoventas/**").hasRole("ADMIN")
                         .requestMatchers("/api/gestores/**").hasAnyRole("ADMIN","GESTOR_LOCAL","PRODUCTORA")
                         // Protege todas las demás rutas
@@ -140,9 +155,11 @@ public class Securityconfig {
 
         // Usa allowedOriginPatterns para más flexibilidad con puertos/hosts
         configuration.setAllowedOriginPatterns(origins);
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "accept", "Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers"));
+        configuration.setExposedHeaders(Arrays.asList("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials", "Set-Cookie"));
         configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L); // 1 hora en segundos
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/api/**", configuration); // Aplica a toda tu API

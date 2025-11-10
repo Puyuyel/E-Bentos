@@ -29,7 +29,7 @@ jobs:
       - name: Deploy backend
         run: |
           ssh -i ~/.ssh/id_rsa ubuntu@${{ secrets.EC2_BACKEND_HOST }} << 'EOF'
-          cd ~/ebentos/backend
+          cd ~/e-bentos/backend
           git pull origin main
           docker compose down
           docker compose up -d --build
