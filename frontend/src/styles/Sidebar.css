@@ -27,6 +27,12 @@
   padding: 0 0.5rem;
 }
 
+@media (max-width: 768px) {
+  .logo-container {
+    margin-left: 4rem;
+  }
+}
+
 .logo {
   height: 4rem; /* 32px */
   width: 4rem;

@@ -3,10 +3,15 @@ package com.ebentos.backend.service;
 import com.ebentos.backend.dto.GestorActualizaDTO;
 import com.ebentos.backend.dto.GestorDTO;
 import com.ebentos.backend.dto.PuntoVentaDTO;
+import com.ebentos.backend.dto.RegistroGestorDTO;
 import com.ebentos.backend.dto.UsuarioSimpleDTO;
 import com.ebentos.backend.model.Gestor;
 import com.ebentos.backend.model.PuntoVenta;
+import com.ebentos.backend.model.Rol;
+import com.ebentos.backend.model.Usuario;
 import com.ebentos.backend.repository.GestorRepository;
+import com.ebentos.backend.repository.RolRepository;
+import com.ebentos.backend.repository.UsuarioRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.HashMap;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,13 +28,60 @@ import java.util.stream.Collectors;
 @Service
 public class GestorService {
     private final GestorRepository gestorRepository;
+    private final UsuarioRepository usuarioRepository;
+    private final RolRepository rolRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
     // SOLO INYECTA LAS DEPENDENCIAS NECESARIAS
-    public GestorService(GestorRepository gestorRepository, PasswordEncoder passwordEncoder) {
+    public GestorService(GestorRepository gestorRepository, 
+            UsuarioRepository usuarioRepository, RolRepository rolRepository,
+            PasswordEncoder passwordEncoder) {
         this.gestorRepository = gestorRepository;
+        this.usuarioRepository = usuarioRepository;
+        this.rolRepository = rolRepository;
         this.passwordEncoder = passwordEncoder;
+    }
+    
+    public Gestor insertar(RegistroGestorDTO registroGestorDTO){
+        //Validar datos inicionales
+        String email = registroGestorDTO.getEmail();
+        String contrasenha = registroGestorDTO.getContrasenha();
+        if(!email.contains("@") || contrasenha.length() < 8){
+            throw new IllegalArgumentException("El formato del correo electrónico o contrasenha no es valido.");
+        }
+
+        // Validar si el email ya existe
+        if (usuarioRepository.findByEmail(registroGestorDTO.getEmail()).isPresent()) {
+            throw new RuntimeException("El email ya está en uso");
+        }
+
+        // Buscar el rol
+        Rol rolUsuario = rolRepository.findByNombre(registroGestorDTO.getNombreRol())
+                .orElseThrow(() -> new RuntimeException("Rol no encontrado"));
+        
+        Gestor nuevoGestor = new Gestor();
+        nuevoGestor.setDni(registroGestorDTO.getDni());
+        nuevoGestor.setNombres(registroGestorDTO.getNombres());
+        nuevoGestor.setApellidos(registroGestorDTO.getApellidos());
+        nuevoGestor.setEmail(email);
+        nuevoGestor.setTelefono(registroGestorDTO.getTelefono());
+        nuevoGestor.setContrasenha(passwordEncoder.encode(contrasenha));
+        nuevoGestor.setRol(rolUsuario);
+        nuevoGestor.setActivo(1);
+        Usuario usuarioCreador = new Usuario();
+        usuarioCreador.setUsuarioId(registroGestorDTO.getUsuarioCreador().getUsuarioId());
+        nuevoGestor.setUsuarioCreador(usuarioCreador);
+        if(rolUsuario.getNombre().equals("TAQUILLERO")){
+            PuntoVenta puntoVenta = new PuntoVenta();
+            puntoVenta.setPuntoventaId(registroGestorDTO.getPuntoVenta().getPuntoVentaId());
+            nuevoGestor.setPuntoVenta(puntoVenta);
+        }
+        
+        Gestor gestor = gestorRepository.save(nuevoGestor);
+        
+        return gestor;
+        
     }
     
     public GestorDTO obtenerPorId(Integer id) {
@@ -131,6 +183,8 @@ public class GestorService {
         if(gestor.getPuntoVenta()!=null){
             PuntoVentaDTO puntoVenta = new PuntoVentaDTO();
             puntoVenta.setPuntoVentaId(gestor.getPuntoVenta().getPuntoventaId());
+            puntoVenta.setNombre(gestor.getPuntoVenta().getNombre());
+            puntoVenta.setDireccion(gestor.getPuntoVenta().getDireccion());
             gestorDTO.setPuntoVenta(puntoVenta);
         }
         
@@ -165,6 +219,14 @@ public class GestorService {
 
         if (!gestorActualizaDTO.getContrasenha().isBlank()) {
             gestorExistente.setContrasenha(passwordEncoder.encode(gestorActualizaDTO.getContrasenha()));
+        }
+
+        if (!Objects.equals(gestorActualizaDTO.getDni(), gestorExistente.getDni())) {
+            gestorExistente.setDni(gestorActualizaDTO.getDni());
+        }
+
+        if (!Objects.equals(gestorActualizaDTO.getActivo(), gestorExistente.getActivo())) {
+            gestorExistente.setActivo(gestorActualizaDTO.getActivo());
         }
 
         //  GUARDAR y devolver
@@ -203,4 +265,20 @@ public class GestorService {
             throw new RuntimeException("Gestor no encontrado con id: " + id);
         }
     }
+
+    public GestorDTO modificarAInactivo(Integer id){
+        // BUSCAR la entidad existente
+        Gestor gestorExistente = gestorRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Gestor no encontrado con ID: " + id));
+
+        gestorExistente.setActivo(0);
+
+        //  GUARDAR y devolver
+        Gestor gestorActualizado = gestorRepository.save(gestorExistente);
+
+        //  Mapear y devolver el DTO de respuesta
+        return mapToGestorDTO(gestorActualizado);
+    }
+    
+    
 }

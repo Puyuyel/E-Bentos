@@ -1,0 +1,28 @@
+.chart-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: auto;
+  min-height: 300px; /* asegura que haya espacio para el gráfico */
+  max-height: 600px;
+  flex-wrap: wrap;
+  box-sizing: border-box;
+}
+
+.chart-item {
+  flex: 1 1 450px; /* se ajusta automáticamente */
+  background: white;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  min-width: 300px;
+  max-width: 100%;
+  height: 450px;
+  overflow: hidden;
+}
+
+.chart-item svg {
+  width: 100% !important;
+  height: 100% !important;
+}

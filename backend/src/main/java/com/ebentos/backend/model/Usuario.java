@@ -10,9 +10,9 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@SQLDelete(sql = "UPDATE USUARIO SET ACTIVO = 0 WHERE USUARIO_ID = ?")
+@Where(clause = "ACTIVO = 1")
 @Entity
-@SQLDelete(sql = "UPDATE usuario SET activo = 0 WHERE usuario_id = ?")
-@Where(clause = "activo = 1")
 @Table(name = "USUARIO")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Usuario {

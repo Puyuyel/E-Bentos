@@ -2,8 +2,12 @@ package com.ebentos.backend.service;
 
 import com.ebentos.backend.dto.ProductoraActualizaDTO;
 import com.ebentos.backend.dto.ProductoraDTO;
+import com.ebentos.backend.dto.RegistroProductoraDTO;
 import com.ebentos.backend.model.Productora;
+import com.ebentos.backend.model.Rol;
 import com.ebentos.backend.repository.ProductoraRepository;
+import com.ebentos.backend.repository.RolRepository;
+import com.ebentos.backend.repository.UsuarioRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.HashMap;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,21 +20,60 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.springframework.security.authentication.BadCredentialsException;
 
 @Service
 public class ProductoraService {
 
     private final ProductoraRepository productoraRepository;
+    private final UsuarioRepository usuarioRepository;
+    private final RolRepository rolRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
     // SOLO INYECTA LAS DEPENDENCIAS NECESARIAS
-    public ProductoraService(ProductoraRepository productoraRepository, PasswordEncoder passwordEncoder) {
+    public ProductoraService(ProductoraRepository productoraRepository, 
+            UsuarioRepository usuarioRepository,RolRepository rolRepository,
+            PasswordEncoder passwordEncoder) {
         this.productoraRepository = productoraRepository;
+        this.usuarioRepository = usuarioRepository;
+        this.rolRepository = rolRepository;
         this.passwordEncoder = passwordEncoder;
     }
+    
+    public Productora insertar(RegistroProductoraDTO registroProductoraDTO){
+        //Validar datos inicionales
+        String email = registroProductoraDTO.getEmail();
+        String contrasenha = registroProductoraDTO.getContrasenha();
+        if(!email.contains("@") || contrasenha.length() < 8){
+            throw new IllegalArgumentException("El formato del correo electrónico o contrasenha no es valido.");
+        }
 
-    // ----------------------------------------------- CRUD -------------------------------------------------
+        // Validar si el email ya existe
+        if (usuarioRepository.findByEmail(registroProductoraDTO.getEmail()).isPresent()) {
+            throw new RuntimeException("El email ya está en uso");
+        }
+        
+        Rol rolUsuario = rolRepository.findByNombre("PRODUCTORA")
+                .orElseThrow(() -> new RuntimeException("Rol no encontrado"));
+        
+        
+        Productora nuevaProductora = new Productora();
+        nuevaProductora.setRuc(registroProductoraDTO.getRuc());
+        nuevaProductora.setRazonSocial(registroProductoraDTO.getRazonSocial());
+        nuevaProductora.setNombreComercial(registroProductoraDTO.getNombreComercial());
+        nuevaProductora.setEmail(email);
+        nuevaProductora.setTelefono(registroProductoraDTO.getTelefono());
+        nuevaProductora.setContrasenha(passwordEncoder.encode(contrasenha));
+        nuevaProductora.setRol(rolUsuario);
+        nuevaProductora.setActivo(1);
+        
+        Productora productora = productoraRepository.save(nuevaProductora);
+        
+        return productora;
+        
+    }
+
     public ProductoraDTO obtenerPorId(Integer id) {
         // Usar Optional con la entidad para manejar el caso de no encontrarla
         Productora productora = productoraRepository.findById(id)
@@ -126,24 +169,7 @@ public class ProductoraService {
         Productora productoraActualizada = productoraRepository.save(productoraExistente);
 
         //  Mapear y devolver el DTO de respuesta
-        return mapToProductoraDTO(productoraActualizada);
-    }
-
-    private ProductoraDTO mapToProductoraDTO(Productora productora) {
-
-        //  Mapear la Productora al DTO principal (ProductoraDTO)
-        ProductoraDTO productoraDTO = new ProductoraDTO();
-
-        // Mapeamos los campos directos de Productora (asumiendo que estos existen
-        // en la entidad Productora además de los que heredó de Usuario)
-        productoraDTO.setRuc(productora.getRuc());
-        productoraDTO.setRazonSocial(productora.getRazonSocial());
-        productoraDTO.setNombreComercial(productora.getNombreComercial());
-        productoraDTO.setUsuarioId(productora.getUsuarioId());
-        productoraDTO.setTelefono(productora.getTelefono());
-        productoraDTO.setEmail(productora.getEmail());
-
-        return productoraDTO;
+        return llenarDTO(productoraActualizada);
     }
     
     public void eliminar(Integer id){

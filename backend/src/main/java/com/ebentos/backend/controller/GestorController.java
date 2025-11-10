@@ -1,14 +1,19 @@
 package com.ebentos.backend.controller;
 import com.ebentos.backend.dto.GestorActualizaDTO;
 import com.ebentos.backend.dto.GestorDTO;
+import com.ebentos.backend.dto.RegistroGestorDTO;
+import com.ebentos.backend.model.Gestor;
 import com.ebentos.backend.service.GestorService;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -76,7 +81,23 @@ public class GestorController {
         }
 
         return response;
-    } 
+    }
+    
+    @PostMapping
+    public ResponseEntity<?> registrarGestor(@RequestBody RegistroGestorDTO registroDTO) {
+        try {
+            Gestor gestorCreado = gestorService.insertar(registroDTO);
+            // Devolvemos 201 Created (no devolvemos la contraseña)
+            return ResponseEntity.status(HttpStatus.CREATED).body("Gestor creado con ID: " + gestorCreado.getUsuarioId());
+        } catch (RuntimeException e) {
+            // Maneja errores como email duplicado o rol no encontrado
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            // Manejador general de errores
+            System.err.println("Error inesperado durante el registro: " + e.getMessage()); // Log del error
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno al procesar el registro.");
+        }
+    }
 
     @GetMapping("/{id}")
     public GestorDTO obtenerPorId(@PathVariable Integer id) {
@@ -88,9 +109,8 @@ public class GestorController {
         // Llama al servicio con el ID y el DTO
         return gestorService.modificar(id, gestorActualizaDTO);
     }
-    
+
     @DeleteMapping("/{id}")
-    public void eliminar(@PathVariable Integer id) {
-        gestorService.eliminar(id);
-    }
+    public GestorDTO eliminar(@PathVariable Integer id) { return gestorService.modificarAInactivo(id);} // Es actualizar a inactivo
+    
 }

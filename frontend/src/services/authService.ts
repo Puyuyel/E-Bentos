@@ -4,10 +4,10 @@ import api from "../services/apiBase";
 import type { LoginCredentials } from "../types/auth.types";
 const apiBaseUrl = import.meta.env.VITE_API_URL;
 
-const apiLog = axios.create({
+export const apiLog = axios.create({
   baseURL: `${apiBaseUrl}/api`, // puedes usar variables de entorno import.meta.env.VITE_API_URL ||
   withCredentials: true, // importante, porque el backend usa cookies de sesión
-  headears: {
+  headers: {
     "Content-Type": "application/x-www-form-urlencoded",
   },
 });
@@ -22,10 +22,20 @@ export async function login(credentials: LoginCredentials) {
       withCredentials: true,
     });
     const roleUser = await api.get("/users/me");
+    
     const cleanRole = roleUser.data.nombreRol.replace("ROLE_", "");
-    return { response: response.data, role: cleanRole }; // El backend debería devolver info del usuario o un mensaje
+    return { response: response.data, role: cleanRole , id: roleUser.data.usuarioId}; // El backend debería devolver info del usuario o un mensaje
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "Error al iniciar sesión");
+  }
+}
+
+export async function getUser() {
+  try {
+    const response = await api.get("/users/me");
+    return response.data; // El backend debería devolver info del nuevo registro o un mensaje
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || "Error al obtener usuario");
   }
 }
 

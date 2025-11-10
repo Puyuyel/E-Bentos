@@ -6,7 +6,58 @@
 }
 
 .app-main {
-  flex: 1;
+  flex: 1;/* Área principal donde está el título y la lista */
+.app-main {
+  padding: 1.25rem;
+  overflow-y: auto;
+  max-height: 100vh;
+  box-sizing: border-box;
+  transition: margin-left 0.3s ease;
+}
+
+@media (min-width: 768px) {
+  /* Cuando el sidebar está oculto */
+  .app-container.sidebar-hidden .app-main,
+  .app-container.sidebar-visible .app-main {
+    width: calc(100vw - 15rem);
+  }
+  /* Título simple */
+  .title {
+    margin: 0 0 1rem 0;
+    font-size: 2rem;
+  }
+}
+
+/* En móvil, ignora el margen */
+@media (max-width: 768px) {
+  .app-container.sidebar-visible .app-main {
+    width: 100vw;
+  }
+
+  .app-container.sidebar-hidden .app-main {
+    width: 100vw;
+    margin: 0;
+  }
+
+  /* Título simple */
+  .title {
+    margin: 0 0 1rem 3rem;
+    font-size: 2rem;
+    
+  }
+}
+/* Contenedor principal con sidebar + main */
+.app-container {
+  display: flex;
+  min-height: 100vh; /* ocupa toda la ventana */
+  box-sizing: border-box;
+}
+.title{
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color:black;
+}
   padding: 2rem;
 }
 

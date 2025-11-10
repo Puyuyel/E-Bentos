@@ -1,5 +1,6 @@
 package com.ebentos.backend.controller;
 
+import com.ebentos.backend.config.UsuarioDetails;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -24,8 +25,9 @@ public class UsuarioController {
     public ResponseEntity<UsuarioLogInDTO> obtenerUsuarioActual(Authentication authentication) {
 
         // 'authentication' es inyectado por Spring Security.
-        // Contiene el 'expediente' (UserDetails) que creamos en SecurityConfig.
-
+        // Contiene el 'expediente' (UserDetails) que creamos en SecurityConfig
+        UsuarioDetails userDetails = (UsuarioDetails) authentication.getPrincipal();
+        Integer usuarioId = userDetails.getUsuarioId();
         String email = authentication.getName();
 
         List<String> roles = authentication.getAuthorities()
@@ -34,7 +36,7 @@ public class UsuarioController {
                 .collect(Collectors.toList());
 
         // Usamos un DTO para no devolver la contraseña, demas campos
-        UsuarioLogInDTO usuarioDTO = new UsuarioLogInDTO(email, roles);
+        UsuarioLogInDTO usuarioDTO = new UsuarioLogInDTO(usuarioId, email, roles.get(0));
 
         return ResponseEntity.ok(usuarioDTO);
     }

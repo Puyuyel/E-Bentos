@@ -2,21 +2,15 @@ package com.ebentos.backend.dto;
 
 import lombok.*;
 
-import java.util.List;
-
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @ToString
 public class UsuarioLogInDTO {
 
+    private Integer usuarioId;
     private String email;
     private String nombreRol;
-
-    public UsuarioLogInDTO(String email, List<String> roles) {
-        this.email = email;
-        this.nombreRol = roles.get(0);
-    }
 
 }
