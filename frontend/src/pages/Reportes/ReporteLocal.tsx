@@ -47,14 +47,7 @@ const ReporteLocal: React.FC = () => {
     fetchData();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="loader">
-        <span></span><span></span><span></span><span></span><span></span>
-      </div>
-    );
-  }
-
+  // Mover el cálculo de datos antes del return
   const filteredReportes = reportes.filter((r) => {
     const fecha = new Date(r.fechaEvento);
     const fechaInicio = filters.fechaInicio ? new Date(filters.fechaInicio) : null;
@@ -62,13 +55,10 @@ const ReporteLocal: React.FC = () => {
 
     // Filtrar por fecha
     if (fechaInicio && fechaFin) {
-      // Si hay ambas fechas, debe estar entre ambas (inclusive)
       if (fecha < fechaInicio || fecha > fechaFin) return false;
     } else if (fechaInicio) {
-      // Si solo hay fecha de inicio, tomar desde esa fecha en adelante
       if (fecha < fechaInicio) return false;
     } else if (fechaFin) {
-      // Si solo hay fecha de fin, tomar hasta esa fecha
       if (fecha > fechaFin) return false;
     }
 
@@ -141,20 +131,26 @@ const ReporteLocal: React.FC = () => {
 
         <FilterBar onFilterChange={(newFilter) => {setFilters((prev) => ({ ...prev, ...newFilter }));}} />
         
-        <div className="chart-container">
-          <div className="chart-item">
-            <Gauge totalCapacity={totalAforo} usedCapacity={totalAsistentes} />
+        {loading ? (
+          <div className="loader">
+            <span></span><span></span><span></span><span></span><span></span>
           </div>
-          <div className="chart-item">
-            <Donut data={incomeData}/>
+        ) : (
+          <div className="chart-container">
+            <div className="chart-item">
+              <Gauge totalCapacity={totalAforo} usedCapacity={totalAsistentes} />
+            </div>
+            <div className="chart-item">
+              <Donut data={incomeData}/>
+            </div>
+            <div className="chart-item">
+              <GroupedBar data={groupedData}/>
+            </div>
+            <div className="chart-item">
+              <Lollipop data={incomeData}/>
+            </div>
           </div>
-          <div className="chart-item">
-            <GroupedBar data={groupedData}/>
-          </div>
-          <div className="chart-item">
-            <Lollipop data={incomeData}/>
-          </div>
-        </div>
+        )}
       </main>
     </div>
   );
