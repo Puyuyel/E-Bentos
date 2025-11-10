@@ -34,3 +34,14 @@
   overflow-y: auto; /* Solo mostrar el SCROLL cuando se requiera */
   box-sizing: border-box;
 }
+
+@media (max-width: 768px) {
+  .auth-left{
+    display: none;
+  }
+  .auth-right {
+    flex: 0 0 100%;
+    padding: 1rem;
+  }
+
+}

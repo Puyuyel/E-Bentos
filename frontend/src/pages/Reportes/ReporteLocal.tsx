@@ -6,8 +6,11 @@ import Donut from '../../components/Donut';
 import Gauge from '../../components/Gauge';
 import FilterBar from '../../components/FilterBar.tsx';
 import '../../styles/Reportes/Reporte.css';
+import '../../styles/CargaSpinner.css'
 import { getReporteLocales } from "../../services/reporteLocalService.ts";
 import type { ChartDatum } from "../../components/util/types.ts";
+import { calculateGaugeData } from "../../components/util/calculateGaugeData.ts";
+
 
 interface ReporteLocalItem {
   categoriaEvento: string;
@@ -44,7 +47,13 @@ const ReporteLocal: React.FC = () => {
     fetchData();
   }, []);
 
-  if (loading) return <p>Cargando datos...</p>;
+  if (loading) {
+    return (
+      <div className="loader">
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
+    );
+  }
 
   const filteredReportes = reportes.filter((r) => {
     const fecha = new Date(r.fechaEvento);
@@ -87,7 +96,14 @@ const ReporteLocal: React.FC = () => {
     return true;
   });
 
-  const dataToDisplay = filteredReportes.length > 0 ? filteredReportes : reportes;
+  const hayFiltrosActivos =
+    filters.fechaInicio ||
+    filters.fechaFin ||
+    (filters.categoriaEvento && filters.categoriaEvento !== "default") ||
+    (filters.local && filters.local !== "default") ||
+    (filters.productora && filters.productora !== "default");
+
+  const dataToDisplay = hayFiltrosActivos ? filteredReportes : reportes;
   
   const totalAforo = dataToDisplay.reduce((acc, r) => acc + Number(r.aforoLocal), 0);
   const totalAsistentes = dataToDisplay.reduce((acc, r) => acc + Number(r.asistentes), 0);

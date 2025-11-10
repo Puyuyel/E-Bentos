@@ -12,7 +12,7 @@ const Donut: React.FC<ChartProps> = ({ data }) => {
       truncation: { type: "none" },
     },
     donut: {
-      center: { label: "Locales" },
+      center: { label: "Ingresos Totales (S/.)" },
     },
     height: "400px",
   };
