@@ -205,8 +205,10 @@ public class GestorService {
             gestorExistente.setApellidos(gestorActualizaDTO.getApellidos());
         }
         
-        if (!Objects.equals(gestorActualizaDTO.getPuntoVenta(), gestorExistente.getPuntoVenta())) {
-            gestorExistente.setPuntoVenta(gestorActualizaDTO.getPuntoVenta());
+        if (gestorActualizaDTO.getPuntoVenta()!=null && gestorActualizaDTO.getPuntoVenta().getPuntoVentaId()!=null) {
+            PuntoVenta puntoventa = new PuntoVenta();
+            puntoventa.setPuntoventaId(gestorActualizaDTO.getPuntoVenta().getPuntoVentaId());
+            gestorExistente.setPuntoVenta(puntoventa);
         }
 
         if (!Objects.equals(gestorActualizaDTO.getTelefono(), gestorExistente.getTelefono())) {
@@ -216,17 +218,13 @@ public class GestorService {
         if (!Objects.equals(gestorActualizaDTO.getEmail(), gestorExistente.getEmail())) {
             gestorExistente.setEmail(gestorActualizaDTO.getEmail());
         }
+        
+        if (!Objects.equals(gestorActualizaDTO.getActivo(), gestorExistente.getActivo())) {
+            gestorExistente.setActivo(gestorActualizaDTO.getActivo());
+        }
 
         if (!gestorActualizaDTO.getContrasenha().isBlank()) {
             gestorExistente.setContrasenha(passwordEncoder.encode(gestorActualizaDTO.getContrasenha()));
-        }
-
-        if (!Objects.equals(gestorActualizaDTO.getDni(), gestorExistente.getDni())) {
-            gestorExistente.setDni(gestorActualizaDTO.getDni());
-        }
-
-        if (!Objects.equals(gestorActualizaDTO.getActivo(), gestorExistente.getActivo())) {
-            gestorExistente.setActivo(gestorActualizaDTO.getActivo());
         }
 
         //  GUARDAR y devolver
