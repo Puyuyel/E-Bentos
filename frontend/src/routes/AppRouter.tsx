@@ -16,6 +16,7 @@ import ReporteLocal from "../pages/Reportes/ReporteLocal";
 import ReporteOrganizador from "../pages/Reportes/ReporteOrganizador";
 import ReporteProductora from "../pages/Reportes/ReporteProductora";
 import ReporteTaquillero from "../pages/Reportes/ReporteTaquillero";
+import GestionarEvento from "../pages/Gestion/GestionEvento/GestionarEvento";
 
 import { ProtectedRoute } from "./ProtectedRoute"; // importa tu wrapper
 import GestionarOrganizador from "../pages/GestionProductora/GestionarOrganizadores";
@@ -190,6 +191,16 @@ const AppRouter: React.FC = () => {
           element={
             <ProtectedRoute requiredRole="DUENHO_LOCAL">
               <GestionarDuenhoLocal />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Ruta /gestionar eventos*/}
+        <Route
+          path="/organizador/eventos"
+          element={
+            <ProtectedRoute requiredRole="ORGANIZADOR_EVENTOS">
+              <GestionarEvento />
             </ProtectedRoute>
           }
         />
