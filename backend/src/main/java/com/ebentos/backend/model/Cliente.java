@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @Setter
 @Getter
@@ -11,6 +13,8 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @ToString
 @Builder
+@SQLDelete(sql = "UPDATE USUARIO SET ACTIVO = 0 WHERE USUARIO_ID = ?")
+@Where(clause = "ACTIVO = 1")
 @Entity
 @Table(name = "CLIENTE")
 public class Cliente extends Usuario{
