@@ -7,6 +7,7 @@ import { verifyData } from "../util/verifiers";
 
 import { forgetPassService } from "../../services/forgetPassService";
 import { useResetPassStore } from "../../store/useResetPassStore";
+import "../../styles/Access/ForgetPass.css";
 
 const FormForgetPass: React.FC = () => {
   const navigate = useNavigate();
