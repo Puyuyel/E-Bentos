@@ -37,7 +37,7 @@ public class Local {
     @Column(name = "DIRECCION", length = 170, nullable = false)
     private String direccion;
 
-    @Column(name = "FOTO", length = 30, nullable = false)
+    @Column(name = "FOTO", length = 100, nullable = false)
     private String foto;
 
     @Column(name = "AFORO", nullable = false)

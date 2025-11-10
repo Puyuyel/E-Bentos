@@ -17,5 +17,5 @@ public class LocalActualizaDTO {
     private String foto;
     private Integer aforo;
     private TipoLocal tipoLocal;
-    private Distrito distrito;
+    private DistritoSimpleDTO distrito;
 }
