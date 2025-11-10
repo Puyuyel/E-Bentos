@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { FluidForm, TextInput, Button } from "@carbon/react";
 
 import { useResetPassStore } from "../../store/useResetPassStore";
+import "../../styles/Access/FormCodigoVerificacion.css";
 
 const FormCodigoVerificacion: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -97,7 +98,7 @@ const FormCodigoVerificacion: React.FC = () => {
         </div>
       </FluidForm>
 
-      <Button disabled={loading} onClick={handleContinuarClick}>
+      <Button disabled={loading} onClick={handleContinuarClick} className="btn-continue">
         Continuar
       </Button>
     </div>

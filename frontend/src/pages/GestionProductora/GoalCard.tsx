@@ -44,7 +44,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
       <div className="progress-container">
         <span className="progress-label">{label}</span>
         <span className="progress-value">
-          {formatValue(value)} / {formatValue(max)} {unit}
+          {formatValue(value)} / <strong>{formatValue(max)} {unit}</strong> 
         </span>
       </div>
       <div className="progress-bar-bg">

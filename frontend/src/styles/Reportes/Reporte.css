@@ -3,11 +3,6 @@
   height: 100vh;
 }
 
-.content {
-  margin-left: 250px; /* ajusta según el ancho del sidebar */
-  padding: 2rem;
-}
-
 .page-title {
   color: var(--Primary-500, #165DF6);
   font-family: 'Sarabun', sans-serif;

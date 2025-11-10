@@ -109,6 +109,7 @@
   }
 }
 
+
 /* Responsivo */
 @media (max-width: 768px) {
   .form-login-container {
@@ -140,4 +141,119 @@ html {
   height: 100%;
   overflow-x: hidden;
   background-color: #fff;
+}
+
+
+/* ============================= */
+/* ===== FormForgetPass ======== */
+/* ============================= */
+
+.form-forgetpass-container {
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  background-color: #ffffff;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+/* Título principal */
+.form-forgetpass-container .title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 1rem 0 2.5rem 0;
+  color: #111;
+  text-align: center;
+}
+
+/* Texto “Ingresa tu correo” */
+.form-forgetpass-container p {
+  margin-bottom: 0.5rem;
+  color: #333;
+  font-weight: 500;
+  text-align: left;
+  width: 100%;
+  max-width: 360px;
+}
+
+/* Input */
+.form-forgetpass-container .input-email {
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto 1.5rem auto;
+}
+
+/* Botón principal */
+.form-forgetpass-container > .bx--btn {
+  width: 100%;
+  max-width: 360px;
+  margin-top: 1rem;
+}
+
+/* Sección superior (¿No tienes cuenta? + botón) */
+.form-forgetpass-container .signup-area {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.form-forgetpass-container .signup-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 360px;
+  flex-wrap: nowrap;
+  gap: 0.5rem;
+  margin: 0 auto 2rem auto;
+}
+
+.form-forgetpass-container .signup p {
+  margin: 0;
+  color: #333;
+  font-weight: 500;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* Cuando la pantalla se reduce o hay zoom */
+@media (max-width: 1200px) {
+  .form-forgetpass-container .signup-row {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+
+  .form-forgetpass-container .signup p {
+    text-align: center;
+    width: 100%;
+  }
+}
+
+/* Móvil */
+@media (max-width: 768px) {
+  .form-forgetpass-container {
+    padding: 0.75rem;
+  }
+
+  .form-forgetpass-container .signup-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+
+  .form-forgetpass-container .title {
+    font-size: 1.5rem;
+  }
+
+  .form-forgetpass-container .bx--btn {
+    max-width: 100%;
+  }
 }

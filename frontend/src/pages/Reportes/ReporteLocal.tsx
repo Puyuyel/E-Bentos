@@ -6,9 +6,11 @@ import Donut from '../../components/Donut';
 import Gauge from '../../components/Gauge';
 import FilterBar from '../../components/FilterBar.tsx';
 import '../../styles/Reportes/Reporte.css';
+import '../../styles/Reportes/ReporteLocal.css';
 import type { ChartDatum } from "../../components/types.ts";
 
 const ReporteLocal: React.FC = () => {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const sampleData: ChartDatum[] = [
     { key: "Local 1", value: 65000 },
     { key: "Local 2", value: 32000 },
@@ -32,12 +34,12 @@ const ReporteLocal: React.FC = () => {
   };
   
   return (
-    <div className="reporte-container">
-      <Sidebar currentPath="reporte-local" />
+    <div className={`app-container ${sidebarOpen ? "sidebar-visible" : "sidebar-hidden"}`}>
+      <Sidebar currentPath="reporte-local" onToggleSidebar={setSidebarOpen}/>
 
-      <div className="content">
-        <h1 className="page-title">
-          Visión General de <span className="highlight">Locales</span>
+      <main className="app-main">
+        <h1 className="title">
+          Visión General de Locales
         </h1>
 
         <FilterBar onFilterChange={handleFilterChange} />
@@ -56,7 +58,7 @@ const ReporteLocal: React.FC = () => {
             <Lollipop data={sampleData}/>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

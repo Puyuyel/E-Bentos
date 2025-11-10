@@ -22,8 +22,7 @@ import {
   contrasenhaIncluyeNumero,
 } from "../util/verifiers";
 
-import React, { useState } from "react";
-import { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import type { RegisterData } from "../../types/register.types";
@@ -453,8 +452,8 @@ const FormRegister: React.FC<FormRegisterProps> = ({
           <div className="gen-p-ddl">
             <p className="genero-p">Género</p>
             <Dropdown
+              titleText=""
               className="ddl-gen"
-              helperText="This is some helper text"
               id="genero"
               onChange={handleGeneroChange}
               invalid={isInvalidGen}
