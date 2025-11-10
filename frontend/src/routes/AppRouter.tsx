@@ -4,10 +4,12 @@ import Register from "../pages/Access/Register"; // tu componente Login
 import ForgetPass from "../pages/Access/ForgetPass";
 import CodigoVerificacion from "../pages/Access/CodigoVerificacion";
 import NewPassword from "../pages/Access/NewPassword";
-import GestionarGestorLocal from "../pages/Gestion/GestionarGestorLocal";
+import GestionarGestorLocal from "../pages/Gestion/GestorLocal/GestionarGestorLocal";
+import VenueCRUD from "../pages/Gestion/GestorLocal/VenueCRUD";
 import GestionarProductora from "../pages/Gestion/GestionarProductora";
 import GestionarPuntoDeVenta from "../pages/Gestion/GestionarPuntoDeVenta";
 import GestionarTaquillero from "../pages/Gestion/GestionarTaquillero";
+import GestionarDuenhoLocal from "../pages/Gestion/DuenhoLocal/GestionarDuenhoLocal";
 import ReporteCliente from "../pages/Reportes/ReporteCliente";
 import ReporteEvento from "../pages/Reportes/ReporteEvento";
 import ReporteLocal from "../pages/Reportes/ReporteLocal";
@@ -156,6 +158,38 @@ const AppRouter: React.FC = () => {
           element={
             <ProtectedRoute requiredRole="PRODUCTORA">
               <Metas />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* RUTAS para GESTOR DE LOCAL */}
+        {/* Ruta /listado locales*/}
+        <Route
+          path="/gestor_local/gestionar-local"
+          element={
+            <ProtectedRoute requiredRole="GESTOR_LOCAL">
+              <GestionarGestorLocal />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Ruta /registro locales*/}
+        <Route
+          path="/gestor_local/registrar-local"
+          element={
+            <ProtectedRoute requiredRole="GESTOR_LOCAL">
+              <VenueCRUD />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* RUTAS para DUEÑO DE LOCAL */}
+        {/* Ruta /listado locales*/}
+        <Route
+          path="/duenho_local/gestionar-local"
+          element={
+            <ProtectedRoute requiredRole="DUENHO_LOCAL">
+              <GestionarDuenhoLocal />
             </ProtectedRoute>
           }
         />

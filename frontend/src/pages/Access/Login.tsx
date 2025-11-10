@@ -8,6 +8,8 @@ import LoginBackground from "../../assets/concert-blue.png";
 import type { LoginCredentials } from "../../types/auth.types";
 import { useAuthStore } from "../../store/useAuthStore";
 
+import { useState } from "react";
+
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const { login, isLoggedIn, user } = useAuthStore();
@@ -18,8 +20,8 @@ const Login: React.FC = () => {
       ADMIN: "/admin/gestionar-productora",
       CLIENTE: "/admin/gestionar-productora",
       PRODUCTORA: "/productora/gestionar-organizador",
-      "GESTOR LOCAL": "/gestorlocal/home",
-      "DUENHO LOCAL": "/duenholocal/home",
+      GESTOR_LOCAL: "/gestor_local/gestionar-local",
+      DUENHO_LOCAL: "/duenho_local/gestionar-local",
       TAQUILLERO: "/taquillero/home",
     };
 
@@ -42,18 +44,10 @@ const Login: React.FC = () => {
     try {
       const rol = await login(credentials);
       console.log("Rol:", rol);
-
-      // Mostrar alertas solo para roles específicos si es necesario
-      if (rol === "ADMIN") {
-        alert("Administrador logueado ¡¡SATISFACTORIAMENTE!!.");
-      } else if (rol === "CLIENTE") {
-        alert("CLIENTE EXITOSAMENTE LOGEADO");
-      }
-
       const route = getRouteByRole(rol);
       navigate(route, { replace: true });
     } catch (error: any) {
-      alert(error.message || "Error al iniciar sesión");
+      throw new Error(error.message + " ... Inténtelo nuevamente. :(");
     }
   };
 

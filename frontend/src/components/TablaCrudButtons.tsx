@@ -12,34 +12,50 @@ const TablaCrudButtons: React.FC<TablaCrudButtonsProps> = ({
   entidad,
   datos,
   raw,
-  onActualizar
+  onActualizar,
 }) => {
   //console.log(raw);
-  return(
-    <div style={{ display: 'flex'}}>
+  return (
+    <div style={{ display: "flex" }}>
       <div
         style={{
-          margin: '0.5rem'
+          margin: "0.5rem",
         }}
       >
-        <TablaCrudButtonDialog entidad={entidad} accion="Visualizar" datos={datos} raw={raw} onActualizar={()=>{}}></TablaCrudButtonDialog>
+        <TablaCrudButtonDialog
+          entidad={entidad}
+          accion="Visualizar"
+          datos={datos}
+          raw={raw}
+          onActualizar={() => {}}
+        ></TablaCrudButtonDialog>
       </div>
       <div
         style={{
-          margin: '0.5rem'
+          margin: "0.5rem",
         }}
       >
-        <TablaCrudButtonDialog entidad={entidad} accion="Editar" datos={datos} raw={raw} onActualizar={onActualizar}></TablaCrudButtonDialog>
+        <TablaCrudButtonDialog
+          entidad={entidad}
+          accion="Editar"
+          datos={datos}
+          raw={raw}
+          onActualizar={onActualizar}
+        ></TablaCrudButtonDialog>
       </div>
       <div
         style={{
-          margin: '0.5rem'
+          margin: "0.5rem",
         }}
       >
-        <TablaCrudDeleteDialog entidad={entidad} raw={raw} onDelete={ onActualizar }></TablaCrudDeleteDialog>
+        <TablaCrudDeleteDialog
+          entidad={entidad}
+          raw={raw}
+          onDelete={onActualizar}
+        ></TablaCrudDeleteDialog>
       </div>
-  </div>
+    </div>
   );
-}
+};
 
 export default TablaCrudButtons;
