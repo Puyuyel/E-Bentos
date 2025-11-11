@@ -1,6 +1,5 @@
 package com.ebentos.backend.dto;
 
-import com.ebentos.backend.model.PuntoVenta;
 import lombok.*;
 @Getter
 @Setter
