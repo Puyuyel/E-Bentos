@@ -18,7 +18,7 @@ const Login: React.FC = () => {
   const getRouteByRole = (rol: string): string => {
     const roleRoutes: Record<string, string> = {
       ADMIN: "/admin/gestionar-productora",
-      CLIENTE: "/admin/gestionar-productora",
+      CLIENTE: "/cliente/ver-detalle-evento",
       PRODUCTORA: "/productora/gestionar-organizador",
       GESTOR_LOCAL: "/gestor_local/gestionar-local",
       DUENHO_LOCAL: "/duenho_local/gestionar-local",
