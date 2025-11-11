@@ -10,6 +10,7 @@ import GestionarProductora from "../pages/Gestion/GestionarProductora";
 import GestionarPuntoDeVenta from "../pages/Gestion/GestionarPuntoDeVenta";
 import GestionarTaquillero from "../pages/Gestion/GestionarTaquillero";
 import GestionarDuenhoLocal from "../pages/Gestion/DuenhoLocal/GestionarDuenhoLocal";
+import VerDetalleEvento from "../pages/Cliente/VerDetalleEvento";
 import ReporteCliente from "../pages/Reportes/ReporteCliente";
 import ReporteEvento from "../pages/Reportes/ReporteEvento";
 import ReporteLocal from "../pages/Reportes/ReporteLocal";
@@ -190,6 +191,17 @@ const AppRouter: React.FC = () => {
           element={
             <ProtectedRoute requiredRole="DUENHO_LOCAL">
               <GestionarDuenhoLocal />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* RUTAS para CLIENTE */}
+        {/* Ruta /ver detalle evento*/}
+        <Route
+          path="/cliente/ver-detalle-evento"
+          element={
+            <ProtectedRoute requiredRole="CLIENTE">
+              <VerDetalleEvento />
             </ProtectedRoute>
           }
         />
