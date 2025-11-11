@@ -1,13 +1,13 @@
 import React from "react";
 import { GroupedBarChart } from "@carbon/charts-react";
 import {ScaleTypes} from "@carbon/charts";
-import type { ChartProps } from "./types.ts";
+import type { ChartProps } from "./util/types.ts";
 import type { BarChartOptions } from "@carbon/charts";
 import "@carbon/charts-react/styles.css";
 
 const GroupedBar: React.FC<ChartProps> = ({ data }) => {
   const options: BarChartOptions = {
-    title: "Ventas por Mes y Local",
+    title: "Ventas por tipo de Evento en Locales",
     axes: {
       left: {
         mapsTo: "value",
