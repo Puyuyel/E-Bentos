@@ -4,6 +4,7 @@ import TablaCrudButtons from "./TablaCrudButtons";
 import { listarProductoras } from "../services/productoraService";
 import { listarGestoresLocales, listarTaquilleros } from "../services/gestorLocalService";
 import { listarPuntosVenta } from "../services/puntoVentaService";
+import { listarEventos } from "../services/eventoService";
 import '../styles/CargaSpinner.css'
 
 
@@ -83,6 +84,8 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
         return ['Nombre', 'Dirección', 'Departamento', 'Provincia', 'Distrito', 'Estado'];
       case 'Taquillero':
         return ['Nombres', 'Apellidos', 'DNI', 'Email', 'Teléfono', 'Punto de Venta'];
+      case 'OrganizadorEvento':
+        return ['Nombre', 'Local', 'Fecha', 'Hora de Inicio', 'Duración Estimada', 'Estado'];
       default:
         return [];
     }
@@ -102,6 +105,7 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
       GestorLocal: listarGestoresLocales,
       Taquillero: listarTaquilleros,
       PuntoVenta: listarPuntosVenta,
+      OrganizadorEvento: listarEventos,
     };
 
     const transformadores: Record<string, (item: any, index: number) => DataRow> = {
@@ -156,6 +160,32 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
           item.puntoVenta.nombre  // Taquillero siempre tiene un Punto de venta
         ]
       }),
+      OrganizadorEvento: (item, index) => {
+        const fecha = new Date(item.fechaHorarioInicio);
+        const fechaInicio = fecha.toLocaleDateString('es-PE', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        });
+        const horaInicio = fecha.toLocaleTimeString('es-PE', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false
+        });
+
+        return {
+          id: index,
+          data: [
+            item.nombre || '—',
+            item.descripcion || '—',
+            fechaInicio,
+            horaInicio,
+            item.duracionEstimada ? `${item.duracionEstimada} min` : '—',
+            item.estado || '—'
+          ],
+          raw: item
+        };
+      },
     };
 
     const fetchAndMap = async () => {
@@ -169,6 +199,8 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
         const data = await fetcher();
         const mapped: DataRow[] = data.map(transform);
         setRows(mapped);
+        console.log("📋 Filas en rows:", rows);
+
       } catch (err: any) {
         console.error(`Error al listar ${tipoGestor}:`, err.message);
       } finally {
@@ -215,6 +247,7 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
       GestorLocal: listarGestoresLocales,
       PuntoVenta: listarPuntosVenta,
       Taquillero: listarTaquilleros,
+      OrganizadorEvento: listarEventos,
     };
     console.log(fetchers.Productora);
     const transformadores: Record<string, (item: any, index: number) => DataRow> = {
@@ -265,6 +298,32 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
           item.puntoVenta.nombre  // Taquillero siempre tiene un Punto de venta
         ]
       }),
+      OrganizadorEvento: (item, index) => {
+        const fecha = new Date(item.fechaHorarioInicio);
+        const fechaInicio = fecha.toLocaleDateString('es-PE', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        });
+        const horaInicio = fecha.toLocaleTimeString('es-PE', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false
+        });
+
+        return {
+          id: index,
+          data: [
+            item.nombre || '—',
+            item.descripcion || '—',
+            fechaInicio,
+            horaInicio,
+            item.duracionEstimada ? `${item.duracionEstimada} min` : '—',
+            item.estado || '—'
+          ],
+          raw: item
+        };
+      },
     };
 
     const fetcher = fetchers[tipoGestor];
@@ -276,6 +335,7 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
       const data = await fetcher();
       const mapped: DataRow[] = data.map(transform);
       setRows(mapped);
+      console.log("📋 Filas en rows:", rows);
 
       const start = (currentPage - 1) * pageSize;
       const end = start + pageSize;

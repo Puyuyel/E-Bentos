@@ -9,7 +9,7 @@ const GestionarEvento: React.FC = () => {
       <SidebarGestor currentPath="gestionar-evento" onToggleSidebar={setSidebarOpen}/>
       <main className="app-main">
         <h1 className="title">Listado de Eventos</h1>
-        <TablaAdmin tipoGestor="Productora"></TablaAdmin>
+        <TablaAdmin tipoGestor="OrganizadorEvento"></TablaAdmin>
       </main>
     </div>
   );
