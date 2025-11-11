@@ -6,9 +6,10 @@ import lombok.*;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class LocalSimpleDTO {
+public class LocalSimpleParaVentasDTO {
     
     private Integer localId;
-    private Integer aforo;
+    private String nombre;
+    private String direccion;
     
 }
