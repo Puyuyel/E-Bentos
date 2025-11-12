@@ -1,7 +1,7 @@
 import { TextInput, Select, SelectItem, VStack } from "@carbon/react";
 import { useEffect, useState } from "react";
-import { listarDepartamentos, listarDistritos, listarProvincias } from "../services/ubicacionService";
-import type { Provincia, Distrito } from "../types/puntoVenta.types";
+import { listarDepartamentos, listarDistritos, listarProvincias } from "../../services/ubicacionService";
+import type { Provincia, Distrito } from "../../types/puntoVenta.types";
 
 interface TablaCrudPuntoVentaFormProps {
   isReadOnly: boolean;

@@ -1,7 +1,7 @@
 import { PasswordInput, Select, SelectItem, TextInput, VStack } from "@carbon/react";
 import { useEffect, useState } from "react";
-import { listarPuntosVenta } from "../services/puntoVentaService";
-import type { PuntoVenta } from "../types/puntoVenta.types";
+import { listarPuntosVenta } from "../../services/puntoVentaService";
+import type { PuntoVenta } from "../../types/puntoVenta.types";
 
 interface TablaCrudTaquilleroFormProps {
   isReadOnly: boolean;

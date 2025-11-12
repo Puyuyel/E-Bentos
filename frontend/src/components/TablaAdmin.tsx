@@ -297,7 +297,7 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <TablaCrudButtonDialog entidad={tipoGestor} accion="Agregar" datos={[]} onActualizar={()=>{}} uniqueId={0}></TablaCrudButtonDialog>
+        <TablaCrudButtonDialog entidad={tipoGestor} accion="Agregar" datos={[]} onActualizar={actualizarTabla} uniqueId={0}></TablaCrudButtonDialog>
       </div>
       <Table
         aria-label="sample table"

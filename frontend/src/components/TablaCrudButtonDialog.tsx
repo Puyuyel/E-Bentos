@@ -1,9 +1,8 @@
-import { Button, IconButton, Select, SelectItem, TextInput, VStack } from "@carbon/react";
+import { Button, IconButton, VStack } from "@carbon/react";
 import { View, Edit, TrashCan } from '@carbon/icons-react';
 import { Dialog, DialogBody, DialogCloseButton, DialogControls, DialogFooter, DialogHeader, DialogSubtitle, DialogTitle } from "@carbon/react/lib/components/Dialog";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { actualizarProductora, registrarProductora } from "../services/productoraService";
-import TablaCrudProductoraForm from "./TablaCrudPuntoVentaForm";
 import { formulariosCrud } from "./util/formularios";
 import { actualizarPuntoVenta,listarPuntoVentaXId,registrarPuntoVenta } from "../services/puntoVentaService";
 import type { PuntoVenta } from "../types/puntoVenta.types";

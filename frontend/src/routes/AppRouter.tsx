@@ -4,7 +4,7 @@ import Register from "../pages/Access/Register"; // tu componente Login
 import ForgetPass from "../pages/Access/ForgetPass";
 import CodigoVerificacion from "../pages/Access/CodigoVerificacion";
 import NewPassword from "../pages/Access/NewPassword";
-import GestionarGestorLocal from "../pages/Gestion/GestorLocal/GestionarGestorLocal";
+import GestionarGestorLocal from "../pages/Gestion/GestionarGestorLocal";
 import VenueCRUD from "../pages/Gestion/GestorLocal/VenueCRUD";
 import GestionarProductora from "../pages/Gestion/GestionarProductora";
 import GestionarPuntoDeVenta from "../pages/Gestion/GestionarPuntoDeVenta";
@@ -47,7 +47,7 @@ const AppRouter: React.FC = () => {
         <Route
           path="/admin/gestionar-gestor-local"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredRole="ADMIN">
               <GestionarGestorLocal />
             </ProtectedRoute>
           }
