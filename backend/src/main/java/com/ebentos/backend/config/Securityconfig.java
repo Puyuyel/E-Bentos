@@ -108,6 +108,10 @@ public class Securityconfig {
                                 "/api/eventos/**").hasRole("ORGANIZADOR_EVENTOS")
                         .requestMatchers(HttpMethod.DELETE, 
                                 "/api/eventos/**").hasRole("ORGANIZADOR_EVENTOS")
+                        .requestMatchers(HttpMethod.PUT, 
+                                "/api/solicitudes/**").hasRole("DUENHO_LOCAL")
+                        .requestMatchers(HttpMethod.GET, 
+                                "/api/solicitudes/**").hasAnyRole("DUENHO_LOCAL","ORGANIZADOR_EVENTOS")
                         // Protege todas las demás rutas
                         .anyRequest().authenticated())
 
