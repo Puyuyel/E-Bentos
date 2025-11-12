@@ -1,0 +1,10 @@
+.img-banner {
+  width: 100vw;
+  height: 30rem;
+  background-size: contain; /* hace que la imagen se escale manteniendo su proporción */
+  background-position: center; /* centra la imagen */
+  background-repeat: no-repeat;
+  margin: 0;
+  padding: 0;
+  display: block;
+}
