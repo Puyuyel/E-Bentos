@@ -9,7 +9,7 @@ const GestionarGestorLocal: React.FC = () => {
       <Sidebar currentPath="gestionar-gestor-local" />
       <main className="app-main">
         <h1 className="title">Panel de Gestión de Gestores Locales</h1>
-        {/* <TablaAdmin tipoGestor="GestorLocal"></TablaAdmin> */}
+        <TablaAdmin tipoGestor="GestorLocal"></TablaAdmin>
       </main>
     </div>
   );

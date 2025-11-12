@@ -5,11 +5,15 @@ import { useState, useRef, useEffect } from "react";
 import { actualizarProductora, registrarProductora } from "../services/productoraService";
 import TablaCrudProductoraForm from "./TablaCrudPuntoVentaForm";
 import { formulariosCrud } from "./util/formularios";
-import { actualizarPuntoVenta,registrarPuntoVenta } from "../services/puntoVentaService";
+import { actualizarPuntoVenta,listarPuntoVentaXId,registrarPuntoVenta } from "../services/puntoVentaService";
 import type { PuntoVenta } from "../types/puntoVenta.types";
 import type { Productora } from "../types/productora.types";
 import type { GestorLocal } from "../types/gestorLocal.types";
-import { actualizarGestorLocal, actualizarTaquillero, registrarGestorLocal } from "../services/gestorLocalService";
+import { actualizarGestorLocal, actualizarTaquillero, registrarGestorLocal, registrarTaquillero } from "../services/gestorLocalService";
+import { getUser } from "../services/authService";
+
+
+
 
 interface TablaCrudButtonDialogProps {
   entidad: string;
@@ -17,17 +21,21 @@ interface TablaCrudButtonDialogProps {
   datos: string[];
   raw?: any;
   onActualizar: () => void;
+  uniqueId: number;
 }
 
 const TablaCrudButtonDialog: React.FC<TablaCrudButtonDialogProps> = ({
-  entidad, accion, datos, raw, onActualizar
+  entidad, accion, datos, raw, onActualizar, uniqueId
 }) => {
-  const Formulario = formulariosCrud[entidad];
   
   const [isOpen, setIsOpen] = useState(false);
-
-  // Reemplaza todos los useRef por un solo estado
   const [formData, setFormData] = useState<Record<string, any>>({});
+  //const [errors, setErrors] = useState<any>({});
+
+  const Formulario = formulariosCrud[entidad];
+  //const validacionEntidad = validaciones[entidad] || {};
+  
+  const [validationState, setValidationState] = useState(1);
 
   useEffect(() => {
     if (accion === 'Agregar') {
@@ -47,16 +55,17 @@ const TablaCrudButtonDialog: React.FC<TablaCrudButtonDialogProps> = ({
           break;
       }
     } else if (raw) {
+      console.log(entidad);
       switch (entidad) {
         case 'Productora':
           const entityProd = raw as Productora;
           setFormData({
+            usuarioId: entityProd.usuarioId,
             ruc: entityProd.ruc,
             razonSocial: entityProd.razonSocial,
             nombreComercial: entityProd.nombreComercial,
             email: entityProd.email,
             telefono: entityProd.telefono,
-            usuarioId: entityProd.usuarioId,
             contrasenha: '',
             estado: 'Activo' // Por default es activo. Preguntar si debería obtenerse del GET
           });
@@ -86,14 +95,14 @@ const TablaCrudButtonDialog: React.FC<TablaCrudButtonDialogProps> = ({
             nombres: entityGL.nombres,
             apellidos: entityGL.apellidos,
             contrasenha: '',
-            activo: true, // si se ha mostrado es porque está activo...
-            //usuarioId: entityGL.usuarioId, // lo sacaremos con users/me
-            //nombreRol: '', // lo sacaremos con users/me
+            estado: 'Activo',
           });
           break;
         case 'Taquillero':
           const entityT = raw as GestorLocal;
+          console.log(entityT);
           setFormData({
+            usuarioId: entityT.usuarioId,
             telefono: entityT.telefono,
             email: entityT.email,
             dni: entityT.dni,
@@ -101,9 +110,7 @@ const TablaCrudButtonDialog: React.FC<TablaCrudButtonDialogProps> = ({
             apellidos: entityT.apellidos,
             contrasenha: '',
             puntoVentaId: entityT.puntoVenta.puntoVentaId,
-            activo: true, // si se ha mostrado es porque está actvo...
-            //usuarioId: entityGL.usuarioId, // lo sacaremos con users/me
-            //nombreRol: '', // lo sacaremos con users/me
+            estado: 'Activo',
           });
           break;
         default:
@@ -173,6 +180,8 @@ const TablaCrudButtonDialog: React.FC<TablaCrudButtonDialogProps> = ({
               setFormData={setFormData}
               isOpen={isOpen}
               accion={accion}
+              uniqueId={uniqueId}
+              validationState={validationState}
             />
           </VStack>
         </DialogBody>
@@ -186,8 +195,10 @@ const TablaCrudButtonDialog: React.FC<TablaCrudButtonDialogProps> = ({
               kind="primary"
               onClick={async () => {
                 try {
-                  let payload: any;let payloadAlt: any;
-
+                  let payload: any; let payloadAlt: any;
+                  let currentUser = null;
+                  setValidationState(2);
+                  console.log(validationState);
                   switch (entidad) {
                     case 'Productora':
                       console.log(formData);
@@ -258,32 +269,36 @@ const TablaCrudButtonDialog: React.FC<TablaCrudButtonDialogProps> = ({
                       break;
 
                     case 'GestorLocal':
-                      //console.log(formData);
+                      if (accion === 'Agregar') {
+                        currentUser = await getUser();
+                      }
                       payload = {
                         telefono: formData.telefono,
                         email: formData.email,
                         contrasenha: formData.contrasenha,
-                        activo: formData.estado === 'Activo',
                         dni: formData.dni,
                         nombres: formData.nombres,
                         apellidos: formData.apellidos,
-                        puntoVenta: null
+                        puntoVenta: null,
+                        activo: (formData.estado === 'Activo')? 1:0 
                       };
                       payloadAlt = {
                         telefono: formData.telefono,
                         email: formData.email,
                         contrasenha: formData.contrasenha,
-                        nombreRol: '', // del listado de roles, falta implementar
+                        nombreRol: 'GESTOR_LOCAL', // del listado de roles, falta implementar
                         nombres: formData.nombres, 
                         apellidos: formData.apellidos, 
                         dni: formData.dni,
-                        usuarioId: formData.nombres, // traerlo de user/me, falta implementar
+                        usuarioCreador: {
+                          usuarioId: currentUser?.usuarioId || 0,
+                        },
                         puntoVenta: null
                       };
                       console.log("payload: ");
                       console.log(payload);
                       if (accion == 'Editar'){
-                        await actualizarGestorLocal(payload.puntoventaId, payload).then( () => {onActualizar(); setIsOpen(false); } )
+                        await actualizarGestorLocal(parseInt(formData.usuarioId), payload).then( () => {onActualizar(); setIsOpen(false); } )
                       } else {
                         await registrarGestorLocal(payloadAlt).then( () => {onActualizar(); setIsOpen(false); } );
                       }
@@ -291,19 +306,63 @@ const TablaCrudButtonDialog: React.FC<TablaCrudButtonDialogProps> = ({
                       break;
 
                     case 'Taquillero':
+                      console.log(formData);
+                      let puntoVenta: PuntoVenta | null = null;
+ 
+                      if (accion === 'Agregar') {
+                        currentUser = await getUser();
+                      }
+                      if (accion === 'Editar') {
+                        puntoVenta = await listarPuntoVentaXId(parseInt(formData.puntoVentaId));
+                        console.log(puntoVenta);
+                      }
                       payload = {
                         telefono: formData.telefono,
                         email: formData.email,
                         contrasenha: formData.contrasenha,
-                        activo: formData.estado === 'Activo',
                         dni: formData.dni,
                         nombres: formData.nombres,
                         apellidos: formData.apellidos,
                         puntoVenta: {
-                          puntoVentaId: formData.puntoVentaId
-                        }
+                          puntoVentaId: formData.puntoVentaId,
+                          nombre: puntoVenta?.nombre,
+                          direccion: puntoVenta?.direccion,
+                          distrito: {
+                            distritoId: puntoVenta?.distrito.distritoId,
+                            nombre: puntoVenta?.distrito.nombre,
+                            provincia: {
+                              diprovinciaId: puntoVenta?.distrito.provincia.provinciaId,
+                              nombre: puntoVenta?.distrito.provincia.nombre,
+                              departamento: {
+                                diprovinciaId: puntoVenta?.distrito.provincia.departamento.departamentoId,
+                                nombre: puntoVenta?.distrito.provincia.departamento.nombre,
+                              }
+                            }
+                          }
+                        },
+                        activo: (formData.estado === 'Activo')? 1:0 
+                      };
+                      payloadAlt = {
+                        telefono: formData.telefono,
+                        email: formData.email,
+                        contrasenha: formData.contrasenha,
+                        nombreRol: 'TAQUILLERO',
+                        nombres: formData.nombres, 
+                        apellidos: formData.apellidos, 
+                        dni: formData.dni,
+                        usuarioCreador: {
+                          usuarioId: currentUser?.usuarioId || 0,
+                        },
+                        puntoVenta: {
+                          puntoVentaId: formData.puntoVentaId,
+                        },
                       };
                       console.log(payload);
+                      if (accion == 'Editar'){
+                        await actualizarTaquillero(parseInt(formData.usuarioId), payload).then( () => {onActualizar(); setIsOpen(false); } )
+                      } else {
+                        await registrarTaquillero(payloadAlt).then( () => {onActualizar(); setIsOpen(false); } );
+                      }
                       //await actualizarTaquillero(raw.usuarioId, payload);
                       break;
                     // otros casos...
@@ -343,6 +402,6 @@ function getEmptyPuntoVenta(){
 
 function getEmptyGestorLocal(){
   return {
-    ruc: '', razonSocial: '', nombreComercial: '', email: '', telefono: '', usuarioId: 0 // reemplazar el usuarioId por el usuario de la persona actual
+    ruc: '', razonSocial: '', nombreComercial: '', email: '', telefono: '', usuarioId: 0, estado: 'Activo', puntoventaId: 0 // reemplazar el usuarioId por el usuario de la persona actual
   };
 }
