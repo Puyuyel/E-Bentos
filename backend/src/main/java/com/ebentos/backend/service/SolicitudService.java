@@ -91,6 +91,16 @@ public class SolicitudService {
 
         return llenarADTO(solicitudActualizada);
     }
+    
+    public SolicitudDTO obtenerPorId(Integer localId, Integer eventoId){
+        SolicitudId solicitudId = new SolicitudId(localId, eventoId);
+        Solicitud solicitud = solicitudRepository.findById(solicitudId)
+                .orElseThrow(() -> new EntityNotFoundException("Solicitud no encontrada con ID: " + solicitudId));
+        
+        SolicitudDTO solicitudDTO = llenarADTO(solicitud);
+        
+        return solicitudDTO;
+    }
 
     private SolicitudDTO llenarADTO(Solicitud solicitudActualizada){
         SolicitudDTO solicitudDTO = new SolicitudDTO();
