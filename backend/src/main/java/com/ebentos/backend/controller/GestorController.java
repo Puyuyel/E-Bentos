@@ -1,9 +1,4 @@
 package com.ebentos.backend.controller;
-import com.ebentos.backend.dto.GestorActualizaDTO;
-import com.ebentos.backend.dto.GestorDTO;
-import com.ebentos.backend.dto.RegistroGestorDTO;
-import com.ebentos.backend.model.Gestor;
-import com.ebentos.backend.service.GestorService;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +15,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import com.ebentos.backend.dto.GestorActualizaDTO;
+import com.ebentos.backend.dto.GestorDTO;
+import com.ebentos.backend.dto.GestorSimpleNombreDTO;
+import com.ebentos.backend.dto.RegistroGestorDTO;
+import com.ebentos.backend.model.Gestor;
+import com.ebentos.backend.service.GestorService;
 
 @RestController
 @RequestMapping("/api/gestores")
@@ -102,6 +104,11 @@ public class GestorController {
     @GetMapping("/{id}")
     public GestorDTO obtenerPorId(@PathVariable Integer id) {
         return gestorService.obtenerPorId(id);
+    }
+
+    @GetMapping("/nombre-por-dni/{dni}")
+    public GestorSimpleNombreDTO obtenerNombrePorDni(@PathVariable String dni) {
+        return gestorService.obtenerNombrePorDni(dni);
     }
 
     @PutMapping("/{id}")

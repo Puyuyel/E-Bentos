@@ -55,6 +55,30 @@ public class LocalController {
 
         return response;
     }
+    
+    @GetMapping("/paginadoPorBuscadorYDuenho")
+    public Map<String, Object> listarPaginadoPorBuscadorYDuenho(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int limit,
+            @RequestParam String buscador,
+            @RequestParam Integer duenhoId) {
+
+        Map<String, Object> response = localService.listarPaginadoPorBuscadorYDuenho(page, limit, buscador, duenhoId);
+
+        // 🔹 Construir URLs completas usando el dominio actual
+        Map<String, Object> pagination = (Map<String, Object>) response.get("pagination");
+
+        String baseUrl = ServletUriComponentsBuilder.fromCurrentRequestUri().toUriString();
+
+        if ((boolean) pagination.get("hasNextPage")) {
+            pagination.put("nextPage", baseUrl + "?page=" + (page + 1) + "&limit=" + limit);
+        }
+        if ((boolean) pagination.get("hasPreviousPage")) {
+            pagination.put("prevPage", baseUrl + "?page=" + (page - 1) + "&limit=" + limit);
+        }
+
+        return response;
+    }
 
     @GetMapping("/{id}")
     public LocalDTO obtenerPorId(@PathVariable Integer id) {

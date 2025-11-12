@@ -1,0 +1,23 @@
+.header-ebentos {
+  background-color: #010d34;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  padding-left: 2rem;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+}
+
+.header-logo {
+  height: 80px; /* Ajusta según el tamaño del logo */
+  margin-right: 1rem;
+}
+
+.bx--header__name {
+  color: white !important;
+  font-size: 2rem;
+  font-weight: 600;
+}

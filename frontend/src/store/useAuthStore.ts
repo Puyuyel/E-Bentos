@@ -44,11 +44,11 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: () => {
+        console.log("🚪 Ejecutando logout...");
         set({ user: null, isLoggedIn: false, displayName: null });
         localStorage.removeItem("auth-storage");
-        setTimeout(() => {
-          window.location.href = "/login";
-        }, 100);
+        console.log("🔄 Redirigiendo a /login");
+        window.location.href = "/login";
       },
 
       setUser: (user: User | null) => {
@@ -64,3 +64,4 @@ export const useAuthStore = create<AuthState>()(
     }
   )
 );
+

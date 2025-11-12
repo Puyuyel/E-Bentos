@@ -178,8 +178,10 @@ public class LocalService {
             localExistente.setTipoLocal(localActualizaDTO.getTipoLocal());
         }
         
-        if (!Objects.equals(localActualizaDTO.getDistrito(), localExistente.getDistrito())) {
-            localExistente.setDistrito(localActualizaDTO.getDistrito());
+        if (localActualizaDTO.getDistrito()!=null && localActualizaDTO.getDistrito().getDistritoId()!=null) {
+            Distrito distrito = new Distrito();
+            distrito.setDistritoId(localActualizaDTO.getDistrito().getDistritoId());
+            localExistente.setDistrito(distrito);
         }
 
         //  GUARDAR y devolver

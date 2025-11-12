@@ -1,8 +1,5 @@
 package com.ebentos.backend.dto;
 
-import com.ebentos.backend.model.Distrito;
-import com.ebentos.backend.model.EstadoLocal;
-import com.ebentos.backend.model.Gestor;
 import com.ebentos.backend.model.TipoLocal;
 import lombok.*;
 
@@ -17,5 +14,5 @@ public class LocalActualizaDTO {
     private String foto;
     private Integer aforo;
     private TipoLocal tipoLocal;
-    private Distrito distrito;
+    private DistritoSimpleDTO distrito;
 }

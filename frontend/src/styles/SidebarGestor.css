@@ -56,6 +56,12 @@
   }
 }
 
+@media (max-width: 768px) {
+  .logo-container {
+    margin-left: 4rem;
+  }
+}
+
 .sidebar-overlay {
   position: fixed;
   top: 0;

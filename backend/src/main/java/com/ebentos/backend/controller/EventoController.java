@@ -2,6 +2,7 @@ package com.ebentos.backend.controller;
 
 import com.ebentos.backend.dto.EventoActualizaDTO;
 import com.ebentos.backend.dto.EventoDTO;
+import com.ebentos.backend.dto.EventoListadoDTO;
 import com.ebentos.backend.dto.RegistroEventoDTO;
 import com.ebentos.backend.service.EventoService;
 import java.util.List;
@@ -30,7 +31,7 @@ public class EventoController {
     }
 
     @GetMapping
-    public List<EventoDTO> listarTodas() {
+    public List<EventoListadoDTO> listarTodas() {
         return eventoService.listarTodas();
     }
 

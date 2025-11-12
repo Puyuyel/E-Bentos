@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import '../styles/FilterBar.css';
 import {
   DatePicker,
@@ -6,6 +6,8 @@ import {
   Select,
   SelectItem,
 } from '@carbon/react';
+import { getLocales } from '../services/localService';
+import { listarProductoras } from '../services/productoraService';
 
 interface FilterBarProps {
   onFilterChange?: (filters: {
@@ -18,6 +20,35 @@ interface FilterBarProps {
 }
 
 const FilterBar: React.FC<FilterBarProps> = ({ onFilterChange }) => {
+  
+  const [locales, setLocales] = useState<{ localId: number; nombre: string }[]>([]);
+  const [productoras, setProductoras] = useState<{ usuarioId: number; nombreComercial: string }[]>([]);
+
+  useEffect(() => {
+    // Cargar locales
+    async function fetchLocales() {
+      try {
+        const data = await getLocales();
+        setLocales(data);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    // Cargar productoras
+    async function fetchProductoras() {
+      try {
+        const data = await listarProductoras();
+        setProductoras(data);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    fetchLocales();
+    fetchProductoras();
+  }, []);  
+  
   const handleSelectChange = (id: string, value: string) => {
     if (onFilterChange) onFilterChange({ [id]: value });
   };
@@ -63,10 +94,11 @@ const FilterBar: React.FC<FilterBarProps> = ({ onFilterChange }) => {
           handleSelectChange('categoriaEvento', e.target.value)
         }
       >
-        <SelectItem text="Elija un evento" value="default" />
-        <SelectItem text="Concierto" value="concierto" />
-        <SelectItem text="Teatro" value="teatro" />
-        <SelectItem text="Festival" value="festival" />
+        <SelectItem text="Elija una categoría de evento" value="default" />
+        <SelectItem text="Concierto" value="CONCIERTO" />
+        <SelectItem text="Teatro" value="TEATRO" />
+        <SelectItem text="Musical" value="MUSICAL" />
+        <SelectItem text="Entretenimiento" value="ENTRETENIMIENTO" />
       </Select>
 
       <Select
@@ -77,9 +109,9 @@ const FilterBar: React.FC<FilterBarProps> = ({ onFilterChange }) => {
         onChange={(e) => handleSelectChange('local', e.target.value)}
       >
         <SelectItem text="Elija un local" value="default" />
-        <SelectItem text="Local A" value="A" />
-        <SelectItem text="Local B" value="B" />
-        <SelectItem text="Local C" value="C" />
+        {locales.map((l) => (
+          <SelectItem key={l.localId} text={l.nombre} value={l.nombre} />
+        ))}
       </Select>
 
       <Select
@@ -90,8 +122,13 @@ const FilterBar: React.FC<FilterBarProps> = ({ onFilterChange }) => {
         onChange={(e) => handleSelectChange('productora', e.target.value)}
       >
         <SelectItem text="Elija una productora" value="default" />
-        <SelectItem text="Activa" value="activa" />
-        <SelectItem text="Inactiva" value="inactiva" />
+        {productoras.map((p) => (
+          <SelectItem
+            key={p.usuarioId}
+            text={p.nombreComercial}
+            value={p.nombreComercial}
+          />
+        ))}
       </Select>
     </div>
   );

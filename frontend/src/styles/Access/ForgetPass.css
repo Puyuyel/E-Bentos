@@ -1,0 +1,259 @@
+/* Contenedor principal */
+.form-login-container {
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  background-color: #ffffff;
+  box-sizing: border-box;
+  overflow-x: hidden; /* evita desbordes horizontales */
+}
+
+/* Sección que contiene “¿No tienes cuenta?” y el botón */
+.signup-area {
+  width: 100%;
+  display: flex;
+  justify-content: center; /* centramos toda la fila */
+  margin-bottom: 0.75rem;
+}
+
+/* Fila con texto a la izquierda y botón a la derecha */
+.signup-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 360px;
+  flex-wrap: nowrap; /* evita que se desborde */
+  gap: 0.5rem;
+  margin-bottom: 2.5rem;
+  box-sizing: border-box;
+  margin: 0 auto;
+}
+
+.signup p {
+  margin: 0;
+  color: #333;
+  font-weight: 500;
+  flex-shrink: 0; /* evita que el texto se comprima */
+  white-space: nowrap; /* evita que el texto se divida en varias líneas */
+}
+
+/* Título */
+.title {
+  font-size: 1.89rem;
+  font-weight: 700;
+  margin: 1rem 0 3rem 0;
+  color: #111;
+  text-align: center;
+}
+
+/* Inputs */
+.fluid-form {
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* Espaciado entre inputs */
+.input-email {
+  margin-bottom: 10%;
+}
+
+/* Botón login */
+.btn-login {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+/* Link “¿Olvidaste tu contraseña?” */
+.link-forgot-pass {
+  display: block;
+  text-align: center;
+  margin-top: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.signup-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 360px;
+  flex-wrap: nowrap; /* mantiene todo en una línea por defecto */
+  gap: 0.5rem;
+  margin-bottom: 2.5rem;
+  box-sizing: border-box;
+  margin: 0 auto;
+}
+
+/* --- Nueva media query --- */
+/* Cuando la pantalla es demasiado pequeña o hay zoom, permitimos que se apile */
+@media (max-width: 1200px) {
+  .signup-row {
+    flex-wrap: wrap; /* ahora sí puede saltar el botón abajo */
+    justify-content: center; /* centramos el grupo */
+    gap: 0.75rem;
+  }
+
+  .signup p {
+    text-align: center;
+    width: 100%; /* hace que el texto ocupe toda la línea */
+  }
+}
+
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .form-login-container {
+    padding: 0.75rem;
+  }
+
+  .signup-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+
+  .fluid-form {
+    max-width: 100%; /* que use todo el ancho disponible del contenedor */
+    padding: 0 0.5rem; /* margen interno para respirar */
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+}
+
+/* Evita scroll horizontal */
+body,
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow-x: hidden;
+  background-color: #fff;
+}
+
+
+/* ============================= */
+/* ===== FormForgetPass ======== */
+/* ============================= */
+
+.form-forgetpass-container {
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  background-color: #ffffff;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+/* Título principal */
+.form-forgetpass-container .title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 1rem 0 2.5rem 0;
+  color: #111;
+  text-align: center;
+}
+
+/* Texto “Ingresa tu correo” */
+.form-forgetpass-container p {
+  margin-bottom: 0.5rem;
+  color: #333;
+  font-weight: 500;
+  text-align: left;
+  width: 100%;
+  max-width: 360px;
+}
+
+/* Input */
+.form-forgetpass-container .input-email {
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto 1.5rem auto;
+}
+
+/* Botón principal */
+.form-forgetpass-container > .bx--btn {
+  width: 100%;
+  max-width: 360px;
+  margin-top: 1rem;
+}
+
+/* Sección superior (¿No tienes cuenta? + botón) */
+.form-forgetpass-container .signup-area {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.form-forgetpass-container .signup-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 360px;
+  flex-wrap: nowrap;
+  gap: 0.5rem;
+  margin: 0 auto 2rem auto;
+}
+
+.form-forgetpass-container .signup p {
+  margin: 0;
+  color: #333;
+  font-weight: 500;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* Cuando la pantalla se reduce o hay zoom */
+@media (max-width: 1200px) {
+  .form-forgetpass-container .signup-row {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+
+  .form-forgetpass-container .signup p {
+    text-align: center;
+    width: 100%;
+  }
+}
+
+/* Móvil */
+@media (max-width: 768px) {
+  .form-forgetpass-container {
+    padding: 0.75rem;
+  }
+
+  .form-forgetpass-container .signup-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+
+  .form-forgetpass-container .title {
+    font-size: 1.5rem;
+  }
+
+  .form-forgetpass-container .bx--btn {
+    max-width: 100%;
+  }
+}

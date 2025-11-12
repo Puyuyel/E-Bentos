@@ -1,7 +1,21 @@
 package com.ebentos.backend.service;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
 import com.ebentos.backend.dto.GestorActualizaDTO;
 import com.ebentos.backend.dto.GestorDTO;
+import com.ebentos.backend.dto.GestorSimpleNombreDTO;
 import com.ebentos.backend.dto.PuntoVentaDTO;
 import com.ebentos.backend.dto.RegistroGestorDTO;
 import com.ebentos.backend.dto.UsuarioSimpleDTO;
@@ -12,18 +26,8 @@ import com.ebentos.backend.model.Usuario;
 import com.ebentos.backend.repository.GestorRepository;
 import com.ebentos.backend.repository.RolRepository;
 import com.ebentos.backend.repository.UsuarioRepository;
+
 import jakarta.persistence.EntityNotFoundException;
-import java.util.HashMap;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 public class GestorService {
@@ -205,8 +209,10 @@ public class GestorService {
             gestorExistente.setApellidos(gestorActualizaDTO.getApellidos());
         }
         
-        if (!Objects.equals(gestorActualizaDTO.getPuntoVenta(), gestorExistente.getPuntoVenta())) {
-            gestorExistente.setPuntoVenta(gestorActualizaDTO.getPuntoVenta());
+        if (gestorActualizaDTO.getPuntoVenta()!=null && gestorActualizaDTO.getPuntoVenta().getPuntoVentaId()!=null) {
+            PuntoVenta puntoventa = new PuntoVenta();
+            puntoventa.setPuntoventaId(gestorActualizaDTO.getPuntoVenta().getPuntoVentaId());
+            gestorExistente.setPuntoVenta(puntoventa);
         }
 
         if (!Objects.equals(gestorActualizaDTO.getTelefono(), gestorExistente.getTelefono())) {
@@ -216,17 +222,13 @@ public class GestorService {
         if (!Objects.equals(gestorActualizaDTO.getEmail(), gestorExistente.getEmail())) {
             gestorExistente.setEmail(gestorActualizaDTO.getEmail());
         }
+        
+        if (!Objects.equals(gestorActualizaDTO.getActivo(), gestorExistente.getActivo())) {
+            gestorExistente.setActivo(gestorActualizaDTO.getActivo());
+        }
 
         if (!gestorActualizaDTO.getContrasenha().isBlank()) {
             gestorExistente.setContrasenha(passwordEncoder.encode(gestorActualizaDTO.getContrasenha()));
-        }
-
-        if (!Objects.equals(gestorActualizaDTO.getDni(), gestorExistente.getDni())) {
-            gestorExistente.setDni(gestorActualizaDTO.getDni());
-        }
-
-        if (!Objects.equals(gestorActualizaDTO.getActivo(), gestorExistente.getActivo())) {
-            gestorExistente.setActivo(gestorActualizaDTO.getActivo());
         }
 
         //  GUARDAR y devolver
@@ -279,6 +281,21 @@ public class GestorService {
         //  Mapear y devolver el DTO de respuesta
         return mapToGestorDTO(gestorActualizado);
     }
-    
+
+    public GestorSimpleNombreDTO obtenerNombrePorDni(String dni) {
+        // Buscar el gestor sin importar si está activo o no
+        Gestor gestor = gestorRepository.findByDniAndActivo(dni)
+            .orElseThrow(() -> new EntityNotFoundException("No existe un gestor registrado con DNI: " + dni));
+        
+        // Si está inactivo, lanzar una excepción más clara
+        //if (gestor.getActivo() == 0) {
+        //    throw new EntityNotFoundException("El gestor con DNI " + dni + " ha sido desactivado");
+        //}
+        
+        GestorSimpleNombreDTO dto = new GestorSimpleNombreDTO();
+        dto.setUsuarioId(gestor.getUsuarioId());
+        dto.setNombre(gestor.getNombres() + " " + gestor.getApellidos());
+        return dto;
+    }
     
 }

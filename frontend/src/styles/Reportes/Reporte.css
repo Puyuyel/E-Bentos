@@ -1,29 +1,3 @@
-.reporte-container {
-  display: flex;
-  height: 100vh;
-}
-
-.content {
-  margin-left: 250px; /* ajusta según el ancho del sidebar */
-  padding: 2rem;
-}
-
-.page-title {
-  color: var(--Primary-500, #165DF6);
-  font-family: 'Sarabun', sans-serif;
-  font-size: 3.5rem;
-  font-style: normal;
-  font-weight: 500; /* medio */
-  line-height: normal;
-  margin-bottom: 2rem; /* espacio debajo del título */
-}
-
-/* Solo resalta la palabra "Locales" */
-.page-title .highlight {
-  font-weight: 700; /* más grueso */
-  color: var(--Primary-500, #165DF6);
-}
-
 .chart-container {
   display: flex;
   justify-content: center;

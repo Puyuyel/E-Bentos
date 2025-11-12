@@ -160,6 +160,10 @@ public class ProductoraService {
         if (!Objects.equals(productoraActualizaDTO.getEmail(), productoraExistente.getEmail())) {
             productoraExistente.setEmail(productoraActualizaDTO.getEmail());
         }
+        
+        if (!Objects.equals(productoraActualizaDTO.getActivo(), productoraExistente.getActivo())) {
+            productoraExistente.setActivo(productoraActualizaDTO.getActivo());
+        }
 
         if (!productoraActualizaDTO.getContrasenha().isBlank()) {
             productoraExistente.setContrasenha(passwordEncoder.encode(productoraActualizaDTO.getContrasenha()));

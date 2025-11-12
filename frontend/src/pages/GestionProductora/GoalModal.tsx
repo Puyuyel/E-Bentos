@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
   Modal,
-  Button,
   Form,
   ComboBox,
   TextInput,
@@ -10,6 +9,7 @@ import {
 } from "@carbon/react";
 import type { Goal } from "./Metas";
 import "../../styles/GestionProductora/GoalModal.css";
+import { listarEventosDisponibles } from "../../services/goalService";
 
 type EventoItem = {
   id: string;
@@ -21,22 +21,13 @@ interface SalesGoalModalProps {
   onClose: () => void;
   onSave: (data: Partial<Goal>) => void; // Solo enviará los campos que maneja
   goalToEdit: Goal | null;
-  eventosList: EventoItem[]; // Necesita la lista de eventos para el ComboBox
 }
-
-// Datos de ejemplo para el ComboBox
-const eventos = [
-  { id: "evento-1", text: "Concierto de Rock 2025" },
-  { id: "evento-2", text: "Feria Gastronómica Local" },
-  { id: "evento-3", text: "Maratón de la Ciudad" },
-];
 
 const GoalModal: React.FC<SalesGoalModalProps> = ({
   open,
   onClose,
   onSave,
   goalToEdit,
-  eventosList,
 }) => {
   // --- ESTADO INTERNO DEL FORMULARIO ---
   const [selectedEvent, setSelectedEvent] = useState<EventoItem | null>(null);
@@ -46,8 +37,36 @@ const GoalModal: React.FC<SalesGoalModalProps> = ({
   const [incomeGoalInvalid, setIncomeGoalInvalid] = useState(false);
   const [conversionRateInvalid, setConversionRateInvalid] = useState(false);
   const [ticketsToSellInvalid, setTicketsToSellInvalid] = useState(false);
+  const [eventosList, setEventosList] = useState<EventoItem[]>([]);
+  const [loadingEventos, setLoadingEventos] = useState(false);
 
-  // ... (añade aquí el "Precio promedio" si lo incluyes)
+  useEffect(() => {
+    if (open) {
+      const fetchEventos = async () => {
+        setLoadingEventos(true);
+        try {
+          const eventos = await listarEventosDisponibles();
+
+          // Adaptar la respuesta de la API al formato { id, text } que espera el ComboBox
+          const eventosAdapted: EventoItem[] = eventos.map((e) => ({
+            id: String(e.eventoId),
+            text: e.nombre,
+          }));
+
+          setEventosList(eventosAdapted);
+        } catch (error) {
+          console.error("Error al cargar eventos disponibles:", error);
+        } finally {
+          setLoadingEventos(false);
+        }
+      };
+
+      fetchEventos();
+    } else {
+      // Si el modal se cierra, opcionalmente puedes limpiar la lista
+      setEventosList([]);
+    }
+  }, [open]);
 
   // Determina el modo basado en la prop
   const isEditMode = !!goalToEdit;
@@ -78,33 +97,41 @@ const GoalModal: React.FC<SalesGoalModalProps> = ({
 
   // --- MANEJAR EL ENVÍO ---
   const handleSubmit = () => {
-  const income = parseFloat(incomeGoal);
-  const conversion = parseFloat(conversionRateGoal);
-  const tickets = parseInt(ticketsToSell);
+    const income = parseFloat(incomeGoal);
+    const conversion = parseFloat(conversionRateGoal);
+    const tickets = parseInt(ticketsToSell);
 
-  const isIncomeInvalid = isNaN(income) || income < 0;
-  const isConversionInvalid = isNaN(conversion) || conversion < 0 || conversion > 1;
-  const isTicketsInvalid = isNaN(tickets) || tickets < 0;
+    const isIncomeInvalid = isNaN(income) || income < 0;
+    const isConversionInvalid =
+      isNaN(conversion) || conversion < 0 || conversion > 100;
+    const isTicketsInvalid = isNaN(tickets) || tickets < 0;
 
-  setIncomeGoalInvalid(isIncomeInvalid);
-  setConversionRateInvalid(isConversionInvalid);
-  setTicketsToSellInvalid(isTicketsInvalid);
+    setIncomeGoalInvalid(isIncomeInvalid);
+    setConversionRateInvalid(isConversionInvalid);
+    setTicketsToSellInvalid(isTicketsInvalid);
 
-  if (!selectedEvent || isIncomeInvalid || isConversionInvalid || isTicketsInvalid) {
-    console.error("Formulario inválido. Corrija los errores antes de continuar.");
-    return;
-  }
+    if (
+      !selectedEvent ||
+      isIncomeInvalid ||
+      isConversionInvalid ||
+      isTicketsInvalid
+    ) {
+      console.error(
+        "Formulario inválido. Corrija los errores antes de continuar."
+      );
+      return;
+    }
 
-  const formData: Partial<Goal> = {
-    eventName: selectedEvent.text,
-    incomeGoal: income,
-    conversionRateGoal: conversion,
-    ticketsToSell: tickets,
+    const formData: Partial<Goal> = {
+      id: Number(selectedEvent.id), // ← enviamos el id real del evento
+      eventName: selectedEvent.text,
+      incomeGoal: income,
+      conversionRateGoal: conversion / 100,
+      ticketsToSell: tickets,
+    };
+
+    onSave(formData);
   };
-
-  onSave(formData);
-};
-
 
   return (
     <Modal
@@ -122,14 +149,16 @@ const GoalModal: React.FC<SalesGoalModalProps> = ({
           <ComboBox
             id="evento-combobox"
             titleText="Seleccione un evento"
-            placeholder="Buscar..."
+            placeholder={loadingEventos ? "Cargando eventos..." : "Buscar..."}
             items={eventosList}
             itemToString={(item) => (item ? item.text : "")}
             onChange={({ selectedItem }) =>
               setSelectedEvent(selectedItem || null)
             }
+            invalid={!selectedEvent}
+            invalidText="Debe seleccionar un evento"
             selectedItem={selectedEvent}
-            disabled={isEditMode}
+            disabled={isEditMode || loadingEventos}
           />
         </div>
 
@@ -152,17 +181,17 @@ const GoalModal: React.FC<SalesGoalModalProps> = ({
           <Column lg={8} md={4} sm={4} className="form-grid">
             <TextInput
               id="tasa-conversion"
-              labelText="Tasa de conversión (Ej: 0.80)"
-              placeholder="Ej: 0.80"
+              labelText="Tasa de conversión (Ej: 80)"
+              placeholder="Ej: 80"
               value={conversionRateGoal}
               onChange={(e) => {
                 const value = e.target.value;
                 setConversionRateGoal(value);
                 const num = parseFloat(value);
-                setConversionRateInvalid(num < 0 || num > 1);
+                setConversionRateInvalid(num < 0 || num > 100);
               }}
               invalid={conversionRateInvalid}
-              invalidText="Debe estar entre 0 y 1"
+              invalidText="Debe estar entre 0 y 100"
             />
           </Column>
           <Column lg={8} md={4} sm={4}>

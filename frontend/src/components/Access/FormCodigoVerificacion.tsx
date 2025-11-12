@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { FluidForm, TextInput, Button } from "@carbon/react";
 
 import { useResetPassStore } from "../../store/useResetPassStore";
+import "../../styles/Access/FormCodigoVerificacion.css";
 
 const FormCodigoVerificacion: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -26,8 +27,10 @@ const FormCodigoVerificacion: React.FC = () => {
 
     if (!regex.test(codigoChange) && codigoChange.length > 0) {
       setIsInvalid(true);
+      setLoading(true); // para que no se pueda utilizar
       return;
     }
+    setLoading(false);
     setIsInvalid(false);
     setCodigo(codigoChange);
   };
@@ -51,6 +54,13 @@ const FormCodigoVerificacion: React.FC = () => {
 
   const handleRegister = () => {
     navigate("/register");
+  };
+
+  const handleKeyDown = (evento: React.KeyboardEvent<HTMLInputElement>) => {
+    if (evento.key == "Enter" && !loading) {
+      evento.preventDefault();
+      handleContinuarClick();
+    }
   };
 
   return (
@@ -81,13 +91,14 @@ const FormCodigoVerificacion: React.FC = () => {
             labelText="Código"
             placeholder="Ej: ABC123"
             onChange={handleChange}
+            onKeyDown={handleKeyDown}
             invalid={isInvalid}
             invalidText="El código ingresado es incorrecto."
           />
         </div>
       </FluidForm>
 
-      <Button disabled={loading} onClick={handleContinuarClick}>
+      <Button disabled={loading} onClick={handleContinuarClick} className="btn-continue">
         Continuar
       </Button>
     </div>

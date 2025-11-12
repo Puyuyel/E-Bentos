@@ -46,3 +46,9 @@
     min-width: unset;
   }
 }
+
+.cds--list-box__menu {
+  max-height: 400px !important; /* aumenta la altura visible */
+  overflow-y: auto !important;  /* permite hacer scroll */
+}
+

@@ -25,25 +25,26 @@ jobs:
         run: |
           ssh -i ~/.ssh/id_rsa ubuntu@${{ secrets.EC2_FRONTEND_HOST }} << 'EOF'
           set -e
-          echo "🚀 Iniciando despliegue del frontend..."
+          echo "🚀 Desplegando frontend..."
 
-          # Ir al directorio del proyecto
           cd ~/e-bentos/frontend
 
-          # Traer últimos cambios
-          git pull origin main
+          # 🔥 Fuerza el código a coincidir exactamente con GitHub
+          git fetch --all
+          git reset --hard origin/main
+          git clean -fd
 
-          # Instalar dependencias (si cambió algo)
+          echo "📦 Instalando dependencias..."
           npm ci --force
 
-          # Construir el proyecto
+          echo "🏗️ Compilando frontend..."
           npm run build
 
-          # Asignar permisos (por si acaso)
+          echo "🔑 Corrigiendo permisos..."
           sudo chmod -R 755 dist
 
-          # Reiniciar nginx para aplicar cambios
+          echo "🔁 Reiniciando Nginx..."
           sudo systemctl restart nginx
 
-          echo "✅ Frontend desplegado correctamente."
+          echo "✅ Despliegue completado correctamente."
           EOF
