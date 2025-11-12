@@ -1,6 +1,8 @@
 package com.ebentos.backend.model;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
@@ -41,8 +43,11 @@ public class Evento {
     @Column(name = "DESCRIPCION", length = 350, nullable = false)
     private String descripcion;
 
-    @Column(name = "POSTER", length = 30, nullable = false)
-    private String poster;
+    @Column(name = "POSTER_HORIZONTAL", length = 100, nullable = false)
+    private String posterHorizontal;
+    
+    @Column(name = "POSTER_VERTICAL", length = 100, nullable = false)
+    private String posterVertical;
 
     @Column(name = "FECHA_HORARIO_INICIO", nullable = false)
     private LocalDateTime fechaHorarioInicio;
@@ -59,4 +64,7 @@ public class Evento {
     @Enumerated(EnumType.STRING)
     @Column(name = "ESTADO", nullable = false)
     private EstadoEvento estado;
+    
+    @OneToMany(mappedBy = "evento", cascade = CascadeType.ALL)
+    private List<Zona> zonas = new ArrayList<>();
 }

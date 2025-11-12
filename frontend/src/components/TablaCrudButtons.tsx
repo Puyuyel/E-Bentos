@@ -6,6 +6,7 @@ interface TablaCrudButtonsProps {
   datos: string[];
   onActualizar: () => void;
   raw?: any;
+  uniqueId: number;
 }
 
 const TablaCrudButtons: React.FC<TablaCrudButtonsProps> = ({
@@ -13,6 +14,7 @@ const TablaCrudButtons: React.FC<TablaCrudButtonsProps> = ({
   datos,
   raw,
   onActualizar,
+  uniqueId
 }) => {
   //console.log(raw);
   return (
@@ -22,26 +24,14 @@ const TablaCrudButtons: React.FC<TablaCrudButtonsProps> = ({
           margin: "0.5rem",
         }}
       >
-        <TablaCrudButtonDialog
-          entidad={entidad}
-          accion="Visualizar"
-          datos={datos}
-          raw={raw}
-          onActualizar={() => {}}
-        ></TablaCrudButtonDialog>
+        <TablaCrudButtonDialog entidad={entidad} accion="Visualizar" datos={datos} raw={raw} onActualizar={()=>{}} uniqueId={uniqueId*100}></TablaCrudButtonDialog>
       </div>
       <div
         style={{
           margin: "0.5rem",
         }}
       >
-        <TablaCrudButtonDialog
-          entidad={entidad}
-          accion="Editar"
-          datos={datos}
-          raw={raw}
-          onActualizar={onActualizar}
-        ></TablaCrudButtonDialog>
+        <TablaCrudButtonDialog entidad={entidad} accion="Editar" datos={datos} raw={raw} onActualizar={onActualizar} uniqueId={uniqueId}></TablaCrudButtonDialog>
       </div>
       <div
         style={{
