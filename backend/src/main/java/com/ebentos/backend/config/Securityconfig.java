@@ -83,6 +83,7 @@ public class Securityconfig {
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
                         ).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/eventosCliente", "/api/eventosCliente/**").permitAll()
                         .requestMatchers(HttpMethod.GET,
                                 "/api/productoras/*"
                         ).hasAnyRole("ADMIN","PRODUCTORA")
