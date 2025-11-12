@@ -20,7 +20,7 @@ const TablaCrudDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  console.log(raw as PuntoVenta);
+  //console.log(raw as PuntoVenta);
   const handleDelete = async () => {
     //console.log('delete');
     console.log(raw as Productora);

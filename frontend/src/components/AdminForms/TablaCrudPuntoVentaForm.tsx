@@ -1,7 +1,7 @@
 import { TextInput, Select, SelectItem, VStack } from "@carbon/react";
 import { useEffect, useState } from "react";
-import { listarDepartamentos, listarDistritos, listarProvincias } from "../services/ubicacionService";
-import type { Provincia, Distrito } from "../types/puntoVenta.types";
+import { listarDepartamentos, listarDistritos, listarProvincias } from "../../services/ubicacionService";
+import type { Provincia, Distrito } from "../../types/puntoVenta.types";
 
 interface TablaCrudPuntoVentaFormProps {
   isReadOnly: boolean;
@@ -9,15 +9,25 @@ interface TablaCrudPuntoVentaFormProps {
   setFormData: React.Dispatch<React.SetStateAction<Record<string, string>>>;
   isOpen: boolean;
   accion: string;
+  uniqueId: number;
+  validationState: number;
 }
 
 const TablaCrudPuntoVentaForm: React.FC<TablaCrudPuntoVentaFormProps> = ({
-  isReadOnly, formData, setFormData, isOpen, accion
+  isReadOnly, formData, setFormData, isOpen, accion, uniqueId, validationState
 }) => {
   
   const [departamentos, setDepartamentos] = useState<any[]>([]);
   const [provincias, setProvincias] = useState<any[]>([]);
   const [distritos, setDistritos] = useState<any[]>([]);
+  const [errors, setErrors] = useState({
+    nombre: '',
+    direccion: '',
+    departamentoId: '',
+    provinciaId: '',
+    distritoId: '',
+    estado: ''
+  });
 
   useEffect(() => {
     if (isOpen) {
@@ -35,29 +45,79 @@ const TablaCrudPuntoVentaForm: React.FC<TablaCrudPuntoVentaFormProps> = ({
     (dist) => dist.provincia.provinciaId?.toString() === formData.provinciaId
   );
 
+  // Funciones de validación
+  const validarNombre = (value: string) => {
+    if (!value.trim()) return 'El nombre es obligatorio';
+    return '';
+  };
+
+  const validarDireccion = (value: string) => {
+    if (!value.trim()) return 'La dirección es obligatoria';
+    return '';
+  };
+
+  const validarDepartamento = (value: string) => {
+    if (!value) return 'Debe seleccionar un departamento';
+    return '';
+  };
+
+  const validarProvincia = (value: string) => {
+    if (!value) return 'Debe seleccionar una provincia';
+    return '';
+  };
+
+  const validarDistrito = (value: string) => {
+    if (!value) return 'Debe seleccionar un distrito';
+    return '';
+  };
+
+  const validarEstado = (value: string) => {
+    if (!value) return 'El estado es obligatorio';
+    return '';
+  };
+
+  // Validación cuando `validationState` es 2
   useEffect(() => {
-    console.log("FormData actualizado:", formData);
-  }, [formData]);
+    if (validationState === 2) {
+      setErrors(prev => ({
+        ...prev,
+        nombre: validarNombre(formData.nombre || ''),
+        direccion: validarDireccion(formData.direccion || ''),
+        departamentoId: validarDepartamento(formData.departamentoId),
+        provinciaId: validarProvincia(formData.provinciaId),
+        distritoId: validarDistrito(formData.distritoId),
+        estado: validarEstado(formData.estado || '')
+      }));
+    }
+  }, [validationState, formData]);
 
   return (
     <VStack gap={4}>
       <TextInput
-        id="nombre"
+        id={`nombre-${uniqueId}`}
         labelText="Nombre"
         value={formData.nombre || ''}
         onChange={(e) => setFormData(prev => ({ ...prev, nombre: e.target.value }))}
+        onBlur={() => setErrors(prev => ({ ...prev, nombre: validarNombre(formData.nombre || '') }))}
         readOnly={isReadOnly}
+        invalid={!!errors.nombre && !isReadOnly}
+        invalidText={errors.nombre}
+        placeholder="Ingrese el nombre"
       />
       <TextInput
-        id="direccion"
+        id={`direccion-${uniqueId}`}
         labelText="Dirección"
         value={formData.direccion || ''}
         onChange={(e) => setFormData(prev => ({ ...prev, direccion: e.target.value }))}
+        onBlur={() => setErrors(prev => ({ ...prev, direccion: validarDireccion(formData.direccion || '') }))}
         readOnly={isReadOnly}
+        invalid={!!errors.direccion && !isReadOnly}
+        invalidText={errors.direccion}
+        placeholder="Ingrese la dirección"
       />
 
       <Select
-        id="departamento"
+        id={`departamento-${uniqueId}`}
         labelText="Departamento"
         value={formData.departamentoId || ''}
         onChange={(e) => {
@@ -90,6 +150,8 @@ const TablaCrudPuntoVentaForm: React.FC<TablaCrudPuntoVentaFormProps> = ({
           
         }}
         readOnly={isReadOnly}
+        invalid={!!errors.departamentoId && !isReadOnly}
+        invalidText={errors.departamentoId}
       >
         {departamentos.map(dep => (
           <SelectItem key={dep.departamentoId} value={dep.departamentoId.toString()} text={dep.nombre} />
@@ -97,7 +159,7 @@ const TablaCrudPuntoVentaForm: React.FC<TablaCrudPuntoVentaFormProps> = ({
       </Select>
 
       <Select
-        id="provincia"
+        id={`provincia-${uniqueId}`}
         labelText="Provincia"
         value={formData.provinciaId || ''}
         onChange={(e) => {
@@ -123,6 +185,8 @@ const TablaCrudPuntoVentaForm: React.FC<TablaCrudPuntoVentaFormProps> = ({
         }}
         disabled={isReadOnly || !formData.departamentoId}
         readOnly={isReadOnly}
+        invalid={!!errors.provinciaId && !isReadOnly}
+        invalidText={errors.provinciaId}
       >
         {provinciasFiltradas.map(prov => (
           <SelectItem key={prov.provinciaId} value={prov.provinciaId} text={prov.nombre} />
@@ -130,7 +194,7 @@ const TablaCrudPuntoVentaForm: React.FC<TablaCrudPuntoVentaFormProps> = ({
       </Select>
 
       <Select
-        id="distrito"
+        id={`distrito-${uniqueId}`}
         labelText="Distrito"
         value={formData.distritoId || ''}
         onChange={(e) => setFormData(prev => ({ 
@@ -140,6 +204,8 @@ const TablaCrudPuntoVentaForm: React.FC<TablaCrudPuntoVentaFormProps> = ({
         }))}
         disabled={isReadOnly || !formData.provinciaId}
         readOnly={isReadOnly}
+        invalid={!!errors.distritoId && !isReadOnly}
+        invalidText={errors.distritoId}
       >
         {distritosFiltrados.map(dist => (
           <SelectItem key={dist.distritoId} value={dist.distritoId} text={dist.nombre} />
@@ -147,11 +213,13 @@ const TablaCrudPuntoVentaForm: React.FC<TablaCrudPuntoVentaFormProps> = ({
       </Select>
       
       <Select
-        id="estado"
+        id={`estado-${uniqueId}`}
         labelText="Estado"
         value={formData.estado || 'Activo'}
         onChange={(e) => setFormData(prev => ({ ...prev, estado: e.target.value }))}
         readOnly={isReadOnly}
+        invalid={!!errors.estado && !isReadOnly}
+        invalidText={errors.estado}
       >
         <SelectItem value="Activo" text="Activo" />
         <SelectItem value="Inactivo" text="Inactivo" />
