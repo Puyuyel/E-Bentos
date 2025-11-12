@@ -1,10 +1,8 @@
 package com.ebentos.backend.dto;
 
-
 import com.ebentos.backend.model.CategoriaEvento;
 import com.ebentos.backend.model.EstadoEvento;
 import java.time.LocalDateTime;
-import java.util.List;
 import lombok.*;
 
 @Getter
@@ -12,17 +10,12 @@ import lombok.*;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventoActualizaDTO {
+public class EventoListadoDTO {
     
-    private LocalSimpleDTO local;
-    private CategoriaEvento categoriaEvento;
+    private Integer eventoId;
+    private LocalAforoDTO local;
     private String nombre;
-    private String descripcion;
-    private String posterHorizontal;
-    private String posterVertical;
     private LocalDateTime fechaHorarioInicio;
-    private Integer duracionEstimada;
-    private Double costoTotal;
+    private Integer duracionEstimada; 
     private EstadoEvento estado;
-    private List<ZonaDTO> zonas;
 }

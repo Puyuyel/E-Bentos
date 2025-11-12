@@ -13,9 +13,9 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class SolicitudId implements Serializable {
     @Column(name = "LOCAL_ID")
-    private Long localId;
+    private Integer localId;
 
     @Column(name = "EVENTO_ID")
-    private Long eventoId;
+    private Integer eventoId;
 }
 

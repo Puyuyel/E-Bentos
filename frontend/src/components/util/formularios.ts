@@ -1,7 +1,7 @@
-import TablaCrudProductoraForm from "../TablaCrudProductoraForm";
-import TablaCrudPuntoVentaForm from "../TablaCrudPuntoVentaForm";
-import TablaCrudGestorLocalForm from "../TablaCrudGestorLocalForm";
-import TablaCrudTaquilleroForm from "../TablaCrudTaquilleroForm";
+import TablaCrudProductoraForm from "../AdminForms/TablaCrudProductoraForm";
+import TablaCrudPuntoVentaForm from "../AdminForms/TablaCrudPuntoVentaForm";
+import TablaCrudGestorLocalForm from "../AdminForms/TablaCrudGestorLocalForm";
+import TablaCrudTaquilleroForm from "../AdminForms/TablaCrudTaquilleroForm";
 
 import { createRef } from "react";
 

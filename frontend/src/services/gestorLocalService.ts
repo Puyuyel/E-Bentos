@@ -4,8 +4,11 @@ import type { GestorLocal } from "../types/gestorLocal.types";
 export async function listarGestoresLocales() {
   try {
     const response = await api.get("/gestores");
-    console.log(response.data);
-    return response.data; // El backend debería devolver info del nuevo registro o un mensaje
+    const gestoresSinPuntoVenta = response.data.filter(
+      (gestor: any) => gestor.puntoVenta == null
+    );
+    console.log(gestoresSinPuntoVenta);
+    return gestoresSinPuntoVenta; 
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "Error al listar gestores");
   }

@@ -10,6 +10,16 @@ export async function listarPuntosVenta() {
   }
 }
 
+export async function listarPuntoVentaXId(id: number) {
+  try {
+    console.log("listando..." + id);
+    const response = await api.get(`/puntoventas/${id}`);
+    return response.data; // El backend debería devolver info del nuevo registro o un mensaje
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || "Error al obtener punto de venta");
+  }
+}
+
 export async function actualizarPuntoVenta(id: number, payload: Partial<PuntoVenta>) {
   try {
     const response = await api.put(`/puntoventas/${id}`, payload);
