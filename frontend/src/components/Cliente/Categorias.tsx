@@ -1,26 +1,32 @@
-import React, { useState } from 'react';
+import React from 'react';
 import "../../styles/Cliente/Categorias.css";
 
-const categories = ['Todos', 'Conciertos', 'Musicales', 'Teatro', 'Deportes', 'Entretenimiento'];
+import { useEventos } from '../../store/useEventos';
+
+const categories = ['Todos', 'Concierto', 'Musical', 'Teatro', 'Entretenimiento'];
 
 const Categories: React.FC = () => {
-  const [activeCategory, setActiveCategory] = useState('Todos');
-  const [activeSort, setActiveSort] = useState('Popularidad');
+  const category = useEventos((s) => s.category);
+  const setCategory = useEventos((s) => s.setCategory);
+  const setSortBy = useEventos((s) => s.setSortBy);
+  const [activeSort, setActiveSort] = React.useState('Popularidad');
 
   const handleToggle = () => {
-    setActiveSort(prev => (prev === 'Popularidad' ? 'Fecha' : 'Popularidad'));
+    const newSort = activeSort === 'Popularidad' ? 'Fecha' : 'Popularidad';
+    setActiveSort(newSort);
+    setSortBy(newSort.toLowerCase() as 'popularidad' | 'fecha');
   };
 
   return (
     <div className="categories-container">
       <div className="category-buttons">
-        {categories.map((category) => (
+        {categories.map((cat) => (
           <button
-            key={category}
-            onClick={() => setActiveCategory(category)}
-            className={`category-button ${activeCategory === category ? 'active' : ''}`}
+            key={cat}
+            onClick={() => setCategory(cat === 'Todos' ? 'Todos' : cat.toUpperCase())}
+            className={`category-button ${category === (cat === 'Todos' ? 'Todos' : cat.toUpperCase()) ? 'active' : ''}`}
           >
-            {category}
+            {cat}
           </button>
         ))}
       </div>
