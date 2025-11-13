@@ -22,6 +22,7 @@ import ReporteTaquillero from "../pages/Reportes/ReporteTaquillero";
 import { ProtectedRoute } from "./ProtectedRoute"; // importa tu wrapper
 import GestionarOrganizador from "../pages/GestionProductora/GestionarOrganizadores";
 import Metas from "../pages/GestionProductora/Metas";
+import MainEbentos from "../components/Cliente/MainEbentos";
 
 const AppRouter: React.FC = () => {
   return (
@@ -42,6 +43,9 @@ const AppRouter: React.FC = () => {
 
         {/* Ruta /newpass */}
         <Route path="/newpass" element={<NewPassword />} />
+
+        {/* Ruta /home */}
+        <Route path="/home" element={<MainEbentos />} />
 
         {/* RUTAS PROTEGIDAS */}
         {/* Ruta /gestionar gestor local */}
@@ -208,7 +212,7 @@ const AppRouter: React.FC = () => {
         />
 
         {/* Redirige cualquier ruta desconocida a /login */}
-        <Route path="*" element={<Navigate to="/login" />} />
+        <Route path="*" element={<Navigate to="/home" />} />
       </Routes>
     </BrowserRouter>
   );

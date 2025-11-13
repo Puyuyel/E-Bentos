@@ -62,7 +62,14 @@ En septiembre de 2025 lanzó su quinto álbum Vie, un proyecto ambicioso que rin
         </div>
       </div>
 
-      <div style={{ display: "flex", gap: "12rem", paddingBottom: "5rem" }}>
+      <div
+        style={{
+          display: "flex",
+          gap: "12rem",
+          paddingBottom: "5rem",
+          justifyContent: "center",
+        }}
+      >
         <div
           className="img-banner"
           style={{
@@ -71,7 +78,6 @@ En septiembre de 2025 lanzó su quinto álbum Vie, un proyecto ambicioso que rin
         />
         <div
           style={{
-            alignSelf: "right",
             width: "110%",
             paddingRight: "5rem",
           }}

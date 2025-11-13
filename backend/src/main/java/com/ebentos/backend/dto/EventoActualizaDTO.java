@@ -21,7 +21,7 @@ public class EventoActualizaDTO {
     private String posterHorizontal;
     private String posterVertical;
     private LocalDateTime fechaHorarioInicio;
-    private Integer duracionEstimada; // En horas
+    private Integer duracionEstimada;
     private Double costoTotal;
     private EstadoEvento estado;
     private List<ZonaDTO> zonas;

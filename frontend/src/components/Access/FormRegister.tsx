@@ -270,7 +270,7 @@ const FormRegister: React.FC<FormRegisterProps> = ({
       setTitleNotify(MENSAJES_NOTIFICACION.EXITO);
       setShowNotify(true);
       setTimeout(() => {
-        navigate("/admin/gestionar-productora"); // Aquí, tengo que navegar hacia la página principal del cliente
+        navigate("/home"); // Aquí, tengo que navegar hacia la página principal del cliente
       }, 2000); // 2000 ms = 2 segundos
     } catch (error: any) {
       setShowNotify(true);
@@ -422,18 +422,21 @@ const FormRegister: React.FC<FormRegisterProps> = ({
           />
           <div>
             <p className="fecha-p">Fecha de nacimiento</p>
-            <DatePicker
-              onChange={handleDateChange}
-              datePickerType="single"
-              invalid={isInvalidFechaNac}
-              invalidText="La fecha ingresada no es válida."
-            >
+            <DatePicker onChange={handleDateChange} datePickerType="single">
               <DatePickerInput
                 onKeyDown={handleKeyDown}
                 id="fechaNacimiento"
                 placeholder="mm/dd/aaaa"
               />
             </DatePicker>
+            <p
+              style={{
+                color: "red",
+              }}
+              hidden={!isInvalidFechaNac}
+            >
+              La fecha ingresada no es válida. Debe ser mayor de edad.
+            </p>
           </div>
         </div>
 

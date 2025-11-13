@@ -8,8 +8,6 @@ import LoginBackground from "../../assets/concert-blue.png";
 import type { LoginCredentials } from "../../types/auth.types";
 import { useAuthStore } from "../../store/useAuthStore";
 
-import { useState } from "react";
-
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const { login, isLoggedIn, user } = useAuthStore();
@@ -18,7 +16,7 @@ const Login: React.FC = () => {
   const getRouteByRole = (rol: string): string => {
     const roleRoutes: Record<string, string> = {
       ADMIN: "/admin/gestionar-productora",
-      CLIENTE: "/cliente/ver-detalle-evento",
+      CLIENTE: "/home",
       PRODUCTORA: "/productora/gestionar-organizador",
       GESTOR_LOCAL: "/gestor_local/gestionar-local",
       DUENHO_LOCAL: "/duenho_local/gestionar-local",

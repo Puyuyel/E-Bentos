@@ -69,6 +69,16 @@ export default function ContenedorZonasPrecios({
                   dolor. Pellentesque vulputate nisl a porttitor interdum.
                 </StructuredListCell>
               </StructuredListRow>
+              <StructuredListRow>
+                <StructuredListCell noWrap>Row 3</StructuredListCell>
+                <StructuredListCell>Row 3</StructuredListCell>
+                <StructuredListCell>
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc
+                  dui magna, finibus id tortor sed, aliquet bibendum augue.
+                  Aenean posuere sem vel euismod dignissim. Nulla ut cursus
+                  dolor. Pellentesque vulputate nisl a porttitor interdum.
+                </StructuredListCell>
+              </StructuredListRow>
             </StructuredListBody>
           </StructuredListWrapper>
         </div>

@@ -1,6 +1,7 @@
 import HeaderEbentos from "../../components/Cliente/HeaderEbentos";
 import { Button } from "@carbon/react";
 import { ContenedorImagenEvento } from "../../components/Cliente/ContenedorImagenEvento";
+import Footer from "../../components/Cliente/Footer";
 import ContenedorZonasPrecios from "../../components/Cliente/ContenedorZonasPrecios";
 import ContenedorInformacionEvento from "../../components/Cliente/ContenedorInformacionEvento";
 import ContenedorTerminosCondiciones from "../../components/Cliente/ContenedorTerminosCondiciones";
@@ -35,6 +36,7 @@ export default function VerDetalleEvento() {
         </div>
         <ContenedorInformacionEvento />
         <ContenedorTerminosCondiciones />
+        <Footer />
       </main>
     </div>
   );

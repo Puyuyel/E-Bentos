@@ -24,8 +24,8 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
+  /* Keep normal document flow to avoid vertical centering of the whole app */
+  display: block;
   min-width: 320px;
   min-height: 100vh;
 }
@@ -64,5 +64,51 @@ button:focus-visible {
   }
   button {
     background-color: #f9f9f9;
+  }
+}
+
+
+/* General Body & Root Styles */
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  height: 100%;
+}
+
+/* Container responsive widths and paddings (shared across Header, Footer, App) */
+@media (min-width: 640px) {
+  .header-container, .footer-container, .main-content-container {
+    max-width: 640px;
+    padding-left: 1.5rem; /* sm:px-6 */
+    padding-right: 1.5rem; /* sm:px-6 */
+  }
+}
+@media (min-width: 768px) {
+  .header-container, .footer-container, .main-content-container {
+    max-width: 768px;
+  }
+}
+@media (min-width: 1024px) {
+  .header-container, .footer-container, .main-content-container {
+    max-width: 1024px;
+    padding-left: 2rem; /* lg:px-8 */
+    padding-right: 2rem; /* lg:px-8 */
+  }
+}
+@media (min-width: 1280px) {
+  .header-container, .footer-container, .main-content-container {
+    max-width: 1280px;
+  }
+}
+@media (min-width: 1536px) {
+  .header-container, .footer-container, .main-content-container {
+    max-width: 1536px;
   }
 }

@@ -23,7 +23,7 @@ La ticketera no se hace responsable por entradas adquiridas fuera del sistema eB
           paddingBottom: "3rem",
         }}
       >
-        Términos y condiciones
+        TÉRMINOS Y CONDICIONES
       </h2>
       <div
         style={{
