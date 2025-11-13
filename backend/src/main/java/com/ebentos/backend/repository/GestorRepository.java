@@ -19,5 +19,12 @@ public interface GestorRepository extends JpaRepository<Gestor, Integer> {
     
     @Query("SELECT g FROM Gestor g WHERE g.dni = :dni AND g.activo = 1")
     Optional<Gestor> findByDniAndActivo(@Param("dni") String dni);
+    
+    @Query("SELECT g FROM Gestor g WHERE g.rol.nombre = 'ORGANIZADOR_EVENTOS' "
+            + "AND g.usuarioCreador.usuarioId = :productoraId AND (" +
+       "LOWER(g.dni) LIKE :buscador OR " +
+       "LOWER(g.nombres) LIKE :buscador OR " +
+       "LOWER(g.apellidos) LIKE :buscador)")
+    Page<Gestor> buscarPorBuscadorYProductora(Integer productoraId, String buscador, Pageable pageable);
 }
 

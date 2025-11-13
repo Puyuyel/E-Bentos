@@ -5,7 +5,7 @@ import VenueCRUD from "./VenueCRUD";
 import VenueList from "./VenueList";
 import TablaAdmin from "../../../components/TablaAdmin";
 
-const GestionarGestorLocal: React.FC = () => {
+const GestionarLocales: React.FC = () => {
   return (
     <div className="app-container">
       <SidebarGestor currentPath="gestionar-local" />
@@ -17,4 +17,4 @@ const GestionarGestorLocal: React.FC = () => {
   );
 };
 
-export default GestionarGestorLocal;
+export default GestionarLocales;

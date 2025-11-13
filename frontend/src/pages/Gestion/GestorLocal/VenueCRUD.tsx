@@ -33,6 +33,7 @@ interface Lookup {
 }
 
 import type { FormDataLocal } from "../../../types/locales.types.ts";
+import getDuenhoId from "../../../services/LocalesServices/getDuenhoId.ts";
 
 const imageBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL;
 
@@ -430,6 +431,7 @@ function VenueForm() {
 function OwnerForm() {
   const {
     register,
+    setValue,
     formState: { errors },
   } = useFormContext();
 
@@ -454,6 +456,25 @@ function OwnerForm() {
                     },
                   })}
                   required
+                  onChange={async (e) => {
+                    try {
+                      const dni = e.target.value;
+                      // Aquí podrías agregar lógica para buscar el nombre del responsable
+                      const response = await getDuenhoId(Number(dni));
+                      // basado en el DNI ingresado, por ejemplo, una llamada a una API.
+                      // Por simplicidad, dejaremos el campo de nombre vacío.
+                      const name = response.data.nombre; // Lógica para obtener el nombre según el DNI
+                      const idDuenho = response.data.usuarioId; // Lógica para obtener el nombre según el DNI
+                      const nombreInput = document.getElementById(
+                        "nombre_responsable"
+                      ) as HTMLInputElement;
+                      nombreInput.value = name;
+                      setValue("gestorId", idDuenho);
+                      console.log("ID del dueño obtenido:", idDuenho);
+                    } catch (error) {
+                      console.error("Error al obtener el ID del dueño:", error);
+                    }
+                  }}
                   invalid={!!errors.dni_responsable}
                   invalidText={errors.dni_responsable?.message?.toString()}
                   labelText="DNI del Responsable"
@@ -469,7 +490,7 @@ function OwnerForm() {
                   className="input-test-class"
                   id="nombre_responsable"
                   name="nombre_responsable"
-                  disabled={true}
+                  readOnly={true}
                   invalidText=""
                   labelText="Nombre del responsable"
                   placeholder="Verifique el nombre del responsable."
