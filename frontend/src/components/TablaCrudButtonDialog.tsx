@@ -8,7 +8,7 @@ import { actualizarPuntoVenta,listarPuntoVentaXId,registrarPuntoVenta } from "..
 import type { PuntoVenta } from "../types/puntoVenta.types";
 import type { Productora } from "../types/productora.types";
 import type { GestorLocal } from "../types/gestorLocal.types";
-import { actualizarGestorLocal, actualizarOrganizador, actualizarTaquillero, registrarGestorLocal, registrarOrganizador, registrarTaquillero } from "../services/gestorLocalService";
+import { actualizarDuenho, actualizarGestorLocal, actualizarOrganizador, actualizarTaquillero, registrarDuenho, registrarGestorLocal, registrarOrganizador, registrarTaquillero } from "../services/gestorLocalService";
 import { getUser } from "../services/authService";
 
 
@@ -53,6 +53,9 @@ const TablaCrudButtonDialog: React.FC<TablaCrudButtonDialogProps> = ({
           setFormData(getEmptyGestorLocal);
           break;
         case 'Organizador':
+          setFormData(getEmptyGestorLocal);
+          break;
+        case 'Duenho':
           setFormData(getEmptyGestorLocal);
           break;
       }
@@ -124,6 +127,19 @@ const TablaCrudButtonDialog: React.FC<TablaCrudButtonDialogProps> = ({
             dni: entityO.dni,
             nombres: entityO.nombres,
             apellidos: entityO.apellidos,
+            contrasenha: '',
+            estado: 'Activo',
+          });
+          break;
+        case 'Duenho':
+          const entityD = raw as GestorLocal;
+          setFormData({
+            usuarioId: entityD.usuarioId,
+            telefono: entityD.telefono,
+            email: entityD.email,
+            dni: entityD.dni,
+            nombres: entityD.nombres,
+            apellidos: entityD.apellidos,
             contrasenha: '',
             estado: 'Activo',
           });
@@ -414,6 +430,43 @@ const TablaCrudButtonDialog: React.FC<TablaCrudButtonDialogProps> = ({
                         await actualizarOrganizador(parseInt(formData.usuarioId), payload).then( () => {onActualizar(); setIsOpen(false); } )
                       } else {
                         await registrarOrganizador(payloadAlt).then( () => {onActualizar(); setIsOpen(false); } );
+                      }
+                      //await actualizarGestorLocal(raw.usuarioId, payload);
+                      break;
+                    case 'Duenho':
+                      if (accion === 'Agregar') {
+                        currentUser = await getUser();
+                      }
+                      payload = {
+                        telefono: formData.telefono,
+                        email: formData.email,
+                        contrasenha: formData.contrasenha,
+                        dni: formData.dni,
+                        nombres: formData.nombres,
+                        apellidos: formData.apellidos,
+                        puntoVenta: null,
+                        activo: (formData.estado === 'Activo')? 1:0 
+                      };
+                      payloadAlt = {
+                        telefono: formData.telefono,
+                        email: formData.email,
+                        contrasenha: formData.contrasenha,
+                        nombreRol: 'DUENHO_LOCAL', // del listado de roles, falta implementar
+                        nombres: formData.nombres, 
+                        apellidos: formData.apellidos, 
+                        dni: formData.dni,
+                        usuarioCreador: {
+                          usuarioId: currentUser?.usuarioId || 0,
+                        },
+                        puntoVenta: null
+                      };
+                      console.log("payload: ");
+                      console.log(payload);
+                      if (accion == 'Editar'){
+                        console.log("Hola ");
+                        await actualizarDuenho(parseInt(formData.usuarioId), payload).then( () => {onActualizar(); setIsOpen(false); } )
+                      } else {
+                        await registrarDuenho(payloadAlt).then( () => {onActualizar(); setIsOpen(false); } );
                       }
                       //await actualizarGestorLocal(raw.usuarioId, payload);
                       break;

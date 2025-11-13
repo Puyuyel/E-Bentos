@@ -2,7 +2,7 @@ import { DataTable, IconButton, Link, Table, TableBody, TableCell, TableHead, Ta
 import { useEffect, useMemo, useState } from "react";
 import TablaCrudButtons from "./TablaCrudButtons";
 import { listarProductoras, listarProductorasPaginado } from "../services/productoraService";
-import { listarGestoresLocales, listarTaquilleros, listarOrganizadores } from "../services/gestorLocalService";
+import { listarGestoresLocales, listarTaquilleros, listarOrganizadores, listarDuenhos } from "../services/gestorLocalService";
 import { listarPuntosVenta } from "../services/puntoVentaService";
 import '../styles/CargaSpinner.css'
 
@@ -71,7 +71,9 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
       case 'Taquillero':
         return ['Nombres', 'Apellidos', 'DNI', 'Email', 'Teléfono', 'Punto de Venta'];
       case 'Organizador':
-        return ['Nombres', 'Apellidos', 'DNI', 'Email', 'Teléfono'];
+        return ['Nombres', 'Apellidos', 'DNI', 'Email', 'Teléfono']; // fecha de nacimiento?
+      case 'Duenho':
+        return ['Nombres', 'Apellidos', 'DNI', 'Email', 'Teléfono']; // estado?
       default:
         return [];
     }
@@ -91,6 +93,7 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
       Taquillero: listarTaquilleros,
       PuntoVenta: listarPuntosVenta,
       Organizador: listarOrganizadores,
+      Duenho: listarDuenhos,
     };
 
     const transformadores: Record<string, (item: any, index: number) => DataRow> = {
@@ -147,6 +150,19 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
         raw: item
       }),
       Organizador: (item: GestorLocal, index) => ({
+        id: index,
+        data: [
+          String(item.usuarioId), // índice 0 (oculto)
+          item.nombres,
+          item.apellidos,
+          item.dni,
+          item.email,
+          item.telefono,
+          //item.puntoVenta?.nombre || '—'
+        ],
+        raw: item
+      }),
+      Duenho: (item: GestorLocal, index) => ({
         id: index,
         data: [
           String(item.usuarioId), // índice 0 (oculto)
@@ -219,6 +235,7 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
       PuntoVenta: listarPuntosVenta,
       Taquillero: listarTaquilleros,
       Organizador: listarOrganizadores,
+      Duenho: listarDuenhos,
     };
     //console.log(fetchers.Productora);
     const transformadores: Record<string, (item: any, index: number) => DataRow> = {
@@ -280,6 +297,19 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
           item.telefono,
           //item.puntoVenta?.nombre || '—'  //Cambiar despues porque el gestor de locales no tiene punto de venta
         ]
+      }),
+      Duenho: (item: GestorLocal, index) => ({
+        id: index,
+        data: [
+          String(item.usuarioId), // índice 0 (oculto)
+          item.nombres,
+          item.apellidos,
+          item.dni,
+          item.email,
+          item.telefono,
+          //item.puntoVenta?.nombre || '—'
+        ],
+        raw: item
       }),
     };
 

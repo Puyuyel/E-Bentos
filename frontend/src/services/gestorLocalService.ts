@@ -38,16 +38,9 @@ export async function listarOrganizadores(
   try {
     const response = await api.get("/gestores/paginadoPorBuscadorYRol", {
       params: {
-        page,
-        limit,
-        nombreRol,
-        buscador,
+        page, limit, nombreRol,buscador,
       },
     });
-
-    //const organizadoresConPuntoVenta = response.data.filter(
-    //  (gestor: any) => gestor.puntoVenta !== null
-    //);
     const user = await getUser();
     const organizadoresFiltrados = response.data.data.filter(
       (gestor: any) => gestor.usuarioCreador.usuarioId === user.usuarioId
@@ -55,8 +48,31 @@ export async function listarOrganizadores(
     console.log(organizadoresFiltrados);
     return organizadoresFiltrados;
   } catch (error: any) {
-    throw new Error(error); 
-    //throw new Error(error.response?.data?.message || "Error al listar organizadores");
+    throw new Error(error.response?.data?.message || "Error al listar organizadores");
+  }
+}
+
+export async function listarDuenhos(
+  page: number = 0,
+  limit: number = 100,
+  nombreRol: string = 'DUENHO_LOCAL',
+  buscador: string = ''
+) {
+  console.log("listando ");
+  try {
+    const response = await api.get("/gestores/paginadoPorBuscadorYRol", {
+      params: {
+        page, limit, nombreRol,buscador,
+      },
+    });
+    const user = await getUser();
+    const organizadoresFiltrados = response.data.data.filter(
+      (gestor: any) => gestor.usuarioCreador.usuarioId === user.usuarioId
+    );
+    console.log(organizadoresFiltrados);
+    return organizadoresFiltrados;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || "Error al listar duenhos");
   }
 }
 
@@ -90,6 +106,16 @@ export async function actualizarOrganizador(id: number, payload: Partial<GestorL
   }
 }
 
+export async function actualizarDuenho(id: number, payload: Partial<GestorLocal>) {
+  try {
+    const response = await api.put(`/gestores/${id}`, payload);
+    console.log(response.data);
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || "Error al actualizar dueños");
+  }
+}
+
 export async function registrarGestorLocal(payload: Partial<GestorLocal>) {
   try {
     const response = await api.post("/gestores", payload);
@@ -117,6 +143,16 @@ export async function registrarOrganizador(payload: Partial<GestorLocal>) {
     return response.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "Error al agregar organizador");
+  }
+}
+
+export async function registrarDuenho(payload: Partial<GestorLocal>) {
+  try {
+    const response = await api.post("/gestores", payload);
+    console.log(response.data);
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || "Error al agregar duenho");
   }
 }
 
@@ -152,6 +188,18 @@ export async function eliminarOrganizador(id: number) {
   } catch (error: any) {
     throw new Error(
       error.response?.data?.message || "Error al eliminar organizador"
+    );
+  }
+}
+
+export async function eliminarDuenho(id: number) {
+  try {
+    const response = await api.delete(`/gestores/${id}`);
+    console.log(response.data);
+    return response.data; // El backend debería devolver info del nuevo registro o un mensaje
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || "Error al eliminar duenho"
     );
   }
 }
