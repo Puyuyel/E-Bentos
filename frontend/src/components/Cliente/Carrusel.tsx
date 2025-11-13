@@ -1,22 +1,37 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CAROUSEL_ITEMS } from './constants';
 import '../../styles/Cliente/Carrusel.css';
 import { Button } from '@carbon/react';
 import { ChevronRightIcon, ChevronLeftIcon } from '../icons';
+import { listarEventos } from '../../services/ClientServices/eventService';
+const imageBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL;
 
 const Carrusel: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [carouselEvents, setCarouselEvents] = useState<any[]>([]);
 
-  const nextSlide = useCallback(() => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === CAROUSEL_ITEMS.length - 1 ? 0 : prevIndex + 1
-    );
+  useEffect(() => {
+    const fetchCarouselEvents = async () => {
+      try {
+        const events = await listarEventos();
+        setCarouselEvents(events.slice(0, 5));
+      } catch (error) {
+        console.error('Error cargando eventos para carrusel:', error);
+        setCarouselEvents(CAROUSEL_ITEMS);
+      }
+    };
+    fetchCarouselEvents();
   }, []);
 
+  const slides = carouselEvents.length > 0 ? carouselEvents : CAROUSEL_ITEMS;
+  const slideCount = slides.length;
+
+  const nextSlide = () => {
+    setCurrentIndex((prevIndex) => (slideCount > 0 ? (prevIndex + 1) % slideCount : 0));
+  };
+
   const prevSlide = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? CAROUSEL_ITEMS.length - 1 : prevIndex - 1
-    );
+    setCurrentIndex((prevIndex) => (slideCount > 0 ? (prevIndex - 1 + slideCount) % slideCount : 0));
   };
 
   const goToSlide = (index: number) => {
@@ -24,21 +39,26 @@ const Carrusel: React.FC = () => {
   };
 
   useEffect(() => {
-    const slideInterval = setInterval(nextSlide, 5000);
+    const slideInterval = setInterval(() => {
+      setCurrentIndex((prevIndex) => (slideCount > 0 ? (prevIndex + 1) % slideCount : 0));
+    }, 5000);
     return () => clearInterval(slideInterval);
-  }, [nextSlide]);
+  }, [slideCount]);
 
   return (
     <>
       <div className="carousel-container">
         {/* Carrusel de imágenes */}
-        <div
-          className="carousel-track"
-          style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-        >
-          {CAROUSEL_ITEMS.map((item) => (
-            <div key={item.id} className="carousel-slide">
-              <img src={item.imageUrl} alt="Event" className="carousel-image" />
+        <div className="carousel-track" style={{ transform: `translateX(-${currentIndex * 100}%)` }}>
+          {slides.map((s, idx) => (
+            <div key={(s as any).eventoId ?? (s as any).id ?? idx} className="carousel-slide">
+              <img
+                src={
+                  `${imageBaseUrl ? `${imageBaseUrl}/` : ''}${(s as any).posterHorizontal ?? (s as any).posterVertical ?? ''}`
+                }
+                alt={(s as any).nombreEvento ?? (s as any).date ?? 'Event'}
+                className="carousel-image"
+              />
             </div>
           ))}
         </div>
@@ -62,7 +82,7 @@ const Carrusel: React.FC = () => {
 
       {/* Dots: fuera del contenedor para que no queden sobre la imagen ni se recorten */}
       <div className="carousel-dots">
-        {CAROUSEL_ITEMS.map((_, index) => (
+        {slides.map((_, index: number) => (
           <button
             key={index}
             onClick={() => goToSlide(index)}
