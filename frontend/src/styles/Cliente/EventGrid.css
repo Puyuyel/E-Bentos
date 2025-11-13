@@ -3,7 +3,8 @@
   display: grid;
   grid-template-columns: repeat(1, minmax(0, 1fr)); /* grid-cols-1 */
   gap: 1.5rem; /* gap-6 */
-  grid-auto-rows: auto;
+  /* Use a flexible row baseline so row-span produces taller cards reliably. */
+  grid-auto-rows: 1fr;
 }
 
 .loader {
