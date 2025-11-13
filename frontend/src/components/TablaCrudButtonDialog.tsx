@@ -8,7 +8,7 @@ import { actualizarPuntoVenta,listarPuntoVentaXId,registrarPuntoVenta } from "..
 import type { PuntoVenta } from "../types/puntoVenta.types";
 import type { Productora } from "../types/productora.types";
 import type { GestorLocal } from "../types/gestorLocal.types";
-import { actualizarGestorLocal, actualizarTaquillero, registrarGestorLocal, registrarTaquillero } from "../services/gestorLocalService";
+import { actualizarGestorLocal, actualizarOrganizador, actualizarTaquillero, registrarGestorLocal, registrarOrganizador, registrarTaquillero } from "../services/gestorLocalService";
 import { getUser } from "../services/authService";
 
 
@@ -50,6 +50,9 @@ const TablaCrudButtonDialog: React.FC<TablaCrudButtonDialogProps> = ({
           setFormData(getEmptyGestorLocal);
           break;
         case 'Taquillero':
+          setFormData(getEmptyGestorLocal);
+          break;
+        case 'Organizador':
           setFormData(getEmptyGestorLocal);
           break;
       }
@@ -109,6 +112,19 @@ const TablaCrudButtonDialog: React.FC<TablaCrudButtonDialogProps> = ({
             apellidos: entityT.apellidos,
             contrasenha: '',
             puntoVentaId: entityT.puntoVenta.puntoVentaId,
+            estado: 'Activo',
+          });
+          break;
+        case 'Organizador':
+          const entityO = raw as GestorLocal;
+          setFormData({
+            usuarioId: entityO.usuarioId,
+            telefono: entityO.telefono,
+            email: entityO.email,
+            dni: entityO.dni,
+            nombres: entityO.nombres,
+            apellidos: entityO.apellidos,
+            contrasenha: '',
             estado: 'Activo',
           });
           break;
@@ -363,6 +379,43 @@ const TablaCrudButtonDialog: React.FC<TablaCrudButtonDialogProps> = ({
                         await registrarTaquillero(payloadAlt).then( () => {onActualizar(); setIsOpen(false); } );
                       }
                       //await actualizarTaquillero(raw.usuarioId, payload);
+                      break;
+                    case 'Organizador':
+                      if (accion === 'Agregar') {
+                        currentUser = await getUser();
+                      }
+                      payload = {
+                        telefono: formData.telefono,
+                        email: formData.email,
+                        contrasenha: formData.contrasenha,
+                        dni: formData.dni,
+                        nombres: formData.nombres,
+                        apellidos: formData.apellidos,
+                        puntoVenta: null,
+                        activo: (formData.estado === 'Activo')? 1:0 
+                      };
+                      payloadAlt = {
+                        telefono: formData.telefono,
+                        email: formData.email,
+                        contrasenha: formData.contrasenha,
+                        nombreRol: 'ORGANIZADOR_EVENTOS', // del listado de roles, falta implementar
+                        nombres: formData.nombres, 
+                        apellidos: formData.apellidos, 
+                        dni: formData.dni,
+                        usuarioCreador: {
+                          usuarioId: currentUser?.usuarioId || 0,
+                        },
+                        puntoVenta: null
+                      };
+                      console.log("payload: ");
+                      console.log(payload);
+                      if (accion == 'Editar'){
+                        console.log("Hola ");
+                        await actualizarOrganizador(parseInt(formData.usuarioId), payload).then( () => {onActualizar(); setIsOpen(false); } )
+                      } else {
+                        await registrarOrganizador(payloadAlt).then( () => {onActualizar(); setIsOpen(false); } );
+                      }
+                      //await actualizarGestorLocal(raw.usuarioId, payload);
                       break;
                     // otros casos...
                   }

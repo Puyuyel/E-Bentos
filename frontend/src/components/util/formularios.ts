@@ -10,4 +10,5 @@ export const formulariosCrud: Record<string, React.FC<any>> = {
   PuntoVenta: TablaCrudPuntoVentaForm,
   GestorLocal: TablaCrudGestorLocalForm,
   Taquillero: TablaCrudTaquilleroForm,
+  Organizador: TablaCrudGestorLocalForm
 };
