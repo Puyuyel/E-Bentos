@@ -85,6 +85,30 @@ public class GestorController {
         return response;
     }
     
+    @GetMapping("/paginadoPorBuscadorYProductora")
+    public Map<String, Object> listarPaginadoPorBuscadorYProductora(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int limit,
+            @RequestParam Integer productoraId,
+            @RequestParam String buscador) {
+
+        Map<String, Object> response = gestorService.listarPaginadoPorBuscadorYProductora(page, limit, productoraId, buscador);
+
+        // 🔹 Construir URLs completas usando el dominio actual
+        Map<String, Object> pagination = (Map<String, Object>) response.get("pagination");
+
+        String baseUrl = ServletUriComponentsBuilder.fromCurrentRequestUri().toUriString();
+
+        if ((boolean) pagination.get("hasNextPage")) {
+            pagination.put("nextPage", baseUrl + "?page=" + (page + 1) + "&limit=" + limit);
+        }
+        if ((boolean) pagination.get("hasPreviousPage")) {
+            pagination.put("prevPage", baseUrl + "?page=" + (page - 1) + "&limit=" + limit);
+        }
+
+        return response;
+    }
+    
     @PostMapping
     public ResponseEntity<?> registrarGestor(@RequestBody RegistroGestorDTO registroDTO) {
         try {
