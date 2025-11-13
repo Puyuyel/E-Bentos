@@ -53,7 +53,7 @@ const Login: React.FC = () => {
     <AuthLayout backgroundImage={LoginBackground} logo={EbentosIcon}>
       <FormLogin
         onRegisterClick={handleRegisterClick}
-        onLoginClick={handleLoginClick} 
+        onLoginClick={handleLoginClick}
       />
     </AuthLayout>
   );

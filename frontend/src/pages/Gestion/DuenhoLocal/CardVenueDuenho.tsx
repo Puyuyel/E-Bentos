@@ -265,7 +265,7 @@ export default function CardVenue({ local }: CardVenueProps) {
             id="direccion-local"
             labelText="Direccion"
             {...register("direccion")}
-            disabled={true}
+            readOnly={true}
             defaultValue={local.direccion}
             style={{
               marginBottom: "24px",
@@ -275,7 +275,7 @@ export default function CardVenue({ local }: CardVenueProps) {
             data-modal-primary-focus
             id="tipo-local"
             labelText="Tipo de Local"
-            disabled={true}
+            readOnly={true}
             defaultValue={local.tipoLocal}
             style={{
               marginBottom: "24px",
@@ -285,7 +285,7 @@ export default function CardVenue({ local }: CardVenueProps) {
             data-modal-primary-focus
             id="duenho-local"
             labelText="Dueño del Local"
-            disabled={true}
+            readOnly={true}
             defaultValue={local.gestor.usuarioId.toString()}
             style={{
               marginBottom: "24px",
@@ -295,7 +295,7 @@ export default function CardVenue({ local }: CardVenueProps) {
             data-modal-primary-focus
             id="distrito-local"
             labelText="Distrito"
-            disabled={true}
+            readOnly={true}
             defaultValue={local.distrito.nombre.toString()}
             style={{
               marginBottom: "24px",

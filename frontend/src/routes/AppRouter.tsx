@@ -5,6 +5,7 @@ import ForgetPass from "../pages/Access/ForgetPass";
 import CodigoVerificacion from "../pages/Access/CodigoVerificacion";
 import NewPassword from "../pages/Access/NewPassword";
 import GestionarGestorLocal from "../pages/Gestion/GestionarGestorLocal";
+import GestionarLocales from "../pages/Gestion/GestorLocal/GestionarLocales";
 import VenueCRUD from "../pages/Gestion/GestorLocal/VenueCRUD";
 import GestionarProductora from "../pages/Gestion/GestionarProductora";
 import GestionarPuntoDeVenta from "../pages/Gestion/GestionarPuntoDeVenta";
@@ -22,6 +23,7 @@ import { ProtectedRoute } from "./ProtectedRoute"; // importa tu wrapper
 import GestionarOrganizador from "../pages/GestionProductora/GestionarOrganizadores";
 import Metas from "../pages/GestionProductora/Metas";
 import MainEbentos from "../components/Cliente/MainEbentos";
+import GestionarDuenhos from "../pages/Gestion/GestorLocal/GestionarDuenhos";
 
 const AppRouter: React.FC = () => {
   return (
@@ -168,12 +170,21 @@ const AppRouter: React.FC = () => {
         />
 
         {/* RUTAS para GESTOR DE LOCAL */}
+        {/* Ruta /listado duenhos*/}
+        <Route
+          path="/gestor_local/gestionar-duenhos-de-local"
+          element={
+            <ProtectedRoute requiredRole="GESTOR_LOCAL">
+              <GestionarDuenhos />
+            </ProtectedRoute>
+          }
+        />
         {/* Ruta /listado locales*/}
         <Route
           path="/gestor_local/gestionar-local"
           element={
             <ProtectedRoute requiredRole="GESTOR_LOCAL">
-              <GestionarGestorLocal />
+              <GestionarLocales />
             </ProtectedRoute>
           }
         />
