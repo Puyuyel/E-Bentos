@@ -13,4 +13,6 @@ public interface ProductoraRepository extends JpaRepository<Productora, Integer>
        "LOWER(p.nombreComercial) LIKE :buscador OR " +
        "LOWER(p.razonSocial) LIKE :buscador)")
     Page<Productora> buscarPorBuscador(String buscador, Pageable pageable);
+    
+    Optional<Productora> findByRuc(String ruc);
 }
