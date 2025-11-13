@@ -104,24 +104,22 @@ public class SolicitudService {
 
     private SolicitudDTO llenarADTO(Solicitud solicitudActualizada){
         SolicitudDTO solicitudDTO = new SolicitudDTO();
+
         solicitudDTO.setJustificacion(solicitudActualizada.getJustificacion());
         solicitudDTO.setEstado(solicitudActualizada.getEstado());
 
-        Local local = new Local();
-        local.setLocalId(solicitudActualizada.getLocal().getLocalId());
-        solicitudDTO.setLocalId(local.getLocalId());
-
-        Evento evento = new Evento();
-        evento.setEventoId(solicitudActualizada.getEvento().getEventoId());
-        solicitudDTO.setEventoId(evento.getEventoId());
+        if (solicitudActualizada.getId() != null) {
+            solicitudDTO.setLocalId(solicitudActualizada.getId().getLocalId());
+            solicitudDTO.setEventoId(solicitudActualizada.getId().getEventoId());
+        }
 
         return solicitudDTO;
     }
 
     //Listar paginado
-    public Map<String, Object> listarPaginado(Integer  page, Integer size){
+    public Map<String, Object> listarPaginado(Integer gestorUsuarioId, Integer  page, Integer size){
         Pageable pageable = PageRequest.of(page, size);
-        Page<Solicitud> solicitudesPage = solicitudRepository.findAll(pageable);
+        Page<Solicitud> solicitudesPage = solicitudRepository.findByGestorUsuarioId(gestorUsuarioId, pageable);
 
         List<SolicitudDTO> solicitudesDTO = solicitudesPage.getContent().stream().map(this::llenarADTO).collect(Collectors.toList());
 
@@ -136,8 +134,10 @@ public class SolicitudService {
         pagination.put("pageSize", solicitudesPage.getSize());
         pagination.put("hasNextPage", solicitudesPage.hasNext());
         pagination.put("hasPreviousPage", solicitudesPage.hasPrevious());
-        pagination.put("nextPage", solicitudesPage.hasNext() ? "/api/locales?page=" + (page + 1) + "&limit=" + size : null);
-        pagination.put("prevPage", solicitudesPage.hasPrevious() ? "/api/locales?page=" + (page - 1) + "&limit=" + size : null);
+
+        String baseUrl = "/api/solicitudes/paginado/" + gestorUsuarioId;
+        pagination.put("nextPage", solicitudesPage.hasNext() ? baseUrl + "?page=" + (page + 1) + "&limit=" + size : null);
+        pagination.put("prevPage", solicitudesPage.hasPrevious() ? baseUrl + "?page=" + (page - 1) + "&limit=" + size : null);
 
         response.put("pagination", pagination);
 
