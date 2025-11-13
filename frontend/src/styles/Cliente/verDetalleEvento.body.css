@@ -1,0 +1,11 @@
+/* Page-scoped body override for VerDetalleEvento
+   This file is imported by the page component and only makes
+   the body use display:block while the page is mounted. */
+body.verdetalle-page {
+  display: block !important;
+}
+
+/* Ensure the page still reserves header space if header is fixed/sticky */
+body.verdetalle-page {
+  padding-top: var(--header-height, 0) !important;
+}
