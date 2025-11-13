@@ -7,7 +7,7 @@ import type { Productora } from "../types/productora.types";
 import { eliminarPuntoVenta } from "../services/puntoVentaService";
 import type { PuntoVenta } from "../types/puntoVenta.types";
 import type { GestorLocal } from "../types/gestorLocal.types";
-import { eliminarGestorLocal, eliminarTaquillero } from "../services/gestorLocalService";
+import { eliminarDuenho, eliminarGestorLocal, eliminarOrganizador, eliminarTaquillero } from "../services/gestorLocalService";
 
 interface ConfirmDeleteDialogProps {
   entidad: string;
@@ -38,6 +38,12 @@ const TablaCrudDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({
           break;
         case 'Taquillero':
           await eliminarTaquillero((raw as GestorLocal).usuarioId);
+          break;
+        case 'Organizador':
+          await eliminarOrganizador((raw as GestorLocal).usuarioId);
+          break;
+        case 'Duenho':
+          await eliminarDuenho((raw as GestorLocal).usuarioId);
           break;
       }
       await onDelete();
@@ -81,7 +87,7 @@ const TablaCrudDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({
         <DialogBody>
           <VStack gap={4}>
             <p>
-              ¿Estás seguro que deseas eliminar <strong>{entidad}</strong>? Esta acción no se puede deshacer.
+              ¿Estás seguro que deseas eliminar <strong>{entidad} : </strong>? Esta acción no se puede deshacer.
             </p>
           </VStack>
         </DialogBody>
