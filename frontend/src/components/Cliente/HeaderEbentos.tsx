@@ -13,6 +13,7 @@ const Header: React.FC = () => {
   const { user, logout } = useAuthStore();
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
+  const esRutaHome = window.location.pathname === "/home";
 
   useEffect(() => {
     const handleOutside = (e: MouseEvent) => {
@@ -41,23 +42,24 @@ const Header: React.FC = () => {
     }
   };
 
-
   return (
     <header className="header">
       <div className="header-container">
-        <div className="header-content">
+        <div className={`${esRutaHome ? "header-content" : "search-hidden"}`}>
           <img src={logo} alt="e-Bentos logo" className="header-logo" />
           <div className="logo-text">e-Bentos</div>
         </div>
 
         {/* --- SECCIÓN CENTRAL (BUSCADOR) --- */}
-        <div className="header-search">
-          <Search
-            labelText="Buscar"
-            placeholder="Buscar eventos, artistas o lugares..."
-            size="lg"
-          />
-        </div>
+        {esRutaHome && (
+          <div className="header-search">
+            <Search
+              labelText="Buscar"
+              placeholder="Buscar eventos, artistas o lugares..."
+              size="lg"
+            />
+          </div>
+        )}
 
         <nav className="nav">
           {!user ? (
