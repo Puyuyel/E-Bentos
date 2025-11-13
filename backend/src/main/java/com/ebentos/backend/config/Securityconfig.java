@@ -100,7 +100,7 @@ public class Securityconfig {
                         .requestMatchers(HttpMethod.POST, 
                                 "/api/locales/**").hasRole("GESTOR_LOCAL")
                         .requestMatchers(HttpMethod.PUT, 
-                                "/api/locales/**").hasRole("DUENHO_LOCAL")
+                                "/api/locales/**").hasAnyRole("GESTOR_LOCAL","DUENHO_LOCAL")
                         .requestMatchers(HttpMethod.DELETE, 
                                 "/api/locales/**").hasAnyRole("GESTOR_LOCAL", "DUENHO_LOCAL")
                         .requestMatchers(HttpMethod.POST, 
