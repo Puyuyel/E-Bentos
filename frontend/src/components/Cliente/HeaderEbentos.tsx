@@ -50,7 +50,7 @@ const Header: React.FC = () => {
 
 
   return (
-    <header className="header">
+    <header className="header-total">
       <div className="header-container">
         <div className={`${esRutaHome ? "header-content" : "search-hidden"}`}>
           <img src={logo} alt="e-Bentos logo" className="header-logo" />
