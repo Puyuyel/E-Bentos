@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.ebentos.backend.dto.EventoClienteDTO;
@@ -146,5 +147,17 @@ public class EventoClienteService {
 
         detalle.setZonas(zonas);
         return detalle;
+    }
+
+    /**
+     * Incrementa el contador de visitas de un evento.
+     * Debe llamarse cuando el usuario hace click en un evento de la lista.
+     */
+    @Transactional
+    public void registrarVisita(Integer eventoId) {
+        if (eventoId == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "eventoId requerido");
+        }
+        eventoClienteRepository.incrementarVisitas(eventoId);
     }
 }
