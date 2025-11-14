@@ -7,7 +7,7 @@ import type { Productora } from "../types/productora.types";
 import { eliminarPuntoVenta } from "../services/puntoVentaService";
 import type { PuntoVenta } from "../types/puntoVenta.types";
 import type { GestorLocal } from "../types/gestorLocal.types";
-import { eliminarGestorLocal, eliminarTaquillero } from "../services/gestorLocalService";
+import { eliminarDuenho, eliminarGestorLocal, eliminarOrganizador, eliminarTaquillero } from "../services/gestorLocalService";
 
 interface ConfirmDeleteDialogProps {
   entidad: string;
@@ -20,7 +20,9 @@ const TablaCrudDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  console.log(raw as PuntoVenta);
+  //console.log(raw as PuntoVenta);
+  const resultado = `${separarConConector(entidad)}`;
+
   const handleDelete = async () => {
     //console.log('delete');
     console.log(raw as Productora);
@@ -39,6 +41,12 @@ const TablaCrudDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({
         case 'Taquillero':
           await eliminarTaquillero((raw as GestorLocal).usuarioId);
           break;
+        case 'Organizador':
+          await eliminarOrganizador((raw as GestorLocal).usuarioId);
+          break;
+        case 'Duenho':
+          await eliminarDuenho((raw as GestorLocal).usuarioId);
+          break;
       }
       await onDelete();
 
@@ -50,6 +58,14 @@ const TablaCrudDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({
       setIsDeleting(false);
     }
   };
+
+  function separarConConector(entidad: string): string {
+    const partes = entidad.replace(/([a-z])([A-Z])/g, '$1 $2').split(' ');
+    if (partes.length === 2) {
+      return `${partes[0]} de ${partes[1]}`;
+    }
+    return partes.join(' ');
+  }
 
   return (
     <>
@@ -81,7 +97,11 @@ const TablaCrudDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({
         <DialogBody>
           <VStack gap={4}>
             <p>
-              ¿Estás seguro que deseas eliminar <strong>{entidad}</strong>? Esta acción no se puede deshacer.
+              ¿Estás seguro que deseas eliminar <strong>{resultado} : {
+                (entidad === 'Productora')? (raw as Productora).nombreComercial 
+                :(entidad === 'PuntoVenta')? (raw as PuntoVenta).nombre
+                :(raw as GestorLocal).nombres + (raw as GestorLocal).apellidos
+                }</strong>? Esta acción no se puede deshacer.
             </p>
           </VStack>
         </DialogBody>

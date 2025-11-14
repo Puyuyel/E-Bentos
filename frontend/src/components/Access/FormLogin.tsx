@@ -16,6 +16,7 @@ import type { LoginCredentials } from "../../types/auth.types";
 interface FormLoginProps {
   onRegisterClick: () => void;
   onLoginClick: (credentials: LoginCredentials) => Promise<void>;
+  notifyMessage: () => void;
 }
 
 const FormLogin: React.FC<FormLoginProps> = ({
@@ -23,22 +24,36 @@ const FormLogin: React.FC<FormLoginProps> = ({
   onLoginClick,
 }) => {
   const [loading, setLoading] = useState(false);
-
-  const handleLoginClick = async () => {
-    setLoading(true);
-    try {
-      await onLoginClick(formData);
-    } catch (error: any) {
-      console.error("Error en FormLogin.tsx: ", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  const [showNotify, setShowNotify] = useState(false);
+  const [notifyParaph, setNotifyParaph] = useState("");
   const [formData, setFormData] = useState<LoginCredentials>({
     email: "",
     contrasenha: "",
   });
+
+  const handleLoginClick = async () => {
+    setLoading(true);
+    try {
+      console.log(formData);
+      const email = formData.email.toString();
+      const contra = formData.contrasenha.toString();
+      if (!email || !contra) {
+        console.log("Entré desde FormLogin");
+        setShowNotify(true);
+        setNotifyParaph("Complete la contraseña y el email correctamente.");
+        setLoading(false);
+        return;
+      }
+      try {
+        await onLoginClick(formData);
+      } catch (error: any) {
+        setShowNotify(true);
+        setNotifyParaph(error.message);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -46,6 +61,13 @@ const FormLogin: React.FC<FormLoginProps> = ({
       ...prev,
       [id]: value,
     }));
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleLoginClick();
+    }
   };
 
   return (
@@ -75,6 +97,7 @@ const FormLogin: React.FC<FormLoginProps> = ({
             labelText="Correo electrónico"
             placeholder="Ej: ebento@ebento.com"
             onChange={handleChange}
+            onKeyDown={handleKeyDown}
           />
         </div>
 
@@ -85,7 +108,15 @@ const FormLogin: React.FC<FormLoginProps> = ({
           type="password"
           placeholder="Ingrese su contraseña"
           onChange={handleChange}
+          onKeyDown={handleKeyDown}
         />
+
+        <p
+          style={{ visibility: showNotify ? "visible" : "hidden" }}
+          className="notify-p"
+        >
+          {notifyParaph}
+        </p>
       </FluidForm>
 
       {/* PARTE 2.2: LINK de OLVIDASTE CONTRASEÑA */}

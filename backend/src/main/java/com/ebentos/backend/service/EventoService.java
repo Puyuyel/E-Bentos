@@ -3,14 +3,13 @@ package com.ebentos.backend.service;
 import com.ebentos.backend.dto.*;
 import com.ebentos.backend.model.*;
 import com.ebentos.backend.repository.EventoRepository;
-import com.ebentos.backend.repository.SolicitudRepository;
 import jakarta.persistence.EntityNotFoundException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -35,13 +34,13 @@ public class EventoService {
         return eventoDTO;
     }
     
-    public Map<String, Object> listarPaginado(int page, int size) {
+    public Map<String, Object> listarPaginadoPorOrganizador(int page, int size, Integer usuarioId) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Evento> eventoPage = eventoRepository.findAll(pageable);
+        Page<Evento> eventoPage = eventoRepository.findByGestor_UsuarioId(usuarioId, pageable);
 
-        List<EventoDTO> eventosDTO = eventoPage.getContent()
+        List<EventoListadoDTO> eventosDTO = eventoPage.getContent()
                 .stream()
-                .map(this::mapToEventoDTO)
+                .map(this::mapToEventoListadoDTO)
                 .collect(Collectors.toList());
 
         Map<String, Object> response = new HashMap<>();
@@ -61,10 +60,17 @@ public class EventoService {
         return response;
     }
     
-    public List<EventoDTO> listarTodas() {
+    public List<EventoListadoDTO> listarTodas() {
         return eventoRepository.findAll()
                 .stream()
-                .map(this::mapToEventoDTO)
+                .map(this::mapToEventoListadoDTO)
+                .collect(Collectors.toList());
+    }
+    
+    public List<EventoListadoDTO> listarPorOrganizador(Integer usuarioId) {
+        return eventoRepository.findByGestor_UsuarioId(usuarioId)
+                .stream()
+                .map(this::mapToEventoListadoDTO)
                 .collect(Collectors.toList());
     }
     
@@ -73,7 +79,8 @@ public class EventoService {
         // Campos simples
         evento.setNombre(registroEventoDTO.getNombre());
         evento.setDescripcion(registroEventoDTO.getDescripcion());
-        evento.setPoster(registroEventoDTO.getPoster());
+        evento.setPosterHorizontal(registroEventoDTO.getPosterHorizontal());
+        evento.setPosterVertical(registroEventoDTO.getPosterVertical());
         evento.setFechaHorarioInicio(registroEventoDTO.getFechaHorarioInicio());
         evento.setDuracionEstimada(registroEventoDTO.getDuracionEstimada());
         evento.setCostoTotal(registroEventoDTO.getCostoTotal());
@@ -98,15 +105,32 @@ public class EventoService {
             categoria.setCategoriaEventoId(registroEventoDTO.getCategoriaEvento().getCategoriaEventoId());
             evento.setCategoriaEvento(categoria);
         }
+        
+        if (registroEventoDTO.getZonas() != null && !registroEventoDTO.getZonas().isEmpty()) {
+            for (RegistroZonaDTO zonaDTO : registroEventoDTO.getZonas()) {
+                Zona zona = new Zona();
+                zona.setCapacidadTotal(zonaDTO.getCapacidadTotal());
+                zona.setLetraZona(zonaDTO.getLetraZona());
+                zona.setPrecioUnitario(zonaDTO.getPrecioUnitario());
+                zona.setTipoZona(zonaDTO.getTipoZona());
+                zona.setActivo(1);
+                zona.setCantidadEntradasDisponibles(zonaDTO.getCapacidadTotal());
+                zona.setLocal(evento.getLocal());
+                zona.setMontoTotalRecaudado(0.0);
+                zona.setEvento(evento);
+                evento.getZonas().add(zona);
+            }
+        }
+    
 
         Evento guardado = eventoRepository.save(evento);
 
         //Insertamos la solicitud del local
-          SolicitudDTO solicitudDTO = new SolicitudDTO();
-          solicitudDTO.setLocalId(registroEventoDTO.getLocal().getLocalId());
-          solicitudDTO.setEventoId(guardado.getEventoId());
-          solicitudDTO.setEstado(EstadoSolicitud.EN_REVISION);
-          solicitudService.insertar(solicitudDTO);
+        SolicitudDTO solicitudDTO = new SolicitudDTO();
+        solicitudDTO.setLocalId(registroEventoDTO.getLocal().getLocalId());
+        solicitudDTO.setEventoId(guardado.getEventoId());
+        solicitudDTO.setEstado(EstadoSolicitud.EN_REVISION);
+        solicitudService.insertar(solicitudDTO);
 
         return mapToEventoDTO(guardado);
     }
@@ -129,8 +153,11 @@ public class EventoService {
         if (!Objects.equals(eventoActualizaDTO.getDescripcion(), eventoExistente.getDescripcion())){
             eventoExistente.setDescripcion(eventoActualizaDTO.getDescripcion());
         }
-        if (!Objects.equals(eventoActualizaDTO.getPoster(), eventoExistente.getPoster())){
-            eventoExistente.setPoster(eventoActualizaDTO.getPoster());
+        if (!Objects.equals(eventoActualizaDTO.getPosterHorizontal(), eventoExistente.getPosterHorizontal())){
+            eventoExistente.setPosterHorizontal(eventoActualizaDTO.getPosterHorizontal());
+        }
+        if (!Objects.equals(eventoActualizaDTO.getPosterVertical(), eventoExistente.getPosterVertical())){
+            eventoExistente.setPosterVertical(eventoActualizaDTO.getPosterVertical());
         }
         if (!Objects.equals(eventoActualizaDTO.getFechaHorarioInicio(), eventoExistente.getFechaHorarioInicio())){
             eventoExistente.setFechaHorarioInicio(eventoActualizaDTO.getFechaHorarioInicio());
@@ -141,14 +168,13 @@ public class EventoService {
         if (!Objects.equals(eventoActualizaDTO.getCostoTotal(), eventoExistente.getCostoTotal())){
             eventoExistente.setCostoTotal(eventoActualizaDTO.getCostoTotal());
         }
-        if (!Objects.equals(eventoActualizaDTO.getVisitas(), eventoExistente.getVisitas())){
-            eventoExistente.setVisitas(eventoActualizaDTO.getVisitas());
-        }
         if (!Objects.equals(eventoActualizaDTO.getEstado(), eventoExistente.getEstado())){
             eventoExistente.setEstado(eventoActualizaDTO.getEstado());
         }
         if (!Objects.equals(eventoActualizaDTO.getLocal().getLocalId(), eventoExistente.getLocal().getLocalId())){
-            eventoExistente.setLocal(eventoActualizaDTO.getLocal());
+            Local local = new Local();
+            local.setLocalId(eventoActualizaDTO.getLocal().getLocalId());
+            eventoExistente.setLocal(local);
 
             //Se envía otra solicitud
             SolicitudDTO solicitudDTO = new SolicitudDTO();
@@ -162,6 +188,45 @@ public class EventoService {
         if (!Objects.equals(eventoActualizaDTO.getCategoriaEvento(), eventoExistente.getCategoriaEvento())){
             eventoExistente.setCategoriaEvento(eventoActualizaDTO.getCategoriaEvento());
         }
+        
+        Map<Integer, Zona> zonasExistentes = eventoExistente.getZonas().stream()
+        .collect(Collectors.toMap(Zona::getZonaId, z -> z));
+
+        List<Zona> nuevasZonas = new ArrayList<>();
+
+        for (ZonaDTO zonaDTO : eventoActualizaDTO.getZonas()) {
+            Zona zona;
+            if (zonaDTO.getZonaId() != null && zonasExistentes.containsKey(zonaDTO.getZonaId())) {
+                // Actualizar zona existente
+                zona = zonasExistentes.get(zonaDTO.getZonaId());
+                zona.setCapacidadTotal(zonaDTO.getCapacidadTotal());
+                zona.setCantidadEntradasDisponibles(zonaDTO.getCapacidadTotal());
+                zona.setLetraZona(zonaDTO.getLetraZona());
+                zona.setTipoZona(zonaDTO.getTipoZona());
+                zona.setPrecioUnitario(zonaDTO.getPrecioUnitario());
+                zonasExistentes.remove(zonaDTO.getZonaId());
+            } else {
+                // Crear zona nueva
+                zona = new Zona();
+                zona.setCapacidadTotal(zonaDTO.getCapacidadTotal());
+                zona.setLetraZona(zonaDTO.getLetraZona());
+                zona.setTipoZona(zonaDTO.getTipoZona());
+                zona.setPrecioUnitario(zonaDTO.getPrecioUnitario());
+                zona.setActivo(1);
+                zona.setCantidadEntradasDisponibles(zonaDTO.getCapacidadTotal());
+                zona.setLocal(eventoExistente.getLocal());
+                zona.setMontoTotalRecaudado(0.0);
+                zona.setEvento(eventoExistente);
+            }
+            nuevasZonas.add(zona);
+        }
+
+        // Eliminar las zonas que ya no están en el DTO
+        for (Zona zonaEliminada : zonasExistentes.values()) {
+            zonaEliminada.setActivo(0);
+        }
+
+        eventoExistente.setZonas(nuevasZonas);
 
         Evento eventoActualizado = eventoRepository.save(eventoExistente);
         return mapToEventoDTO(eventoActualizado);
@@ -173,25 +238,54 @@ public class EventoService {
         eventoDTO.setEventoId(evento.getEventoId());
         eventoDTO.setNombre(evento.getNombre());
         eventoDTO.setDescripcion(evento.getDescripcion());
-        eventoDTO.setPoster(evento.getPoster());
+        eventoDTO.setPosterHorizontal(evento.getPosterHorizontal());
+        eventoDTO.setPosterVertical(evento.getPosterVertical());
         eventoDTO.setFechaHorarioInicio(evento.getFechaHorarioInicio());
         eventoDTO.setDuracionEstimada(evento.getDuracionEstimada());
         eventoDTO.setCostoTotal(evento.getCostoTotal());
-        eventoDTO.setVisitas(evento.getVisitas());
         eventoDTO.setEstado(evento.getEstado());
         eventoDTO.setCategoriaEvento(evento.getCategoriaEvento());
 
         if (evento.getLocal() != null) {
-            LocalSimpleDTO localDTO = new LocalSimpleDTO();
+            LocalAforoDTO localDTO = new LocalAforoDTO();
             localDTO.setLocalId(evento.getLocal().getLocalId());
+            localDTO.setNombre(evento.getLocal().getNombre());
             localDTO.setAforo(evento.getLocal().getAforo());
             eventoDTO.setLocal(localDTO);
         }
+        
+        if (evento.getZonas() != null && !evento.getZonas().isEmpty()) {
+            List<ZonaDTO> zonasDTO = evento.getZonas().stream().map(zona -> {
+                ZonaDTO zonaDTO = new ZonaDTO();
+                zonaDTO.setZonaId(zona.getZonaId());
+                zonaDTO.setCapacidadTotal(zona.getCapacidadTotal());
+                zonaDTO.setLetraZona(zona.getLetraZona());
+                zonaDTO.setTipoZona(zona.getTipoZona());
+                zonaDTO.setPrecioUnitario(zona.getPrecioUnitario());
+                return zonaDTO;
+            }).collect(Collectors.toList());
 
-        if (evento.getGestor() != null) {
-            GestorSimpleDTO gestorDTO = new GestorSimpleDTO();
-            gestorDTO.setUsuarioId(evento.getGestor().getUsuarioId());
-            eventoDTO.setGestor(gestorDTO);
+            eventoDTO.setZonas(zonasDTO);
+        }
+
+        return eventoDTO;
+    }
+    
+    private EventoListadoDTO mapToEventoListadoDTO(Evento evento) {
+        EventoListadoDTO eventoDTO = new EventoListadoDTO();
+
+        eventoDTO.setEventoId(evento.getEventoId());
+        eventoDTO.setNombre(evento.getNombre());
+        eventoDTO.setFechaHorarioInicio(evento.getFechaHorarioInicio());
+        eventoDTO.setDuracionEstimada(evento.getDuracionEstimada());
+        eventoDTO.setEstado(evento.getEstado());
+
+        if (evento.getLocal() != null) {
+            LocalAforoDTO localDTO = new LocalAforoDTO();
+            localDTO.setLocalId(evento.getLocal().getLocalId());
+            localDTO.setNombre(evento.getLocal().getNombre());
+            localDTO.setAforo(evento.getLocal().getAforo());
+            eventoDTO.setLocal(localDTO);
         }
 
         return eventoDTO;
@@ -203,18 +297,17 @@ public class EventoService {
         EventoActualizaDTO eventoActualizaDTO = new EventoActualizaDTO();
         eventoActualizaDTO.setNombre(evento.getNombre());
         eventoActualizaDTO.setDescripcion(evento.getDescripcion());
-        eventoActualizaDTO.setPoster(evento.getPoster());
+        eventoActualizaDTO.setPosterHorizontal(evento.getPosterHorizontal());
+        eventoActualizaDTO.setPosterVertical(evento.getPosterVertical());
         eventoActualizaDTO.setFechaHorarioInicio(evento.getFechaHorarioInicio());
         eventoActualizaDTO.setDuracionEstimada(evento.getDuracionEstimada());
         eventoActualizaDTO.setCostoTotal(evento.getCostoTotal());
-        eventoActualizaDTO.setVisitas(evento.getVisitas());
         eventoActualizaDTO.setEstado(evento.getEstado());
         eventoActualizaDTO.setCategoriaEvento(evento.getCategoriaEvento());
 
         if (evento.getLocal() != null) {
-            Local localDTO = new Local();
+            LocalSimpleDTO localDTO = new LocalSimpleDTO();
             localDTO.setLocalId(evento.getLocal().getLocalId());
-            localDTO.setAforo(evento.getLocal().getAforo());
             eventoActualizaDTO.setLocal(localDTO);
         }
         return eventoActualizaDTO;

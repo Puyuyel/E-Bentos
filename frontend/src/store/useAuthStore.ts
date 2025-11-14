@@ -47,8 +47,6 @@ export const useAuthStore = create<AuthState>()(
         console.log("🚪 Ejecutando logout...");
         set({ user: null, isLoggedIn: false, displayName: null });
         localStorage.removeItem("auth-storage");
-        console.log("🔄 Redirigiendo a /login");
-        window.location.href = "/login";
       },
 
       setUser: (user: User | null) => {

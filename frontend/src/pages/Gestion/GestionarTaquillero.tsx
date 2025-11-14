@@ -10,7 +10,7 @@ const GestionarTaquillero: React.FC = () => {
       <Sidebar currentPath="gestionar-taquillero" onToggleSidebar={setSidebarOpen}/>
       <main className="app-main">
         <h1 className="title">Panel de Gestión de Taquilleros</h1>
-        {/* <TablaAdmin tipoGestor="Taquillero"></TablaAdmin> */}
+        <TablaAdmin tipoGestor="Taquillero"></TablaAdmin>
       </main>
     </div>
   );

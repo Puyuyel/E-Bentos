@@ -1,12 +1,18 @@
 package com.ebentos.backend.controller;
 
+import com.ebentos.backend.dto.ClienteActualizaDTO;
+import com.ebentos.backend.dto.ClienteDTO;
 import com.ebentos.backend.dto.RegistroClienteDTO;
 import com.ebentos.backend.model.Cliente;
 import com.ebentos.backend.service.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,5 +42,20 @@ public class ClienteController {
             System.err.println("Error inesperado durante el registro: " + e.getMessage()); // Log del error
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno al procesar el registro.");
         }
+    }
+    
+    @GetMapping("/{id}")
+    public ClienteDTO obtenerPorId(@PathVariable Integer id) {
+        return clienteService.obtenerPorId(id);
+    }
+
+    @PutMapping("/{id}")
+    public ClienteDTO modificar(@PathVariable Integer id, @RequestBody ClienteActualizaDTO clienteActualizaDTO) {
+        return clienteService.modificar(id, clienteActualizaDTO);
+    }
+
+    @DeleteMapping("/{id}")
+    public void eliminar(@PathVariable Integer id) {
+        clienteService.eliminar(id);
     }
 }

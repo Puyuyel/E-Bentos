@@ -2,6 +2,7 @@ package com.ebentos.backend.controller;
 
 import com.ebentos.backend.dto.EventoActualizaDTO;
 import com.ebentos.backend.dto.EventoDTO;
+import com.ebentos.backend.dto.EventoListadoDTO;
 import com.ebentos.backend.dto.RegistroEventoDTO;
 import com.ebentos.backend.service.EventoService;
 import java.util.List;
@@ -30,16 +31,22 @@ public class EventoController {
     }
 
     @GetMapping
-    public List<EventoDTO> listarTodas() {
+    public List<EventoListadoDTO> listarTodas() {
         return eventoService.listarTodas();
     }
+    
+    @GetMapping("/organizador/{id}")
+    public List<EventoListadoDTO> listarPorOrganizador(@PathVariable Integer id) {
+        return eventoService.listarPorOrganizador(id);
+    }
 
-    @GetMapping("/paginado")
+    @GetMapping("/paginado/organizador/{id}")
     public Map<String, Object> listarPaginado(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int limit) {
+            @RequestParam(defaultValue = "10") int limit,
+            @PathVariable Integer id) {
 
-        Map<String, Object> response = eventoService.listarPaginado(page, limit);
+        Map<String, Object> response = eventoService.listarPaginadoPorOrganizador(page, limit, id);
 
         // Construir URLs completas dinámicamente
         Map<String, Object> pagination = (Map<String, Object>) response.get("pagination");

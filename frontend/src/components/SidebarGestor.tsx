@@ -8,6 +8,7 @@ import {
   CalendarIcon,
   OfficeBuildingIcon,
   ClipboardIcon,
+  DocumentReportIcon,
 } from "./icons";
 
 import { Callout } from "@carbon/react";
@@ -46,7 +47,9 @@ const NavItem: React.FC<NavItemProps> = ({
   return (
     <a
       onClick={disabled ? undefined : onClick}
-      className={`nav-item ${active ? "nav-item-active" : ""} ${disabled ? "nav-item-disabled" : ""}`}
+      className={`nav-item ${active ? "nav-item-active" : ""} ${
+        disabled ? "nav-item-disabled" : ""
+      }`}
       style={{ cursor: disabled ? "not-allowed" : "pointer" }}
     >
       {icon}
@@ -60,7 +63,10 @@ interface SidebarProps {
   onToggleSidebar?: (open: boolean) => void;
 }
 
-const SidebarGestor: React.FC<SidebarProps> = ({ currentPath = "" , onToggleSidebar}) => {
+const SidebarGestor: React.FC<SidebarProps> = ({
+  currentPath = "",
+  onToggleSidebar,
+}) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
   const { logout } = useAuthStore(); // AÑADIR ESTA LÍNEA
@@ -108,6 +114,7 @@ const SidebarGestor: React.FC<SidebarProps> = ({ currentPath = "" , onToggleSide
           case "duenho_local":
           case "organizador_eventos":
             const dataGestor = await useGetGestor(user.id);
+            console.log("dataGestor: ", dataGestor);
             fetchedName =
               dataGestor.response.nombres + " " + dataGestor.response.apellidos;
             break;
@@ -133,13 +140,14 @@ const SidebarGestor: React.FC<SidebarProps> = ({ currentPath = "" , onToggleSide
     try {
       setLoading(true);
       const llamadaAPI = await logoutService();
-      
+
       if (llamadaAPI === LLAMADA_EXITOSA) {
         setShowSuccess(true);
-        
+
         // Esperar 1 segundo antes de limpiar y redirigir
         setTimeout(() => {
           logout();
+          navigate("/home");
         }, 1000);
       }
     } catch (error: any) {
@@ -179,6 +187,11 @@ const SidebarGestor: React.FC<SidebarProps> = ({ currentPath = "" , onToggleSide
             icon: <OfficeBuildingIcon />,
             label: "Locales",
             route: "gestionar-local",
+          },
+          {
+            icon: <DocumentReportIcon />,
+            label: "Registro de locales",
+            route: "registrar-local",
           },
         ];
 
@@ -220,10 +233,7 @@ const SidebarGestor: React.FC<SidebarProps> = ({ currentPath = "" , onToggleSide
   return (
     <>
       {/* Botón hamburguesa visible solo en móvil */}
-      <button
-        className="hamburger-button"
-        onClick={toggleSidebar}
-      >
+      <button className="hamburger-button" onClick={toggleSidebar}>
         ☰
       </button>
       <aside className={`sidebar ${sidebarOpen ? "open" : "closed"}`}>

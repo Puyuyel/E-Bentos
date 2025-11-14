@@ -31,25 +31,34 @@ public class SolicitudService {
 
     //Insertar
     public void insertar(SolicitudDTO solicitudDTO) {
-            Solicitud solicitud = new Solicitud();
-        //Campos simples
-            solicitud.setJustificacion(solicitudDTO.getJustificacion());
-            solicitud.setEstado(solicitudDTO.getEstado());
-        //Asociaciones
-            Local local = new Local();
-            local.setLocalId(solicitudDTO.getLocalId());
-            solicitud.setLocal(local);
-            Evento evento = new Evento();
-            evento.setEventoId(solicitudDTO.getEventoId());
-            solicitud.setEvento(evento);
-        //Guardamos
-            solicitudRepository.save(solicitud);
+        Solicitud solicitud = new Solicitud();
+
+        // Crear el ID compuesto
+        SolicitudId solicitudId = new SolicitudId();
+        solicitudId.setEventoId(solicitudDTO.getEventoId());
+        solicitudId.setLocalId(solicitudDTO.getLocalId());
+        solicitud.setId(solicitudId);
+
+        // Asociaciones (solo por ID)
+        Evento evento = new Evento();
+        evento.setEventoId(solicitudDTO.getEventoId());
+        solicitud.setEvento(evento);
+
+        Local local = new Local();
+        local.setLocalId(solicitudDTO.getLocalId());
+        solicitud.setLocal(local);
+
+        // Campo simple
+        solicitud.setEstado(solicitudDTO.getEstado());
+
+        // Guardar
+        solicitudRepository.save(solicitud);
     }
 
     //Modificar / Aceptar rechazar
     public SolicitudDTO modificar(Integer localId, Integer eventoId, SolicitudDTO solicitudDTO) {
         //Al tener el id compuesto por dos fks, tenemos que crear el id
-        SolicitudId solicitudId = new SolicitudId(localId.longValue(), eventoId.longValue());
+        SolicitudId solicitudId = new SolicitudId(localId, eventoId);
         Solicitud solicitud = solicitudRepository.findById(solicitudId)
                 .orElseThrow(() -> new EntityNotFoundException("Solicitud no encontrada con ID: " + solicitudId));
             if (!Objects.equals(localId, solicitud.getLocal().getLocalId())){
@@ -82,27 +91,35 @@ public class SolicitudService {
 
         return llenarADTO(solicitudActualizada);
     }
+    
+    public SolicitudDTO obtenerPorId(Integer localId, Integer eventoId){
+        SolicitudId solicitudId = new SolicitudId(localId, eventoId);
+        Solicitud solicitud = solicitudRepository.findById(solicitudId)
+                .orElseThrow(() -> new EntityNotFoundException("Solicitud no encontrada con ID: " + solicitudId));
+        
+        SolicitudDTO solicitudDTO = llenarADTO(solicitud);
+        
+        return solicitudDTO;
+    }
 
     private SolicitudDTO llenarADTO(Solicitud solicitudActualizada){
         SolicitudDTO solicitudDTO = new SolicitudDTO();
+
         solicitudDTO.setJustificacion(solicitudActualizada.getJustificacion());
         solicitudDTO.setEstado(solicitudActualizada.getEstado());
 
-        Local local = new Local();
-        local.setLocalId(solicitudActualizada.getLocal().getLocalId());
-        solicitudDTO.setLocalId(local.getLocalId());
-
-        Evento evento = new Evento();
-        evento.setEventoId(solicitudActualizada.getEvento().getEventoId());
-        solicitudDTO.setEventoId(evento.getEventoId());
+        if (solicitudActualizada.getId() != null) {
+            solicitudDTO.setLocalId(solicitudActualizada.getId().getLocalId());
+            solicitudDTO.setEventoId(solicitudActualizada.getId().getEventoId());
+        }
 
         return solicitudDTO;
     }
 
     //Listar paginado
-    public Map<String, Object> listarPaginado(Integer  page, Integer size){
+    public Map<String, Object> listarPaginado(Integer gestorUsuarioId, Integer  page, Integer size){
         Pageable pageable = PageRequest.of(page, size);
-        Page<Solicitud> solicitudesPage = solicitudRepository.findAll(pageable);
+        Page<Solicitud> solicitudesPage = solicitudRepository.findByGestorUsuarioId(gestorUsuarioId, pageable);
 
         List<SolicitudDTO> solicitudesDTO = solicitudesPage.getContent().stream().map(this::llenarADTO).collect(Collectors.toList());
 
@@ -117,8 +134,10 @@ public class SolicitudService {
         pagination.put("pageSize", solicitudesPage.getSize());
         pagination.put("hasNextPage", solicitudesPage.hasNext());
         pagination.put("hasPreviousPage", solicitudesPage.hasPrevious());
-        pagination.put("nextPage", solicitudesPage.hasNext() ? "/api/locales?page=" + (page + 1) + "&limit=" + size : null);
-        pagination.put("prevPage", solicitudesPage.hasPrevious() ? "/api/locales?page=" + (page - 1) + "&limit=" + size : null);
+
+        String baseUrl = "/api/solicitudes/paginado/" + gestorUsuarioId;
+        pagination.put("nextPage", solicitudesPage.hasNext() ? baseUrl + "?page=" + (page + 1) + "&limit=" + size : null);
+        pagination.put("prevPage", solicitudesPage.hasPrevious() ? baseUrl + "?page=" + (page - 1) + "&limit=" + size : null);
 
         response.put("pagination", pagination);
 

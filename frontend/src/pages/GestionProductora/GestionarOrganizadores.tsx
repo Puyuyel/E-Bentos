@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import SidebarGestor from "../../components/SidebarGestor";
+import TablaAdmin from "../../components/TablaAdmin";
 import "../../styles/GestionProductora/GestionarOrganizadores.css";
 
 const GestionarOrganizador: React.FC = () => {
@@ -10,6 +11,7 @@ const GestionarOrganizador: React.FC = () => {
       <SidebarGestor currentPath="gestionar-organizador" onToggleSidebar={setSidebarOpen}/>
       <main className="app-main">
         <h1 className="title">Panel de Gestión de Organizadores</h1>
+        <TablaAdmin tipoGestor="Organizador"></TablaAdmin>
       </main>
     </div>
   );
