@@ -122,7 +122,7 @@ const TablaCrudGestorLocalForm: React.FC<TablaCrudGestorLocalFormProps> = ({
           setErrors(prev => ({ ...prev, dni: validarDni(value) }));
         }}
         onBlur={() => setErrors(prev => ({ ...prev, dni: validarDni(formData.dni || '') }))}
-        readOnly={isReadOnly}
+        readOnly={isReadOnly || accion != 'Agregar'}
         invalid={!!errors.dni && !isReadOnly}
         invalidText={errors.dni}
         maxLength={8}
