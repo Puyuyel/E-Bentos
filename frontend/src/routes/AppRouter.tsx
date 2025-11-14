@@ -23,6 +23,7 @@ import { ProtectedRoute } from "./ProtectedRoute"; // importa tu wrapper
 import GestionarOrganizador from "../pages/GestionProductora/GestionarOrganizadores";
 import Metas from "../pages/GestionProductora/Metas";
 import MainEbentos from "../components/Cliente/MainEbentos";
+import GestionarDuenhos from "../pages/Gestion/GestorLocal/GestionarDuenhos";
 
 const AppRouter: React.FC = () => {
   return (
@@ -169,6 +170,15 @@ const AppRouter: React.FC = () => {
         />
 
         {/* RUTAS para GESTOR DE LOCAL */}
+        {/* Ruta /listado duenhos*/}
+        <Route
+          path="/gestor_local/gestionar-duenhos-de-local"
+          element={
+            <ProtectedRoute requiredRole="GESTOR_LOCAL">
+              <GestionarDuenhos />
+            </ProtectedRoute>
+          }
+        />
         {/* Ruta /listado locales*/}
         <Route
           path="/gestor_local/gestionar-local"

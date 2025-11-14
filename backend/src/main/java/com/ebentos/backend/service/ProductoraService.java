@@ -45,13 +45,17 @@ public class ProductoraService {
         //Validar datos inicionales
         String email = registroProductoraDTO.getEmail();
         String contrasenha = registroProductoraDTO.getContrasenha();
-        if(!email.contains("@") || contrasenha.length() < 8){
+        if(!email.contains("@") || contrasenha.length() < 6){
             throw new IllegalArgumentException("El formato del correo electrónico o contrasenha no es valido.");
         }
 
         // Validar si el email ya existe
         if (usuarioRepository.findByEmail(registroProductoraDTO.getEmail()).isPresent()) {
             throw new RuntimeException("El email ya está en uso");
+        }
+        
+        if (productoraRepository.findByRuc(registroProductoraDTO.getRuc()).isPresent()) {
+            throw new RuntimeException("El RUC ya está en uso");
         }
         
         Rol rolUsuario = rolRepository.findByNombre("PRODUCTORA")
@@ -158,6 +162,9 @@ public class ProductoraService {
         }
 
         if (!Objects.equals(productoraActualizaDTO.getEmail(), productoraExistente.getEmail())) {
+            if (usuarioRepository.findByEmail(productoraActualizaDTO.getEmail()).isPresent()) {
+                throw new RuntimeException("El email ya está en uso");
+            }
             productoraExistente.setEmail(productoraActualizaDTO.getEmail());
         }
         
