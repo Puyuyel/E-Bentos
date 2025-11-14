@@ -6,7 +6,7 @@
 .container {
   width: 100vw;
   margin: 0 auto;
-  padding: 1rem;
+  padding: 0rem;
   box-sizing: border-box;
 }
 
@@ -23,16 +23,4 @@
   background-position: center;
   background-repeat: no-repeat;
   display: block;
-}
-
-@media (min-width: 768px) {
-  .container {
-    padding: 2rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .container {
-    padding: 0.75rem;
-  }
 }

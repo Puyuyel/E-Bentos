@@ -1,5 +1,9 @@
 import "../../styles/Cliente/ContenedorZonasPrecios.css";
 
+import zonaProvisional from "../../assets/zonas-img-test.png";
+
+const imageBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL;
+
 import {
   StructuredListBody,
   StructuredListWrapper,
@@ -9,12 +13,38 @@ import {
 } from "@carbon/react";
 
 interface ContenedorZonasPreciosProps {
-  imagen?: string;
+  zonas: [
+    {
+      zonaId: number;
+      capacidadTotal: number;
+      tipoZona: string;
+      letraZona: string;
+      precioUnitario: number;
+    }
+  ];
+  local: {
+    localId: number;
+    nombre: string;
+    direccion: string;
+    foto: string;
+    aforo: number;
+    tipoLocal: string; // 'BAR'
+    activo: number;
+    gestor: {
+      usuarioId: number;
+    };
+    distrito: {
+      distritoId: number;
+      nombre: string;
+    };
+  };
 }
 
 export default function ContenedorZonasPrecios({
-  imagen,
+  zonas,
+  local,
 }: ContenedorZonasPreciosProps) {
+  const imagenZona = `${imageBaseUrl}/${local.tipoLocal}`;
   return (
     <div
       style={{
@@ -35,7 +65,7 @@ export default function ContenedorZonasPrecios({
         <div
           className="img-zonas"
           style={{
-            backgroundImage: `url(${imagen})`,
+            backgroundImage: `url(${zonaProvisional})`,
           }}
         ></div>
 
@@ -49,36 +79,24 @@ export default function ContenedorZonasPrecios({
               </StructuredListRow>
             </StructuredListHead>
             <StructuredListBody>
-              <StructuredListRow>
-                <StructuredListCell noWrap>Row 1</StructuredListCell>
-                <StructuredListCell>Row 1</StructuredListCell>
-                <StructuredListCell>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc
-                  dui magna, finibus id tortor sed, aliquet bibendum augue.
-                  Aenean posuere sem vel euismod dignissim. Nulla ut cursus
-                  dolor. Pellentesque vulputate nisl a porttitor interdum.
-                </StructuredListCell>
-              </StructuredListRow>
-              <StructuredListRow>
-                <StructuredListCell noWrap>Row 2</StructuredListCell>
-                <StructuredListCell>Row 2</StructuredListCell>
-                <StructuredListCell>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc
-                  dui magna, finibus id tortor sed, aliquet bibendum augue.
-                  Aenean posuere sem vel euismod dignissim. Nulla ut cursus
-                  dolor. Pellentesque vulputate nisl a porttitor interdum.
-                </StructuredListCell>
-              </StructuredListRow>
-              <StructuredListRow>
-                <StructuredListCell noWrap>Row 3</StructuredListCell>
-                <StructuredListCell>Row 3</StructuredListCell>
-                <StructuredListCell>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc
-                  dui magna, finibus id tortor sed, aliquet bibendum augue.
-                  Aenean posuere sem vel euismod dignissim. Nulla ut cursus
-                  dolor. Pellentesque vulputate nisl a porttitor interdum.
-                </StructuredListCell>
-              </StructuredListRow>
+              {Array.isArray(zonas) &&
+                zonas.length > 0 &&
+                zonas.map((zona) => (
+                  <StructuredListRow key={zona.zonaId}>
+                    {/* Nombre de la zona */}
+                    <StructuredListCell noWrap>
+                      {zona.tipoZona} {zona.letraZona}
+                    </StructuredListCell>
+
+                    {/* Precio regular */}
+                    <StructuredListCell>
+                      S/ {zona.precioUnitario.toFixed(2)}
+                    </StructuredListCell>
+
+                    {/* Descuentos (si aún no hay, se deja texto fijo o vacío) */}
+                    <StructuredListCell>— Sin descuentos —</StructuredListCell>
+                  </StructuredListRow>
+                ))}
             </StructuredListBody>
           </StructuredListWrapper>
         </div>

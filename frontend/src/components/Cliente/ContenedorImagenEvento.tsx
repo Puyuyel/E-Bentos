@@ -1,5 +1,7 @@
 import "../../styles/Cliente/ContenerImagenEvento.css";
 
+const imageBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL;
+
 interface ContenedorImagenEventoProps {
   imagen: string;
   className?: string;
@@ -13,7 +15,7 @@ export function ContenedorImagenEvento({
     <div
       className={className ? `img-banner ${className}` : "img-banner"}
       style={{
-        backgroundImage: `url(${imagen})`,
+        backgroundImage: `url(${imageBaseUrl}/${imagen})`,
       }}
     />
   );

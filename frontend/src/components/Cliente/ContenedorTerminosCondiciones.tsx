@@ -1,8 +1,21 @@
 import { FluidTextArea } from "@carbon/react";
+import { obtenerFecha } from "../util/obtenerFecha";
 
-export default function ContenedorTerminosCondiciones() {
-  const terminosCondiciones = `Día del concierto: 13 de Febrero - 8:00pm
-Recinto: ARENA 1 - Costa Verde de San Miguel s/n, altura de bajada Bertolotto.
+interface ContenedorTerminosCondicionesProps {
+  local: {
+    localId: number;
+    nombre: string;
+    aforo: number;
+  };
+  fechaISO?: string;
+}
+
+export default function ContenedorTerminosCondiciones({
+  local,
+  fechaISO,
+}: ContenedorTerminosCondicionesProps) {
+  const terminosCondiciones = `Día del evento: ${obtenerFecha(fechaISO || "")}
+Recinto: ${local.nombre} - Aforo: ${local.aforo} personas
 Público recomendado: a partir de los 14 años.
 Ingresan y pagan a partir de los 4 años, acompañados de un adulto responsable de su seguridad, cada uno con su ticket en el mismo sector.
 Venta de entradas online solo por e-Bentos.
@@ -36,8 +49,7 @@ La ticketera no se hace responsable por entradas adquiridas fuera del sistema eB
           invalidText="Error message that is really long can wrap to more lines but should not be excessively long."
           labelText="Términos y condiciones"
           style={{ height: "15rem" }}
-          maxCount={500}
-          editable={false}
+          readOnly={true}
           value={terminosCondiciones}
           warnText="This is a warning message."
         />
