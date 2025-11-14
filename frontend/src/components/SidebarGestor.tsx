@@ -147,6 +147,7 @@ const SidebarGestor: React.FC<SidebarProps> = ({
         // Esperar 1 segundo antes de limpiar y redirigir
         setTimeout(() => {
           logout();
+          navigate("/home");
         }, 1000);
       }
     } catch (error: any) {
