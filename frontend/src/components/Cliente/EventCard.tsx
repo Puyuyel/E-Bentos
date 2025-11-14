@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { use } from "react";
 import "../../styles/Cliente/EventCard.css";
-import { LocationIcon } from '../icons';
-import type { Evento } from '../../types/event.types';
+import { LocationIcon } from "../icons";
+import type { Evento } from "../../types/event.types";
+import { useNavigate } from "react-router-dom";
+import VerDetalleEvento from "../../pages/Cliente/VerDetalleEvento";
 
 const imageBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL;
 
@@ -10,14 +12,22 @@ interface EventCardProps {
 }
 
 const EventCard: React.FC<EventCardProps> = ({ event }) => {
+  const navigate = useNavigate();
   // 🎯 Genera un número aleatorio entre 0 y 1, y lo compara con la popularidad
   // Ejemplo: si popularidad = 0.8 → 80% de probabilidad de ser grande
   const isLarge = Math.random() < event.popularidad;
 
   const imageSrc = isLarge ? event.posterVertical : event.posterHorizontal;
 
+  const handleClickCard = () => {
+    navigate(`/cliente/ver-detalle-evento/${event.eventoId}`);
+  };
+
   return (
-    <div className={`event-card ${isLarge ? 'md:row-span-2' : ''}`}>
+    <div
+      onClick={handleClickCard}
+      className={`event-card ${isLarge ? "md:row-span-2" : ""}`}
+    >
       <div className="event-card-image-container">
         <img
           src={`${imageBaseUrl}/${imageSrc}`}
@@ -33,10 +43,10 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
           </span>
         </div>
         <p className="event-card-date">
-          {new Date(event.fecha).toLocaleDateString('es-PE', {
-            day: '2-digit',
-            month: 'long',
-            year: 'numeric',
+          {new Date(event.fecha).toLocaleDateString("es-PE", {
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
           })}
         </p>
         <div className="event-card-location">

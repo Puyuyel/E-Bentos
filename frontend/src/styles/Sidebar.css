@@ -44,7 +44,7 @@
 .logo-text {
   font-size: 1.25rem; /* 20px */
   font-weight: 700;
-  color: hsl(228, 95%, 66%);
+  color: hsl(228, 95%, 66%) !important;
 }
 
 /* === BACK BUTTON === */

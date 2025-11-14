@@ -29,3 +29,33 @@ export interface EventoBackend {
   duracionEstimada: number;
   estado: string;
 }
+
+export interface EventoDetalle {
+  eventoId: number;
+  local: {
+    localId: number;
+    nombre: string;
+    aforo: number;
+  };
+  categoriaEvento: {
+    categoriaEventoId: number;
+    nombre: string;
+  };
+  nombre: string;
+  descripcion: string;
+  posterHorizontal: string;
+  posterVertical: string;
+  fechaHorarioInicio: string;
+  duracionEstimada: number;
+  costoTotal: number;
+  estado: string;
+  zonas: [
+    {
+      zonaId: number;
+      capacidadTotal: number;
+      tipoZona: string;
+      letraZona: string;
+      precioUnitario: number;
+    }
+  ];
+}

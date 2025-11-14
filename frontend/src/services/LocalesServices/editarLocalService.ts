@@ -15,6 +15,7 @@ export default async function editarLocal(dataUpdate: FormDataLocalUpdate) {
       },
     };
     console.log("Datos para EDITAR del local:", jsonRequired);
+    console.log("ID del local a editar:", dataUpdate.localId.toString());
     const response = await api.put(
       `/locales/${dataUpdate.localId.toString()}`,
       jsonRequired

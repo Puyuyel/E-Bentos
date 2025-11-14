@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Login from "../pages/Access/Login"; // tu componente Login
-import Register from "../pages/Access/Register"; // tu componente Login
+import { useAuthStore } from "../store/useAuthStore";
+import Login from "../pages/Access/Login";
+import Register from "../pages/Access/Register";
 import ForgetPass from "../pages/Access/ForgetPass";
 import CodigoVerificacion from "../pages/Access/CodigoVerificacion";
 import NewPassword from "../pages/Access/NewPassword";
@@ -21,12 +22,28 @@ import ReporteTaquillero from "../pages/Reportes/ReporteTaquillero";
 import GestionarEvento from "../pages/Gestion/GestionEvento/GestionarEvento";
 import EventoCRUD from "../pages/Gestion/GestionEvento/EventoCRUD";
 
-import { ProtectedRoute } from "./ProtectedRoute"; // importa tu wrapper
+import { ProtectedRoute } from "./ProtectedRoute";
 import GestionarOrganizador from "../pages/GestionProductora/GestionarOrganizadores";
 import Metas from "../pages/GestionProductora/Metas";
 import MainEbentos from "../components/Cliente/MainEbentos";
+import GestionarDuenhos from "../pages/Gestion/GestorLocal/GestionarDuenhos";
 
 const AppRouter: React.FC = () => {
+  const { isLoggedIn, user } = useAuthStore();
+
+  // Función para obtener la ruta según el rol
+  const getRouteByRole = (rol: string): string => {
+    const roleRoutes: Record<string, string> = {
+      ADMIN: "/admin/gestionar-productora",
+      CLIENTE: "/home",
+      PRODUCTORA: "/productora/gestionar-organizador",
+      GESTOR_LOCAL: "/gestor_local/gestionar-local",
+      DUENHO_LOCAL: "/duenho_local/gestionar-local",
+      TAQUILLERO: "/home",
+    };
+    return roleRoutes[rol] || "/home";
+  };
+
   return (
     <BrowserRouter>
       <Routes>
@@ -41,6 +58,19 @@ const AppRouter: React.FC = () => {
         <Route path="/codigo_verificacion" element={<CodigoVerificacion />} />
         {/* Ruta /newpass */}
         <Route path="/newpass" element={<NewPassword />} />
+
+        {/* Ruta raíz - redirige según autenticación y rol */}
+        <Route
+          path="/"
+          element={
+            isLoggedIn && user ? (
+              <Navigate to={getRouteByRole(user.rol)} replace />
+            ) : (
+              <Navigate to="/home" replace />
+            )
+          }
+        />
+
         {/* Ruta /home */}
         <Route path="/home" element={<MainEbentos />} />
         {/* RUTAS PROTEGIDAS */}
@@ -153,6 +183,15 @@ const AppRouter: React.FC = () => {
           }
         />
         {/* RUTAS para GESTOR DE LOCAL */}
+        {/* Ruta /listado duenhos*/}
+        <Route
+          path="/gestor_local/gestionar-duenhos-de-local"
+          element={
+            <ProtectedRoute requiredRole="GESTOR_LOCAL">
+              <GestionarDuenhos />
+            </ProtectedRoute>
+          }
+        />
         {/* Ruta /listado locales*/}
         <Route
           path="/gestor_local/gestionar-local"
@@ -181,6 +220,7 @@ const AppRouter: React.FC = () => {
             </ProtectedRoute>
           }
         />
+        {/* RUTAS para ORGANIZADOR DE EVENTOS */}
         {/* Ruta /gestionar eventos*/}
         <Route
           path="/organizador/eventos"
@@ -215,18 +255,53 @@ const AppRouter: React.FC = () => {
             </ProtectedRoute>
           }
         />
+        
+        <Route
+          path="/organizador/eventos/crear"
+          element={
+            <ProtectedRoute requiredRole="ORGANIZADOR_EVENTOS">
+              <EventoCRUD modo="crear" />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/organizador/eventos/editar/:eventoId"
+          element={
+            <ProtectedRoute requiredRole="ORGANIZADOR_EVENTOS">
+              <EventoCRUD modo="editar" />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/organizador/eventos/ver/:eventoId"
+          element={
+            <ProtectedRoute requiredRole="ORGANIZADOR_EVENTOS">
+              <EventoCRUD modo="visualizar" />
+            </ProtectedRoute>
+          }
+        />
         {/* RUTAS para CLIENTE */}
         {/* Ruta /ver detalle evento*/}
         <Route
-          path="/cliente/ver-detalle-evento"
+          path={`/cliente/ver-detalle-evento/:eventoId`}
           element={
             <ProtectedRoute requiredRole="CLIENTE">
               <VerDetalleEvento />
             </ProtectedRoute>
           }
         />
-        {/* Redirige cualquier ruta desconocida a /login */}
-        <Route path="*" element={<Navigate to="/home" />} />
+
+        {/* Redirige cualquier ruta desconocida según rol o a /home */}
+        <Route
+          path="*"
+          element={
+            isLoggedIn && user ? (
+              <Navigate to={getRouteByRole(user.rol)} replace />
+            ) : (
+              <Navigate to="/home" replace />
+            )
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

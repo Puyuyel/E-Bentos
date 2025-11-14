@@ -26,6 +26,7 @@ import SidebarGestor from "../../../components/SidebarGestor.tsx";
 import { BlobServiceClient } from "@azure/storage-blob";
 import agregarLocal from "../../../services/LocalesServices/agregarLocal.ts";
 import uploadImage from "../../../services/LocalesServices/uploadImageService.ts";
+import { listarDepartamentos, listarProvincias, listarDistritos } from "../../../services/ubicacionService.ts";
 
 interface Lookup {
   value: string;
@@ -116,9 +117,9 @@ function VenueForm() {
     trigger,
     setValue,
   } = useFormContext();
-  const [distritos, setDistritos] = useState<Lookup[]>([]);
-  const [provincias, setProvincias] = useState<Lookup[]>([]);
-  const [departamentos, setDepartamentos] = useState<Lookup[]>([]);
+  const [departamentos, setDepartamentos] = useState<any[]>([]);
+  const [provincias, setProvincias] = useState<any[]>([]);
+  const [distritos, setDistritos] = useState<any[]>([]);
   const tiposLocales = [
     { value: "CAMPO", label: "Campo" },
     { value: "BAR", label: "Bar" },
@@ -130,8 +131,7 @@ function VenueForm() {
   const [files, setFiles] = useState<File[]>([]);
 
   useEffect((): void => {
-    fetch("/api/distritos")
-      .then((res: Response): Promise<Lookup[]> => res.json())
+    listarDistritos()
       .then((data) => {
         const formatted: Lookup[] = data.map((item: any) => ({
           value: item.distritoId.toString(),
@@ -143,9 +143,9 @@ function VenueForm() {
         console.error("Error al cargar los distritos", err)
       );
   }, []);
+
   useEffect((): void => {
-    fetch("/api/provincias")
-      .then((res: Response): Promise<Lookup[]> => res.json())
+    listarProvincias()
       .then((data) => {
         const formatted: Lookup[] = data.map((item: any) => ({
           value: item.provinciaId.toString(),
@@ -157,9 +157,9 @@ function VenueForm() {
         console.error("Error al cargar las provincias", err)
       );
   }, []);
+
   useEffect((): void => {
-    fetch("/api/departamentos")
-      .then((res: Response): Promise<Lookup[]> => res.json())
+    listarDepartamentos()
       .then((data) => {
         const formatted: Lookup[] = data.map((item: any) => ({
           value: item.departamentoId.toString(),
@@ -287,23 +287,27 @@ function VenueForm() {
             />
             <Stack orientation="horizontal" gap={4}>
               <Select
-                id="distrito"
-                {...register("distritoId", {
+                id="departamento"
+                {...register("departamento", {
                   required: {
                     value: true,
-                    message: "Seleccione un distrito. Es obligatorio",
+                    message: "Seleccione un departamento. Es obligatorio",
                   },
                 })}
                 required
-                invalid={!!errors.distrito}
-                invalidText={errors.distrito?.message?.toString()}
-                labelText="Distrito"
+                invalid={!!errors.departamento}
+                invalidText={errors.departamento?.message?.toString()}
+                labelText="Departamento"
                 size="md"
                 style={{ width: "100%" }}
                 defaultValue=""
               >
-                <SelectItem text="Seleccione el Distrito" value="" disabled />
-                {distritos.map((tipo: Lookup) => (
+                <SelectItem
+                  text="Seleccione el Departamento"
+                  value=""
+                  disabled
+                />
+                {departamentos.map((tipo: Lookup) => (
                   <SelectItem
                     key={tipo.value}
                     text={tipo.label}
@@ -337,27 +341,23 @@ function VenueForm() {
                 ))}
               </Select>
               <Select
-                id="departamento"
-                {...register("departamento", {
+                id="distrito"
+                {...register("distritoId", {
                   required: {
                     value: true,
-                    message: "Seleccione un departamento. Es obligatorio",
+                    message: "Seleccione un distrito. Es obligatorio",
                   },
                 })}
                 required
-                invalid={!!errors.departamento}
-                invalidText={errors.departamento?.message?.toString()}
-                labelText="Departamento"
+                invalid={!!errors.distrito}
+                invalidText={errors.distrito?.message?.toString()}
+                labelText="Distrito"
                 size="md"
                 style={{ width: "100%" }}
                 defaultValue=""
               >
-                <SelectItem
-                  text="Seleccione el Departamento"
-                  value=""
-                  disabled
-                />
-                {departamentos.map((tipo: Lookup) => (
+                <SelectItem text="Seleccione el Distrito" value="" disabled />
+                {distritos.map((tipo: Lookup) => (
                   <SelectItem
                     key={tipo.value}
                     text={tipo.label}

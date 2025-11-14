@@ -51,13 +51,18 @@ public class GestorService {
         //Validar datos inicionales
         String email = registroGestorDTO.getEmail();
         String contrasenha = registroGestorDTO.getContrasenha();
-        if(!email.contains("@") || contrasenha.length() < 8){
+        if(!email.contains("@") || contrasenha.length() < 6){
             throw new IllegalArgumentException("El formato del correo electrónico o contrasenha no es valido.");
         }
 
         // Validar si el email ya existe
         if (usuarioRepository.findByEmail(registroGestorDTO.getEmail()).isPresent()) {
             throw new RuntimeException("El email ya está en uso");
+        }
+        
+        // Validar si el dni ya existe
+        if (gestorRepository.findByDniAndActivo(registroGestorDTO.getDni()).isPresent()) {
+            throw new RuntimeException("El dni ya está en uso");
         }
 
         // Buscar el rol
@@ -250,6 +255,9 @@ public class GestorService {
         }
 
         if (!Objects.equals(gestorActualizaDTO.getEmail(), gestorExistente.getEmail())) {
+            if (usuarioRepository.findByEmail(gestorActualizaDTO.getEmail()).isPresent()) {
+                throw new RuntimeException("El email ya está en uso");
+            }
             gestorExistente.setEmail(gestorActualizaDTO.getEmail());
         }
         
