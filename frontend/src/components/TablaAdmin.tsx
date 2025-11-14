@@ -4,6 +4,7 @@ import TablaCrudButtons from "./TablaCrudButtons";
 import { listarProductoras, listarProductorasPaginado } from "../services/productoraService";
 import { listarGestoresLocales, listarTaquilleros, listarOrganizadores, listarDuenhos } from "../services/gestorLocalService";
 import { listarPuntosVenta } from "../services/puntoVentaService";
+import { listarEventos } from "../services/eventoService";
 import '../styles/CargaSpinner.css'
 
 
@@ -188,6 +189,8 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
         const data = await fetcher();
         const mapped: DataRow[] = data.map(transform);
         setRows(mapped);
+        console.log("📋 Filas en rows:", rows);
+
       } catch (err: any) {
         console.error(`Error al listar ${tipoGestor}:`, err.message);
       } finally {
@@ -313,6 +316,32 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
         ],
         raw: item
       }),
+      OrganizadorEvento: (item, index) => {
+        const fecha = new Date(item.fechaHorarioInicio);
+        const fechaInicio = fecha.toLocaleDateString('es-PE', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        });
+        const horaInicio = fecha.toLocaleTimeString('es-PE', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false
+        });
+
+        return {
+          id: index,
+          data: [
+            item.nombre || '—',
+            item.descripcion || '—',
+            fechaInicio,
+            horaInicio,
+            item.duracionEstimada ? `${item.duracionEstimada} min` : '—',
+            item.estado || '—'
+          ],
+          raw: item
+        };
+      },
     };
 
     const fetcher = fetchers[tipoGestor];
@@ -323,6 +352,7 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
       const data = await fetcher();
       const mapped: DataRow[] = data.map(transform);
       setRows(mapped);
+      console.log("📋 Filas en rows:", rows);
 
       const start = (currentPage - 1) * pageSize;
       const end = start + pageSize;
