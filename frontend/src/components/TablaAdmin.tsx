@@ -2,7 +2,7 @@ import { DataTable, IconButton, Link, Table, TableBody, TableCell, TableHead, Ta
 import { useEffect, useMemo, useState } from "react";
 import TablaCrudButtons from "./TablaCrudButtons";
 import { listarProductoras, listarProductorasPaginado } from "../services/productoraService";
-import { listarGestoresLocales, listarTaquilleros } from "../services/gestorLocalService";
+import { listarGestoresLocales, listarTaquilleros, listarOrganizadores, listarDuenhos } from "../services/gestorLocalService";
 import { listarPuntosVenta } from "../services/puntoVentaService";
 import '../styles/CargaSpinner.css'
 
@@ -45,7 +45,8 @@ interface ApiResponse<T> {
 const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
   tipoGestor
 }) => {
-  listarProductorasPaginado(1,10,'');
+  //listarProductorasPaginado(1,10,'');
+  //listarOrganizadores();
   /**********************************
   Sección de paginación de la tabla
   ***********************************/
@@ -69,6 +70,10 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
         return ['Nombre', 'Dirección', 'Departamento', 'Provincia', 'Distrito', 'Estado'];
       case 'Taquillero':
         return ['Nombres', 'Apellidos', 'DNI', 'Email', 'Teléfono', 'Punto de Venta'];
+      case 'Organizador':
+        return ['Nombres', 'Apellidos', 'DNI', 'Email', 'Teléfono']; // fecha de nacimiento?
+      case 'Duenho':
+        return ['Nombres', 'Apellidos', 'DNI', 'Email', 'Teléfono']; // estado?
       default:
         return [];
     }
@@ -87,6 +92,8 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
       GestorLocal: listarGestoresLocales,
       Taquillero: listarTaquilleros,
       PuntoVenta: listarPuntosVenta,
+      Organizador: listarOrganizadores,
+      Duenho: listarDuenhos,
     };
 
     const transformadores: Record<string, (item: any, index: number) => DataRow> = {
@@ -139,6 +146,32 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
           item.email,
           item.telefono,
           item.puntoVenta.nombre  // Taquillero siempre tiene un Punto de venta
+        ],
+        raw: item
+      }),
+      Organizador: (item: GestorLocal, index) => ({
+        id: index,
+        data: [
+          String(item.usuarioId), // índice 0 (oculto)
+          item.nombres,
+          item.apellidos,
+          item.dni,
+          item.email,
+          item.telefono,
+          //item.puntoVenta?.nombre || '—'
+        ],
+        raw: item
+      }),
+      Duenho: (item: GestorLocal, index) => ({
+        id: index,
+        data: [
+          String(item.usuarioId), // índice 0 (oculto)
+          item.nombres,
+          item.apellidos,
+          item.dni,
+          item.email,
+          item.telefono,
+          //item.puntoVenta?.nombre || '—'
         ],
         raw: item
       }),
@@ -201,6 +234,8 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
       GestorLocal: listarGestoresLocales,
       PuntoVenta: listarPuntosVenta,
       Taquillero: listarTaquilleros,
+      Organizador: listarOrganizadores,
+      Duenho: listarDuenhos,
     };
     //console.log(fetchers.Productora);
     const transformadores: Record<string, (item: any, index: number) => DataRow> = {
@@ -250,6 +285,31 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
           item.telefono,
           item.puntoVenta.nombre  // Taquillero siempre tiene un Punto de venta
         ]
+      }),
+      Organizador: (item: GestorLocal, index) => ({
+        id: index,
+        data: [
+          String(item.usuarioId),
+          item.nombres,
+          item.apellidos,
+          item.dni,
+          item.email,
+          item.telefono,
+          //item.puntoVenta?.nombre || '—'  //Cambiar despues porque el gestor de locales no tiene punto de venta
+        ]
+      }),
+      Duenho: (item: GestorLocal, index) => ({
+        id: index,
+        data: [
+          String(item.usuarioId), // índice 0 (oculto)
+          item.nombres,
+          item.apellidos,
+          item.dni,
+          item.email,
+          item.telefono,
+          //item.puntoVenta?.nombre || '—'
+        ],
+        raw: item
       }),
     };
 

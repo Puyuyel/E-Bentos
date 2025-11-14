@@ -8,9 +8,11 @@ interface EventosState {
   filteredEvents: Evento[];
   category: string;
   sortBy: 'popularidad' | 'fecha';
+  searchTerm: string;
   loadEvents: () => Promise<void>;
   setCategory: (category: string) => void;
   setSortBy: (sortBy: 'popularidad' | 'fecha') => void;
+  setSearchTerm: (searchTerm: string) => void;
   clear: () => void;
 }
 
@@ -21,13 +23,15 @@ export const useEventos = create<EventosState>()(
       filteredEvents: [],
       category: 'Todos',
       sortBy: 'popularidad',
+      searchTerm: '',
 
       loadEvents: async () => {
         try {
           const data = await listarEventos();
           const category = get().category || 'Todos';
           const sortBy = get().sortBy || 'popularidad';
-          const filtered = category === 'Todos' ? data : data.filter(e => e.nombreCategoria.toUpperCase() === category.toUpperCase());
+          const searchTerm = get().searchTerm || '';
+          const filtered = applyFilters(data, category, searchTerm);
           const sorted = sortByType(filtered, sortBy);
           set({ events: data, filteredEvents: sorted });
         } catch (error) {
@@ -38,13 +42,9 @@ export const useEventos = create<EventosState>()(
       setCategory: (category: string) => {
         const events = get().events || [];
         const sortBy = get().sortBy || 'popularidad';
-        const filtered = category === 'Todos' ? events : events.filter(e => {
-          const match = e.nombreCategoria.toUpperCase() === category.toUpperCase();
-          console.log(`Comparando: "${e.nombreCategoria}" (${e.nombreCategoria.toUpperCase()}) === "${category}" (${category.toUpperCase()}) = ${match}`);
-          return match;
-        });
+        const searchTerm = get().searchTerm || '';
+        const filtered = applyFilters(events, category, searchTerm);
         const sorted = sortByType(filtered, sortBy);
-        console.log(`Categoría seleccionada: ${category}, eventos encontrados: ${filtered.length}`);
         set({ category, filteredEvents: sorted });
       },
 
@@ -54,11 +54,47 @@ export const useEventos = create<EventosState>()(
         set({ sortBy, filteredEvents: sorted });
       },
 
-      clear: () => set({ events: [], filteredEvents: [], category: 'Todos', sortBy: 'popularidad' }),
+      setSearchTerm: (searchTerm: string) => {
+        const events = get().events || [];
+        const category = get().category || 'Todos';
+        const sortBy = get().sortBy || 'popularidad';
+        const filtered = applyFilters(events, category, searchTerm);
+        const sorted = sortByType(filtered, sortBy);
+        set({ searchTerm, filteredEvents: sorted });
+      },
+
+      clear: () => set({ events: [], filteredEvents: [], category: 'Todos', sortBy: 'popularidad', searchTerm: '' }),
     }),
-    { name: 'eventos-storage' }
+    { 
+      name: 'eventos-storage',
+      partialize: (state) => ({
+        category: state.category,
+        sortBy: state.sortBy,
+        searchTerm: state.searchTerm,
+      })
+    }
   )
 );
+
+const applyFilters = (events: Evento[], category: string, searchTerm: string): Evento[] => {
+  let filtered = [...events];
+
+  // Filtrar por categoría
+  if (category !== 'Todos') {
+    filtered = filtered.filter(e => e.nombreCategoria.toUpperCase() === category.toUpperCase());
+  }
+
+  // Filtrar por término de búsqueda
+  if (searchTerm.trim()) {
+    const searchLower = searchTerm.toLowerCase();
+    filtered = filtered.filter(e =>
+      e.nombreEvento.toLowerCase().includes(searchLower) ||
+      e.nombreLocal.toLowerCase().includes(searchLower)
+    );
+  }
+
+  return filtered;
+};
 
 const sortByType = (events: Evento[], sortBy: 'popularidad' | 'fecha'): Evento[] => {
   const sorted = [...events];

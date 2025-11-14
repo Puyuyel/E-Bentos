@@ -6,11 +6,13 @@ import { useNavigate } from "react-router-dom";
 import { UserCircleIcon } from "../icons";
 // Ajusta la importación según donde tengas el store
 import { useAuthStore } from "../../store/useAuthStore";
+import { useEventos } from "../../store/useEventos";
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
   // Ajusta según la API de tu useAuthStore (puede ser { user, logout } o hooks independientes)
   const { user, logout } = useAuthStore();
+  const setSearchTerm = useEventos((s) => s.setSearchTerm);
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const esRutaHome = window.location.pathname === "/home";
@@ -42,6 +44,11 @@ const Header: React.FC = () => {
     }
   };
 
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  };
+
+
   return (
     <header className="header">
       <div className="header-container">
@@ -51,15 +58,14 @@ const Header: React.FC = () => {
         </div>
 
         {/* --- SECCIÓN CENTRAL (BUSCADOR) --- */}
-        {esRutaHome && (
-          <div className="header-search">
-            <Search
-              labelText="Buscar"
-              placeholder="Buscar eventos, artistas o lugares..."
-              size="lg"
-            />
-          </div>
-        )}
+        <div className="header-search">
+          <Search
+            labelText="Buscar"
+            placeholder="Buscar eventos, artistas o lugares..."
+            size="lg"
+            onChange={handleSearchChange}
+          />
+        </div>
 
         <nav className="nav">
           {!user ? (

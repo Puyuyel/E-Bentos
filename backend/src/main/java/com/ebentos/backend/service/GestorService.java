@@ -51,13 +51,18 @@ public class GestorService {
         //Validar datos inicionales
         String email = registroGestorDTO.getEmail();
         String contrasenha = registroGestorDTO.getContrasenha();
-        if(!email.contains("@") || contrasenha.length() < 8){
+        if(!email.contains("@") || contrasenha.length() < 6){
             throw new IllegalArgumentException("El formato del correo electrónico o contrasenha no es valido.");
         }
 
         // Validar si el email ya existe
         if (usuarioRepository.findByEmail(registroGestorDTO.getEmail()).isPresent()) {
             throw new RuntimeException("El email ya está en uso");
+        }
+        
+        // Validar si el dni ya existe
+        if (gestorRepository.findByDniAndActivo(registroGestorDTO.getDni()).isPresent()) {
+            throw new RuntimeException("El dni ya está en uso");
         }
 
         // Buscar el rol
@@ -156,6 +161,36 @@ public class GestorService {
         return response;
     }
     
+    public Map<String, Object> listarPaginadoPorBuscadorYProductora(int page, int size, 
+            Integer productoraId, String buscador) {
+        Pageable pageable = PageRequest.of(page, size);
+        buscador = "%" + buscador.toLowerCase() + "%";
+        Page<Gestor> gestoresPage = gestorRepository.buscarPorBuscadorYProductora(productoraId, buscador, pageable);
+
+        // Convertimos la lista de entidades a DTOs
+        List<GestorDTO> gestoresDTO = gestoresPage.getContent().stream()
+                .map(this::llenarDTO)
+                .collect(Collectors.toList());
+
+        // Construimos la respuesta con la estructura pedida
+        Map<String, Object> response = new HashMap<>();
+        response.put("data", gestoresDTO);
+
+        Map<String, Object> pagination = new HashMap<>();
+        pagination.put("totalItems", gestoresPage.getTotalElements());
+        pagination.put("totalPages", gestoresPage.getTotalPages());
+        pagination.put("currentPage", gestoresPage.getNumber());
+        pagination.put("pageSize", gestoresPage.getSize());
+        pagination.put("hasNextPage", gestoresPage.hasNext());
+        pagination.put("hasPreviousPage", gestoresPage.hasPrevious());
+        pagination.put("nextPage", gestoresPage.hasNext() ? "/api/gestores?page=" + (page + 1) + "&limit=" + size : null);
+        pagination.put("prevPage", gestoresPage.hasPrevious() ? "/api/gestores?page=" + (page - 1) + "&limit=" + size : null);
+
+        response.put("pagination", pagination);
+
+        return response;
+    }
+    
     public List<GestorDTO> listarTodas() {
         // Obtener todas las entidades
         List<Gestor> gestores = gestorRepository.findAll();
@@ -220,6 +255,9 @@ public class GestorService {
         }
 
         if (!Objects.equals(gestorActualizaDTO.getEmail(), gestorExistente.getEmail())) {
+            if (usuarioRepository.findByEmail(gestorActualizaDTO.getEmail()).isPresent()) {
+                throw new RuntimeException("El email ya está en uso");
+            }
             gestorExistente.setEmail(gestorActualizaDTO.getEmail());
         }
         
