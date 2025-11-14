@@ -3,6 +3,7 @@ package com.ebentos.backend.repository;
 import java.util.List;
  
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -71,4 +72,15 @@ public interface EventoClienteRepository extends JpaRepository<Evento, Integer>{
                        "AND z.ACTIVO = 1",
            nativeQuery = true)
         List<Object[]> findZonasByEventoId(@Param("eventoId") Integer eventoId);
+
+        /**
+         * Incrementa el contador de visitas de un evento.
+         * La operación es atómica y segura para concurrencia gracias a:
+         * - Row-level locking de MySQL (InnoDB)
+         * - La operación VISITAS = VISITAS + 1 se ejecuta en una sola instrucción SQL
+         * - @Transactional en el servicio garantiza consistencia
+         */
+        @Modifying
+        @Query(value = "UPDATE EVENTO SET VISITAS = VISITAS + 1 WHERE EVENTO_ID = :eventoId", nativeQuery = true)
+        void incrementarVisitas(@Param("eventoId") Integer eventoId);
 }
