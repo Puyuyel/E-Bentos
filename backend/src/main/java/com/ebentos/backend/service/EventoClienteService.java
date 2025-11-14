@@ -74,14 +74,14 @@ public class EventoClienteService {
         }
 
         Object[] row = results.get(0);
-        if (row.length < 7) {
+        if (row.length < 8) {
             // datos incompletos
             return null;
         }
 
         EventoClienteDetalleDTO detalle = new EventoClienteDetalleDTO();
 
-        // Mapeo de columnas según la consulta: poster_horizontal, poster_vertical, tipo_local, nombre_local, direccion, departamento, fecha
+        // Mapeo de columnas según la consulta: poster_horizontal, poster_vertical, tipo_local, nombre_local, direccion, departamento, fecha, descripcion
         detalle.setPosterHorizontal(row[0] != null ? row[0].toString() : null);
         detalle.setPosterVertical(row[1] != null ? row[1].toString() : null);
         detalle.setTipoLocal(row[2] != null ? row[2].toString() : null);
@@ -103,6 +103,8 @@ public class EventoClienteService {
                 }
             }
         }
+
+        detalle.setDescripcion(row[7] != null ? row[7].toString() : null);
 
         // Traer zonas
         List<Object[]> zonasRows = eventoClienteRepository.findZonasByEventoId(eventoId);

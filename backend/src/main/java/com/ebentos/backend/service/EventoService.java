@@ -34,9 +34,9 @@ public class EventoService {
         return eventoDTO;
     }
     
-    public Map<String, Object> listarPaginado(int page, int size) {
+    public Map<String, Object> listarPaginadoPorOrganizador(int page, int size, Integer usuarioId) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Evento> eventoPage = eventoRepository.findAll(pageable);
+        Page<Evento> eventoPage = eventoRepository.findByGestor_UsuarioId(usuarioId, pageable);
 
         List<EventoListadoDTO> eventosDTO = eventoPage.getContent()
                 .stream()
@@ -62,6 +62,13 @@ public class EventoService {
     
     public List<EventoListadoDTO> listarTodas() {
         return eventoRepository.findAll()
+                .stream()
+                .map(this::mapToEventoListadoDTO)
+                .collect(Collectors.toList());
+    }
+    
+    public List<EventoListadoDTO> listarPorOrganizador(Integer usuarioId) {
+        return eventoRepository.findByGestor_UsuarioId(usuarioId)
                 .stream()
                 .map(this::mapToEventoListadoDTO)
                 .collect(Collectors.toList());
