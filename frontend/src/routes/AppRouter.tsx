@@ -221,7 +221,7 @@ const AppRouter: React.FC = () => {
           }
         />
 
-        {/* Redirige cualquier ruta desconocida a /login */}
+        {/* Redirige cualquier ruta desconocida a /home */}
         <Route path="*" element={<Navigate to="/home" />} />
       </Routes>
     </BrowserRouter>
