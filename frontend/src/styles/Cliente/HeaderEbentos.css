@@ -31,7 +31,7 @@
 
 .search-hidden {
   max-width: 1200px;
-  display: flex;
+  display: none;
   align-content: center;
   align-items: left;
   /* Evita que esta sección se encoja */

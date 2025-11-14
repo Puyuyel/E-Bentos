@@ -48,17 +48,16 @@ const Header: React.FC = () => {
     setSearchTerm(e.target.value);
   };
 
-
   return (
     <header className="header">
       <div className="header-container">
-        <div className={`${esRutaHome ? "header-content" : "search-hidden"}`}>
+        <div className="header-content">
           <img src={logo} alt="e-Bentos logo" className="header-logo" />
           <div className="logo-text">e-Bentos</div>
         </div>
 
         {/* --- SECCIÓN CENTRAL (BUSCADOR) --- */}
-        <div className="header-search">
+        <div className={`${esRutaHome ? "header-search" : "search-hidden"}`}>
           <Search
             labelText="Buscar"
             placeholder="Buscar eventos, artistas o lugares..."
