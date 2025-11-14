@@ -29,6 +29,7 @@ const TablaCrudButtonDialog: React.FC<TablaCrudButtonDialogProps> = ({
   
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState<Record<string, any>>({});
+  const [mensajeError, setMensajeError] = useState<string | null>(null);
   //const [errors, setErrors] = useState<any>({});
 
   const Formulario = formulariosCrud[entidad];
@@ -211,7 +212,6 @@ const TablaCrudButtonDialog: React.FC<TablaCrudButtonDialogProps> = ({
             <DialogCloseButton onClick={() => setIsOpen(false)} />
           </DialogControls>
         </DialogHeader>
-
         <DialogBody>
           <VStack gap={4}>
             <Formulario
@@ -340,7 +340,13 @@ const TablaCrudButtonDialog: React.FC<TablaCrudButtonDialogProps> = ({
                       if (accion == 'Editar'){
                         await actualizarGestorLocal(parseInt(formData.usuarioId), payload).then( () => {onActualizar(); setIsOpen(false); } )
                       } else {
-                        await registrarGestorLocal(payloadAlt).then( () => {onActualizar(); setIsOpen(false); } );
+                        try {
+                          await registrarGestorLocal(payloadAlt).then( () => {onActualizar(); setIsOpen(false); } );
+                          setMensajeError(null); // Limpia errores anteriores si todo va bien
+                        } catch (error: any) {
+                          setMensajeError(error.message); // Muestra el mensaje del backend
+                        }
+                        //await registrarGestorLocal(payloadAlt).then( () => {onActualizar(); setIsOpen(false); } );
                       }
                       //await actualizarGestorLocal(raw.usuarioId, payload);
                       break;
@@ -401,7 +407,13 @@ const TablaCrudButtonDialog: React.FC<TablaCrudButtonDialogProps> = ({
                       if (accion == 'Editar'){
                         await actualizarTaquillero(parseInt(formData.usuarioId), payload).then( () => {onActualizar(); setIsOpen(false); } )
                       } else {
-                        await registrarTaquillero(payloadAlt).then( () => {onActualizar(); setIsOpen(false); } );
+                        try {
+                          await registrarTaquillero(payloadAlt).then( () => {onActualizar(); setIsOpen(false); } );
+                          setMensajeError(null); // Limpia errores anteriores si todo va bien
+                        } catch (error: any) {
+                          setMensajeError(error.message); // Muestra el mensaje del backend
+                        }
+                        //await registrarTaquillero(payloadAlt).then( () => {onActualizar(); setIsOpen(false); } );
                       }
                       //await actualizarTaquillero(raw.usuarioId, payload);
                       break;
@@ -435,10 +447,15 @@ const TablaCrudButtonDialog: React.FC<TablaCrudButtonDialogProps> = ({
                       console.log("payload: ");
                       console.log(payload);
                       if (accion == 'Editar'){
-                        console.log("Hola ");
                         await actualizarOrganizador(parseInt(formData.usuarioId), payload).then( () => {onActualizar(); setIsOpen(false); } )
                       } else {
-                        await registrarOrganizador(payloadAlt).then( () => {onActualizar(); setIsOpen(false); } );
+                        try {
+                          await registrarOrganizador(payloadAlt).then( () => {onActualizar(); setIsOpen(false); } );
+                          setMensajeError(null); // Limpia errores anteriores si todo va bien
+                        } catch (error: any) {
+                          setMensajeError(error.message); // Muestra el mensaje del backend
+                        }
+                        //await registrarOrganizador(payloadAlt).then( () => {onActualizar(); setIsOpen(false); } );
                       }
                       //await actualizarGestorLocal(raw.usuarioId, payload);
                       break;
@@ -472,10 +489,14 @@ const TablaCrudButtonDialog: React.FC<TablaCrudButtonDialogProps> = ({
                       console.log("payload: ");
                       console.log(payload);
                       if (accion == 'Editar'){
-                        console.log("Hola ");
                         await actualizarDuenho(parseInt(formData.usuarioId), payload).then( () => {onActualizar(); setIsOpen(false); } )
                       } else {
-                        await registrarDuenho(payloadAlt).then( () => {onActualizar(); setIsOpen(false); } );
+                        try {
+                          await registrarDuenho(payloadAlt).then( () => {onActualizar(); setIsOpen(false); } );
+                          setMensajeError(null); // Limpia errores anteriores si todo va bien
+                        } catch (error: any) {
+                          setMensajeError(error.message); // Muestra el mensaje del backend
+                        }
                       }
                       //await actualizarGestorLocal(raw.usuarioId, payload);
                       break;
