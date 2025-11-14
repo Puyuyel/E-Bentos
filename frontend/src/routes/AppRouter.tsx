@@ -35,6 +35,7 @@ const AppRouter: React.FC = () => {
       ADMIN: "/admin/gestionar-productora",
       CLIENTE: "/home",
       PRODUCTORA: "/productora/gestionar-organizador",
+      ORGANIZADOR_EVENTOS: "/organizador_eventos/gestionar-evento",
       GESTOR_LOCAL: "/gestor_local/gestionar-local",
       DUENHO_LOCAL: "/duenho_local/gestionar-local",
       TAQUILLERO: "/home",
