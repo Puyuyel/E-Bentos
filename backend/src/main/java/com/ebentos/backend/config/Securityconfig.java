@@ -30,157 +30,185 @@ import jakarta.servlet.http.HttpServletResponse;
 @EnableWebSecurity
 public class Securityconfig {
 
-    // Inyecta el valor CSV desde application.properties
-    @Value("${app.cors.allowed-origins}")
-    private String allowedOriginsCsv;
+        // Inyecta el valor CSV desde application.properties
+        @Value("${app.cors.allowed-origins}")
+        private String allowedOriginsCsv;
 
-    // BEAN: Codificador de Contraseñas
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+        // BEAN: Codificador de Contraseñas
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+                return new BCryptPasswordEncoder();
+        }
 
-    // BEAN: Servicio de Detalles de Usuario
-    @Bean
-    public UserDetailsService userDetailsService(UsuarioRepository usuarioRepository) {
-        return email -> usuarioRepository.findByEmail(email)
-                .map(usuario -> {
-                    // Obtiene el objeto Rol del usuario
-                    Rol rol = usuario.getRol();
-                    String nombreRol = rol.getNombre();
+        // BEAN: Servicio de Detalles de Usuario
+        @Bean
+        public UserDetailsService userDetailsService(UsuarioRepository usuarioRepository) {
+                return email -> usuarioRepository.findByEmail(email)
+                                .map(usuario -> {
+                                        // Obtiene el objeto Rol del usuario
+                                        Rol rol = usuario.getRol();
+                                        String nombreRol = rol.getNombre();
 
-                    // Spring Security necesita que los roles empiecen con "ROLE_"
-                    SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + nombreRol);
+                                        // Spring Security necesita que los roles empiecen con "ROLE_"
+                                        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(
+                                                        "ROLE_" + nombreRol);
 
-                    // Crea el usuario de Spring con su rol
-                    return new UsuarioDetails(
-                            usuario.getUsuarioId(),
-                            usuario.getEmail(),
-                            usuario.getContrasenha(),
-                            // 5. Le pasa la lista con la autoridad
-                            Collections.singletonList(authority));
-                })
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + email));
-    }
+                                        // Crea el usuario de Spring con su rol
+                                        return new UsuarioDetails(
+                                                        usuario.getUsuarioId(),
+                                                        usuario.getEmail(),
+                                                        usuario.getContrasenha(),
+                                                        // 5. Le pasa la lista con la autoridad
+                                                        Collections.singletonList(authority));
+                                })
+                                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + email));
+        }
 
-    // BEAN: Cadena de Filtros de Seguridad
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                // Configuración de CORS (para que React se conecte)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+        // BEAN: Cadena de Filtros de Seguridad
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+                http
+                                // Configuración de CORS (para que React se conecte)
+                                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-                // Desactivar CSRF (común para APIs REST stateless)
-                .csrf(csrf -> csrf.disable())
+                                // Desactivar CSRF (común para APIs REST stateless)
+                                .csrf(csrf -> csrf.disable())
 
-                // Autorización de Rutas
-                .authorizeHttpRequests(authz -> authz
-                        // Permite el registro y el login públicamente
-                        .requestMatchers(HttpMethod.POST, "/api/clientes").permitAll()
-                        .requestMatchers(
-                                "/api/auth/**",
-                                "/v3/api-docs/**",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html"
-                        ).permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/eventosCliente", "/api/eventosCliente/**").permitAll()
-                        .requestMatchers(HttpMethod.GET,
-                                "/api/productoras/*"
-                        ).hasAnyRole("ADMIN","PRODUCTORA")
-                        .requestMatchers("/api/metas/**").hasRole("PRODUCTORA")
-                        .requestMatchers(HttpMethod.GET,
-                                "/api/gestores/*"
-                        ).hasAnyRole("ADMIN","PRODUCTORA","GESTOR_LOCAL",
-                                "DUENHO_LOCAL","TAQUILLERO","ORGANIZADOR_EVENTOS")
-                        .requestMatchers(HttpMethod.GET,
-                                "/api/clientes/*"
-                        ).hasAnyRole("CLIENTE","TAQUILLERO")
-                        .requestMatchers("/api/productoras/**", "/api/puntoventas/**").hasRole("ADMIN")
-                        .requestMatchers("/api/gestores/**").hasAnyRole("ADMIN","GESTOR_LOCAL","PRODUCTORA")
-                        .requestMatchers(HttpMethod.POST, 
-                                "/api/locales/**").hasRole("GESTOR_LOCAL")
-                        .requestMatchers(HttpMethod.PUT, 
-                                "/api/locales/**").hasAnyRole("GESTOR_LOCAL","DUENHO_LOCAL")
-                        .requestMatchers(HttpMethod.DELETE, 
-                                "/api/locales/**").hasAnyRole("GESTOR_LOCAL", "DUENHO_LOCAL")
-                        .requestMatchers(HttpMethod.POST, 
-                                "/api/eventos/**").hasRole("ORGANIZADOR_EVENTOS")
-                        .requestMatchers(HttpMethod.PUT, 
-                                "/api/eventos/**").hasRole("ORGANIZADOR_EVENTOS")
-                        .requestMatchers(HttpMethod.DELETE, 
-                                "/api/eventos/**").hasRole("ORGANIZADOR_EVENTOS")
-                        .requestMatchers(HttpMethod.PUT, 
-                                "/api/solicitudes/**").hasRole("DUENHO_LOCAL")
-                        .requestMatchers(HttpMethod.GET, 
-                                "/api/solicitudes/**").hasAnyRole("DUENHO_LOCAL","ORGANIZADOR_EVENTOS")
-                        // Protege todas las demás rutas
-                        .anyRequest().authenticated())
+                                // Autorización de Rutas
+                                .authorizeHttpRequests(authz -> authz
+                                                // Rutas públicas (no requieren autenticación)
+                                                .requestMatchers(HttpMethod.POST, "/api/clientes").permitAll()
+                                                .requestMatchers(
+                                                                "/api/auth/**",
+                                                                "/v3/api-docs/**",
+                                                                "/swagger-ui/**",
+                                                                "/swagger-ui.html")
+                                                .permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/eventosCliente",
+                                                                "/api/eventosCliente/**")
+                                                .permitAll()
 
-                .exceptionHandling(ex -> ex
-                        // Esto se dispara cuando un usuario no autenticado
-                        // intenta acceder a una ruta protegida.
-                        .authenticationEntryPoint((request, response, authException) -> {
-                            // En lugar de redirigir a HTML, devolvemos 401.
-                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No autorizado");
-                        }))
+                                                // Permitir acceso público a rutas de ubicación
+                                                .requestMatchers(
+                                                                "/api/departamentos/**",
+                                                                "/api/provincias/**",
+                                                                "/api/distritos/**")
+                                                .permitAll()
 
-                // Configuración de FORM LOGIN (para que funcione como API REST)
-                .formLogin(form -> form
-                        // La URL que Spring Security vigilará para el POST de login
-                        .loginProcessingUrl("/api/auth/login")
+                                                // Rutas protegidas por rol
+                                                .requestMatchers(HttpMethod.GET,
+                                                                "/api/productoras/*")
+                                                .hasAnyRole("ADMIN", "PRODUCTORA")
+                                                .requestMatchers("/api/metas/**").hasRole("PRODUCTORA")
+                                                .requestMatchers(HttpMethod.GET,
+                                                                "/api/gestores/*")
+                                                .hasAnyRole("ADMIN", "PRODUCTORA", "GESTOR_LOCAL",
+                                                                "DUENHO_LOCAL", "TAQUILLERO", "ORGANIZADOR_EVENTOS")
+                                                .requestMatchers(HttpMethod.GET,
+                                                                "/api/clientes/*")
+                                                .hasAnyRole("CLIENTE", "TAQUILLERO")
+                                                .requestMatchers("/api/productoras/**", "/api/puntoventas/**")
+                                                .hasRole("ADMIN")
+                                                .requestMatchers("/api/gestores/**")
+                                                .hasAnyRole("ADMIN", "GESTOR_LOCAL", "PRODUCTORA")
+                                                .requestMatchers(HttpMethod.POST,
+                                                                "/api/locales/**")
+                                                .hasRole("GESTOR_LOCAL")
+                                                .requestMatchers(HttpMethod.PUT,
+                                                                "/api/locales/**")
+                                                .hasAnyRole("GESTOR_LOCAL", "DUENHO_LOCAL")
+                                                .requestMatchers(HttpMethod.DELETE,
+                                                                "/api/locales/**")
+                                                .hasAnyRole("GESTOR_LOCAL", "DUENHO_LOCAL")
+                                                .requestMatchers(HttpMethod.POST,
+                                                                "/api/eventos/**")
+                                                .hasRole("ORGANIZADOR_EVENTOS")
+                                                .requestMatchers(HttpMethod.PUT,
+                                                                "/api/eventos/**")
+                                                .hasRole("ORGANIZADOR_EVENTOS")
+                                                .requestMatchers(HttpMethod.DELETE,
+                                                                "/api/eventos/**")
+                                                .hasRole("ORGANIZADOR_EVENTOS")
+                                                .requestMatchers(HttpMethod.PUT,
+                                                                "/api/solicitudes/**")
+                                                .hasRole("DUENHO_LOCAL")
+                                                .requestMatchers(HttpMethod.GET,
+                                                                "/api/solicitudes/**")
+                                                .hasAnyRole("DUENHO_LOCAL", "ORGANIZADOR_EVENTOS")
+                                                // Protege todas las demás rutas
+                                                .anyRequest().authenticated())
 
-                        // Nombres de los parámetros que React enviará en el JSON/form
-                        .usernameParameter("email")
-                        .passwordParameter("contrasenha") // Coincide con tu entidad
+                                .exceptionHandling(ex -> ex
+                                                // Esto se dispara cuando un usuario no autenticado
+                                                // intenta acceder a una ruta protegida.
+                                                .authenticationEntryPoint((request, response, authException) -> {
+                                                        // En lugar de redirigir a HTML, devolvemos 401.
+                                                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+                                                                        "No autorizado");
+                                                }))
 
-                        // Handler para ÉXITO de login (devuelve 200 OK)
-                        .successHandler((request, response, authentication) -> {
-                            response.setStatus(HttpServletResponse.SC_OK);
-                            String sessionId = request.getSession().getId();
-                            response.setHeader(
-                                "Set-Cookie",
-                                "JSESSIONID=" + sessionId + "; Path=/; Secure; HttpOnly; SameSite=None"
-                            );
-                        })
-                        .failureHandler((request, response, exception) -> {
-                            // ¡Añade esta línea para imprimir el error en tu consola de Spring!
-                            System.out.println("Error de autenticación: " + exception.getMessage());
+                                // Configuración de FORM LOGIN (para que funcione como API REST)
+                                .formLogin(form -> form
+                                                // La URL que Spring Security vigilará para el POST de login
+                                                .loginProcessingUrl("/api/auth/login")
 
-                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Credenciales inválidas");
-                        }))
+                                                // Nombres de los parámetros que React enviará en el JSON/form
+                                                .usernameParameter("email")
+                                                .passwordParameter("contrasenha") // Coincide con tu entidad
 
-                // Configuración de LOGOUT (opcional)
-                .logout(logout -> logout
-                        .logoutUrl("/api/auth/logout")
-                        .logoutSuccessHandler((request, response, authentication) -> {
-                            response.setStatus(HttpServletResponse.SC_OK);
-                        }));
+                                                // Handler para ÉXITO de login (devuelve 200 OK)
+                                                .successHandler((request, response, authentication) -> {
+                                                        response.setStatus(HttpServletResponse.SC_OK);
+                                                        String sessionId = request.getSession().getId();
+                                                        response.setHeader(
+                                                                        "Set-Cookie",
+                                                                        "JSESSIONID=" + sessionId
+                                                                                        + "; Path=/; Secure; HttpOnly; SameSite=None");
+                                                })
+                                                .failureHandler((request, response, exception) -> {
+                                                        // ¡Añade esta línea para imprimir el error en tu consola de
+                                                        // Spring!
+                                                        System.out.println("Error de autenticación: "
+                                                                        + exception.getMessage());
 
-        return http.build();
-    }
+                                                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+                                                                        "Credenciales inválidas");
+                                                }))
 
-    // BEAN: Configuración de CORS
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
+                                // Configuración de LOGOUT (opcional)
+                                .logout(logout -> logout
+                                                .logoutUrl("/api/auth/logout")
+                                                .logoutSuccessHandler((request, response, authentication) -> {
+                                                        response.setStatus(HttpServletResponse.SC_OK);
+                                                }));
 
-        // Parsea CSV y trim
-        List<String> origins = Arrays.stream(allowedOriginsCsv.split(","))
-                .map(String::trim)
-                .filter(s -> !s.isEmpty())
-                .collect(Collectors.toList());
+                return http.build();
+        }
 
-        // Usa allowedOriginPatterns para más flexibilidad con puertos/hosts
-        configuration.setAllowedOriginPatterns(origins);
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "accept", "Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers"));
-        configuration.setExposedHeaders(Arrays.asList("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials", "Set-Cookie"));
-        configuration.setAllowCredentials(true);
-        configuration.setMaxAge(3600L); // 1 hora en segundos
+        // BEAN: Configuración de CORS
+        @Bean
+        public CorsConfigurationSource corsConfigurationSource() {
+                CorsConfiguration configuration = new CorsConfiguration();
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/api/**", configuration); // Aplica a toda tu API
-        return source;
-    }
+                // Parsea CSV y trim
+                List<String> origins = Arrays.stream(allowedOriginsCsv.split(","))
+                                .map(String::trim)
+                                .filter(s -> !s.isEmpty())
+                                .collect(Collectors.toList());
+
+                // Usa allowedOriginPatterns para más flexibilidad con puertos/hosts
+                configuration.setAllowedOriginPatterns(origins);
+                configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+                configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With",
+                                "accept", "Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers"));
+                configuration.setExposedHeaders(Arrays.asList("Access-Control-Allow-Origin",
+                                "Access-Control-Allow-Credentials", "Set-Cookie"));
+                configuration.setAllowCredentials(true);
+                configuration.setMaxAge(3600L); // 1 hora en segundos
+
+                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+                source.registerCorsConfiguration("/api/**", configuration); // Aplica a toda tu API
+                return source;
+        }
 
 }
