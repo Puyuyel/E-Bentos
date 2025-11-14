@@ -15,24 +15,19 @@ import type { EventoDetalle } from "../../types/event.types";
 import { obtenerFecha } from "../../components/util/obtenerFecha";
 import { getLocalPorIdService } from "../../services/LocalesServices/getLocalPorId";
 import type { Local } from "../../types/locales.types";
+import { ConvertToCloud } from "@carbon/icons-react";
 
 export default function VerDetalleEvento() {
   const [datosEvento, setDatosEvento] = useState<EventoDetalle>();
-  const [datosLocal, setDatosLocal] = useState<Local>();
   const { eventoId } = useParams();
   useEffect(() => {
     const llamarAPIConIdEvento = async () => {
       try {
         console.log("Llamando API para eventoId:", eventoId);
-        const response = await obtenerDetalleEvento(Number(eventoId));
-        console.log("Detalle del evento recibido:", response);
-        const responseLocal = await getLocalPorIdService(
-          response.local.localId
-        );
-        console.log("Detalle del local recibido:", responseLocal);
+        const response = await obtenerDetalleEvento(Number(eventoId)); // ya me da el .data
+        console.log("Respuesta de detalleEventoService:", response);
         setDatosEvento(response);
-        setDatosLocal(responseLocal);
-        if (response && responseLocal) {
+        if (response) {
           setLoading(false);
         }
       } catch (error: any) {
@@ -76,7 +71,10 @@ export default function VerDetalleEvento() {
         className={styles.hero}
       />
       <main className={styles.container}>
-        <ContenedorZonasPrecios zonas={datosEvento.zonas} local={datosLocal} />
+        <ContenedorZonasPrecios
+          zonas={datosEvento.zonas}
+          localTipo={datosEvento.tipoLocal}
+        />
         <div
           style={{
             backgroundColor: "rgba(130, 150, 252, 0.25)",
@@ -86,14 +84,14 @@ export default function VerDetalleEvento() {
           <Button>Comprar Entradas</Button>
         </div>
         <ContenedorInformacionEvento
-          ubicacion={datosLocal?.direccion || "No se obtuvo la ubicación"}
+          ubicacion={datosEvento.direccionLocal}
           imgArtista={datosEvento.posterVertical}
-          fechaHora={obtenerFecha(datosEvento.fechaHorarioInicio)}
-          descripcion={datosEvento.descripcion}
+          fechaHora={obtenerFecha(datosEvento.fecha)}
+          descripcion={"datosEvento.descripcion"}
         />
         <ContenedorTerminosCondiciones
-          local={datosEvento.local}
-          fechaISO={datosEvento.fechaHorarioInicio}
+          nombreLocal={datosEvento.nombreLocal}
+          fechaISO={datosEvento.fecha}
         />
         <Footer />
       </main>

@@ -2,20 +2,16 @@ import { FluidTextArea } from "@carbon/react";
 import { obtenerFecha } from "../util/obtenerFecha";
 
 interface ContenedorTerminosCondicionesProps {
-  local: {
-    localId: number;
-    nombre: string;
-    aforo: number;
-  };
+  nombreLocal: string;
   fechaISO?: string;
 }
 
 export default function ContenedorTerminosCondiciones({
-  local,
+  nombreLocal,
   fechaISO,
 }: ContenedorTerminosCondicionesProps) {
   const terminosCondiciones = `Día del evento: ${obtenerFecha(fechaISO || "")}
-Recinto: ${local.nombre} - Aforo: ${local.aforo} personas
+Recinto: ${nombreLocal}
 Público recomendado: a partir de los 14 años.
 Ingresan y pagan a partir de los 4 años, acompañados de un adulto responsable de su seguridad, cada uno con su ticket en el mismo sector.
 Venta de entradas online solo por e-Bentos.

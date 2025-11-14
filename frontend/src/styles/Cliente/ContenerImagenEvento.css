@@ -1,6 +1,6 @@
 .img-banner {
   /* Use width:100% to avoid 100vw issues with scrollbars and clipping */
-  width: 100%;
+  width: 50rem;
   height: 30rem;
   background-size: cover; /* ocupa todo el ancho manteniendo proporción */
   background-position: center; /* centra la imagen */

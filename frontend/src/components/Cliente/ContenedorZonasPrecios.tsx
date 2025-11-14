@@ -15,36 +15,20 @@ import {
 interface ContenedorZonasPreciosProps {
   zonas: [
     {
-      zonaId: number;
-      capacidadTotal: number;
+      cantidadEntradasDisponible: number;
+      precioUnitario: number;
       tipoZona: string;
       letraZona: string;
-      precioUnitario: number;
     }
   ];
-  local: {
-    localId: number;
-    nombre: string;
-    direccion: string;
-    foto: string;
-    aforo: number;
-    tipoLocal: string; // 'BAR'
-    activo: number;
-    gestor: {
-      usuarioId: number;
-    };
-    distrito: {
-      distritoId: number;
-      nombre: string;
-    };
-  };
+  localTipo: string;
 }
 
 export default function ContenedorZonasPrecios({
   zonas,
-  local,
+  localTipo,
 }: ContenedorZonasPreciosProps) {
-  const imagenZona = `${imageBaseUrl}/${local.tipoLocal}`;
+  // const imagenZona = `${imageBaseUrl}/${localTipo}`;
   return (
     <div
       style={{
@@ -81,8 +65,8 @@ export default function ContenedorZonasPrecios({
             <StructuredListBody>
               {Array.isArray(zonas) &&
                 zonas.length > 0 &&
-                zonas.map((zona) => (
-                  <StructuredListRow key={zona.zonaId}>
+                zonas.map((zona, index) => (
+                  <StructuredListRow key={index}>
                     {/* Nombre de la zona */}
                     <StructuredListCell noWrap>
                       {zona.tipoZona} {zona.letraZona}
@@ -93,8 +77,10 @@ export default function ContenedorZonasPrecios({
                       S/ {zona.precioUnitario.toFixed(2)}
                     </StructuredListCell>
 
-                    {/* Descuentos (si aún no hay, se deja texto fijo o vacío) */}
-                    <StructuredListCell>— Sin descuentos —</StructuredListCell>
+                    {/* Descuentos o stock */}
+                    <StructuredListCell>
+                      Entradas disponibles: {zona.cantidadEntradasDisponible}
+                    </StructuredListCell>
                   </StructuredListRow>
                 ))}
             </StructuredListBody>
