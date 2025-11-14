@@ -187,10 +187,8 @@ const TablaCrudButtonDialog: React.FC<TablaCrudButtonDialogProps> = ({
           size="sm"
           align="bottom"
           kind="primary"
-          label={accion}
+          label=" "
           onClick={() => {
-            // Añadir lógica para abrir el diálogo de delete
-            // Provisional
             if(['Visualizar', 'Editar'].includes(accion))
               setIsOpen(true);
           }}

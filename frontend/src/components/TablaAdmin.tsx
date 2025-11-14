@@ -382,7 +382,7 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
           <Search
             id="buscador"
             labelText="Buscar"
-            placeholder="Buscar por nombre, RUC, etc."
+            placeholder="Buscar..."
             size="lg"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
