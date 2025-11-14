@@ -25,6 +25,9 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
 
   return (
     <div
+      style={{
+        cursor: "pointer",
+      }}
       onClick={handleClickCard}
       className={`event-card ${isLarge ? "md:row-span-2" : ""}`}
     >
