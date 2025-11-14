@@ -31,25 +31,34 @@ public class SolicitudService {
 
     //Insertar
     public void insertar(SolicitudDTO solicitudDTO) {
-            Solicitud solicitud = new Solicitud();
-        //Campos simples
-            solicitud.setJustificacion(solicitudDTO.getJustificacion());
-            solicitud.setEstado(solicitudDTO.getEstado());
-        //Asociaciones
-            Local local = new Local();
-            local.setLocalId(solicitudDTO.getLocalId());
-            solicitud.setLocal(local);
-            Evento evento = new Evento();
-            evento.setEventoId(solicitudDTO.getEventoId());
-            solicitud.setEvento(evento);
-        //Guardamos
-            solicitudRepository.save(solicitud);
+        Solicitud solicitud = new Solicitud();
+
+        // Crear el ID compuesto
+        SolicitudId solicitudId = new SolicitudId();
+        solicitudId.setEventoId(solicitudDTO.getEventoId());
+        solicitudId.setLocalId(solicitudDTO.getLocalId());
+        solicitud.setId(solicitudId);
+
+        // Asociaciones (solo por ID)
+        Evento evento = new Evento();
+        evento.setEventoId(solicitudDTO.getEventoId());
+        solicitud.setEvento(evento);
+
+        Local local = new Local();
+        local.setLocalId(solicitudDTO.getLocalId());
+        solicitud.setLocal(local);
+
+        // Campo simple
+        solicitud.setEstado(solicitudDTO.getEstado());
+
+        // Guardar
+        solicitudRepository.save(solicitud);
     }
 
     //Modificar / Aceptar rechazar
     public SolicitudDTO modificar(Integer localId, Integer eventoId, SolicitudDTO solicitudDTO) {
         //Al tener el id compuesto por dos fks, tenemos que crear el id
-        SolicitudId solicitudId = new SolicitudId(localId.longValue(), eventoId.longValue());
+        SolicitudId solicitudId = new SolicitudId(localId, eventoId);
         Solicitud solicitud = solicitudRepository.findById(solicitudId)
                 .orElseThrow(() -> new EntityNotFoundException("Solicitud no encontrada con ID: " + solicitudId));
             if (!Objects.equals(localId, solicitud.getLocal().getLocalId())){
@@ -81,6 +90,16 @@ public class SolicitudService {
             Solicitud solicitudActualizada = solicitudRepository.save(solicitud);
 
         return llenarADTO(solicitudActualizada);
+    }
+    
+    public SolicitudDTO obtenerPorId(Integer localId, Integer eventoId){
+        SolicitudId solicitudId = new SolicitudId(localId, eventoId);
+        Solicitud solicitud = solicitudRepository.findById(solicitudId)
+                .orElseThrow(() -> new EntityNotFoundException("Solicitud no encontrada con ID: " + solicitudId));
+        
+        SolicitudDTO solicitudDTO = llenarADTO(solicitud);
+        
+        return solicitudDTO;
     }
 
     private SolicitudDTO llenarADTO(Solicitud solicitudActualizada){

@@ -83,6 +83,7 @@ public class Securityconfig {
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
                         ).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/eventosCliente", "/api/eventosCliente/**").permitAll()
                         .requestMatchers(HttpMethod.GET,
                                 "/api/productoras/*"
                         ).hasAnyRole("ADMIN","PRODUCTORA")
@@ -96,6 +97,22 @@ public class Securityconfig {
                         ).hasAnyRole("CLIENTE","TAQUILLERO")
                         .requestMatchers("/api/productoras/**", "/api/puntoventas/**").hasRole("ADMIN")
                         .requestMatchers("/api/gestores/**").hasAnyRole("ADMIN","GESTOR_LOCAL","PRODUCTORA")
+                        .requestMatchers(HttpMethod.POST, 
+                                "/api/locales/**").hasRole("GESTOR_LOCAL")
+                        .requestMatchers(HttpMethod.PUT, 
+                                "/api/locales/**").hasRole("DUENHO_LOCAL")
+                        .requestMatchers(HttpMethod.DELETE, 
+                                "/api/locales/**").hasAnyRole("GESTOR_LOCAL", "DUENHO_LOCAL")
+                        .requestMatchers(HttpMethod.POST, 
+                                "/api/eventos/**").hasRole("ORGANIZADOR_EVENTOS")
+                        .requestMatchers(HttpMethod.PUT, 
+                                "/api/eventos/**").hasRole("ORGANIZADOR_EVENTOS")
+                        .requestMatchers(HttpMethod.DELETE, 
+                                "/api/eventos/**").hasRole("ORGANIZADOR_EVENTOS")
+                        .requestMatchers(HttpMethod.PUT, 
+                                "/api/solicitudes/**").hasRole("DUENHO_LOCAL")
+                        .requestMatchers(HttpMethod.GET, 
+                                "/api/solicitudes/**").hasAnyRole("DUENHO_LOCAL","ORGANIZADOR_EVENTOS")
                         // Protege todas las demás rutas
                         .anyRequest().authenticated())
 

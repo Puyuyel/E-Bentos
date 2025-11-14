@@ -7,14 +7,18 @@ import { useNavigate } from "react-router-dom";
 import { getLocalesService } from "../../../services/LocalesServices/getLocales";
 
 import type { Local } from "../../../types/locales.types";
+import { useAuthStore } from "../../../store/useAuthStore";
 
 export default function VenueList() {
+  const { user } = useAuthStore();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [locales, setLocales] = useState<Local[]>([]);
 
-  const filteredLocales = locales.filter((l) =>
-    l.nombre.toLowerCase().includes(search.toLowerCase())
+  const filteredLocales = locales.filter(
+    (l) =>
+      l.nombre.toLowerCase().includes(search.toLowerCase()) &&
+      l.gestor.usuarioId === parseInt(user?.id || "32")
   );
 
   useEffect(() => {

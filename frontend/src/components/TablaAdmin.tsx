@@ -1,7 +1,7 @@
 import { DataTable, IconButton, Link, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Pagination, Search, Button, Loading } from "@carbon/react";
 import { useEffect, useMemo, useState } from "react";
 import TablaCrudButtons from "./TablaCrudButtons";
-import { listarProductoras } from "../services/productoraService";
+import { listarProductoras, listarProductorasPaginado } from "../services/productoraService";
 import { listarGestoresLocales, listarTaquilleros } from "../services/gestorLocalService";
 import { listarPuntosVenta } from "../services/puntoVentaService";
 import { listarEventos } from "../services/eventoService";
@@ -25,21 +25,6 @@ interface DataRow{
   raw?: any;
 }
 
-/**********************************
-Sección de modelos
-***********************************/
-
-
-interface Taquillero {
-  id: number;
-  nombre: string;
-  direccion: string;
-}
-
-/**********************************
-Fin de Sección de modelos
-***********************************/
-
 // Representa la información de paginación
 interface Pagination {
   totalItems: number;
@@ -61,6 +46,7 @@ interface ApiResponse<T> {
 const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
   tipoGestor
 }) => {
+  listarProductorasPaginado(1,10,'');
   /**********************************
   Sección de paginación de la tabla
   ***********************************/
@@ -72,7 +58,7 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
   ***********************************/
 
   /**********************************
-  Sección de hardcodeo
+  Sección de cabeceras
   ***********************************/
   const headers: string[] = useMemo(() => {
     switch (tipoGestor) {
@@ -90,9 +76,8 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
         return [];
     }
   }, [tipoGestor]);
-  
   /**********************************
-  Fin de Sección de hardcodeo
+  Fin de Sección de cabeceras
   ***********************************/
   /**********************************
   Sección APIs
@@ -151,14 +136,15 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
       Taquillero: (item: GestorLocal, index) => ({
         id: index,
         data: [
-          String(item.usuarioId),
+          String(item.usuarioId), // este no se muestra
           item.nombres,
           item.apellidos,
           item.dni,
           item.email,
           item.telefono,
           item.puntoVenta.nombre  // Taquillero siempre tiene un Punto de venta
-        ]
+        ],
+        raw: item
       }),
       OrganizadorEvento: (item, index) => {
         const fecha = new Date(item.fechaHorarioInicio);
@@ -249,7 +235,7 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
       Taquillero: listarTaquilleros,
       OrganizadorEvento: listarEventos,
     };
-    console.log(fetchers.Productora);
+    //console.log(fetchers.Productora);
     const transformadores: Record<string, (item: any, index: number) => DataRow> = {
       Productora: (item: Productora, index) => ({
         id: index,
@@ -359,7 +345,7 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
     );
   }
   return(
-    <div style={{ overflow: 'visible' }}>
+    <div style={{ width: 'calc(100vw - 17rem)', overflow: 'visible' }}>
       <div style={{ display: "flex", gap: "1rem", alignItems: "center", marginBottom: "1rem" }}>
         <div style={{ flexGrow: 1 }}>
           <Search
@@ -371,7 +357,7 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <TablaCrudButtonDialog entidad={tipoGestor} accion="Agregar" datos={[]} onActualizar={()=>{}}></TablaCrudButtonDialog>
+        <TablaCrudButtonDialog entidad={tipoGestor} accion="Agregar" datos={[]} onActualizar={actualizarTabla} uniqueId={0}></TablaCrudButtonDialog>
       </div>
       <Table
         aria-label="sample table"
@@ -399,6 +385,7 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
                   datos={row.data}
                   raw={row.raw}
                   onActualizar={actualizarTabla}
+                  uniqueId={row.id + 1}
                 />
               </TableCell>
             </TableRow>

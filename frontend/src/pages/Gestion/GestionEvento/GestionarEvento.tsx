@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import SidebarGestor from "../../../components/SidebarGestor";
-import TablaAdmin from "../../../components/TablaAdmin";
+import TablaEventos from "../../../components/TablaEventos";
 
 const GestionarEvento: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -9,7 +9,7 @@ const GestionarEvento: React.FC = () => {
       <SidebarGestor currentPath="gestionar-evento" onToggleSidebar={setSidebarOpen}/>
       <main className="app-main">
         <h1 className="title">Listado de Eventos</h1>
-        <TablaAdmin tipoGestor="OrganizadorEvento"></TablaAdmin>
+        <TablaEventos />
       </main>
     </div>
   );

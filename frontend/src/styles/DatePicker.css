@@ -1,0 +1,42 @@
+/* Contenedor principal - más específico */
+.date-picker-responsive {
+  width: 100% !important;
+}
+
+/* Todos los elementos internos del DatePicker */
+.date-picker-responsive > div,
+.date-picker-responsive .cds--date-picker-container,
+.date-picker-responsive .cds--date-picker,
+.date-picker-responsive .cds--date-picker__input,
+.date-picker-responsive .cds--form-item {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* El input específicamente */
+.date-picker-responsive .cds--date-picker-input__wrapper {
+  width: 100% !important;
+}
+
+.date-picker-input-responsive {
+  width: 100% !important;
+  min-width: 100% !important;
+}
+
+.date-picker-input-responsive .cds--date-picker__input {
+  width: 100% !important;
+  min-width: 100% !important;
+}
+.date-picker-wrapper {
+  width: 100%;
+  position: relative;
+}
+
+.date-picker-wrapper .cds--date-picker {
+  width: 100%;
+}
+
+.date-picker-wrapper .cds--date-picker__input {
+  width: 100%;
+  min-width: 100%;
+}

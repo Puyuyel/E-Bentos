@@ -25,6 +25,12 @@ public class SolicitudController {
         // Pasamos los IDs de la URL y el cuerpo de la solicitud al servicio
         return solicitudService.modificar(localId, eventoId, solicitudDTO);
     }
+    
+    @GetMapping("/local/{localId}/evento/{eventoId}")
+    public SolicitudDTO obtenerSolicitud( @PathVariable Integer localId, @PathVariable Integer eventoId) {
+        // Pasamos los IDs de la URL y el cuerpo de la solicitud al servicio
+        return solicitudService.obtenerPorId(localId, eventoId);
+    }
 
     @GetMapping("/paginado")
     public Map<String, Object> listarPaginado(

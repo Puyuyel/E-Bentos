@@ -9,6 +9,5 @@ import lombok.*;
 public class LocalSimpleDTO {
     
     private Integer localId;
-    private Integer aforo;
-
+    
 }
