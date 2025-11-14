@@ -22,6 +22,7 @@ export interface EventoDetalle {
   direccionLocal: string;
   departamento: string;
   fecha: string;
+  descripcion: string;
   zonas: [
     {
       cantidadEntradasDisponible: number;

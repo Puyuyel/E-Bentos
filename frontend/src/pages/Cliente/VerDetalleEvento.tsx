@@ -87,7 +87,7 @@ export default function VerDetalleEvento() {
           ubicacion={datosEvento.direccionLocal}
           imgArtista={datosEvento.posterVertical}
           fechaHora={obtenerFecha(datosEvento.fecha)}
-          descripcion={"datosEvento.descripcion"}
+          descripcion={datosEvento.descripcion}
         />
         <ContenedorTerminosCondiciones
           nombreLocal={datosEvento.nombreLocal}

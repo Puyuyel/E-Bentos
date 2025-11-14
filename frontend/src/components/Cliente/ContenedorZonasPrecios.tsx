@@ -59,7 +59,7 @@ export default function ContenedorZonasPrecios({
               <StructuredListRow head>
                 <StructuredListCell head>ZONAS</StructuredListCell>
                 <StructuredListCell head>Tarifa regular</StructuredListCell>
-                <StructuredListCell head>Descuentos</StructuredListCell>
+                <StructuredListCell head>Disponibilidad</StructuredListCell>
               </StructuredListRow>
             </StructuredListHead>
             <StructuredListBody>
@@ -79,7 +79,7 @@ export default function ContenedorZonasPrecios({
 
                     {/* Descuentos o stock */}
                     <StructuredListCell>
-                      Entradas disponibles: {zona.cantidadEntradasDisponible}
+                      {zona.cantidadEntradasDisponible} entradas
                     </StructuredListCell>
                   </StructuredListRow>
                 ))}
