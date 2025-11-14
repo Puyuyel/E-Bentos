@@ -53,7 +53,7 @@ public interface EventoClienteRepository extends JpaRepository<Evento, Integer>{
         nativeQuery = true)
     List<EventoClienteDTO> findEventosCliente(@Param("categoriaId") Integer categoriaId);
 
-        @Query(value = "SELECT e.POSTER_HORIZONTAL, e.POSTER_VERTICAL, l.TIPO_LOCAL, l.NOMBRE, l.DIRECCION, d.NOMBRE, e.FECHA_HORARIO_INICIO " +
+        @Query(value = "SELECT e.POSTER_HORIZONTAL, e.POSTER_VERTICAL, l.TIPO_LOCAL, l.NOMBRE, l.DIRECCION, d.NOMBRE, e.FECHA_HORARIO_INICIO, e.DESCRIPCION " +
                "FROM EVENTO e " +
                "JOIN LOCAL l ON e.LOCAL_ID = l.LOCAL_ID " +
                "JOIN DISTRITO di ON l.DISTRITO_ID = di.DISTRITO_ID " +
