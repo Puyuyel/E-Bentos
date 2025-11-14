@@ -87,7 +87,9 @@ public class Securityconfig {
                                                 .requestMatchers(HttpMethod.GET, "/api/eventosCliente",
                                                                 "/api/eventosCliente/**")
                                                 .permitAll()
-
+                                                .requestMatchers(HttpMethod.POST, "/api/eventosCliente",
+                                                                "/api/eventosCliente/**")
+                                                .permitAll()
                                                 // Permitir acceso público a rutas de ubicación
                                                 .requestMatchers(
                                                                 "/api/departamentos/**",
