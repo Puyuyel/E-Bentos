@@ -17,6 +17,13 @@ const TablaCrudButtons: React.FC<TablaCrudButtonsProps> = ({
   uniqueId
 }) => {
   //console.log(raw);
+  console.log("📦 Props recibidas en TablaCrudButtons:", {
+  entidad,
+  datos,
+  uniqueId,
+  raw,
+  onActualizar: typeof onActualizar === "function" ? "Función válida" : "No definida"
+});
   return (
     <div style={{ display: "flex" }}>
       <div
