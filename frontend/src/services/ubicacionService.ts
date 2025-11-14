@@ -8,7 +8,9 @@ export async function listarDepartamentos() {
     const response = await api.get("/departamentos");
     return response.data;
   } catch (error: any) {
-    throw new Error(error.response?.data?.message || "Error al listar departamentos");
+    throw new Error(
+      error.response?.data?.message || "Error al listar departamentos"
+    );
   }
 }
 
@@ -17,7 +19,9 @@ export async function listarDistritos() {
     const response = await api.get("/distritos");
     return response.data;
   } catch (error: any) {
-    throw new Error(error.response?.data?.message || "Error al listar distritos");
+    throw new Error(
+      error.response?.data?.message || "Error al listar distritos"
+    );
   }
 }
 
@@ -26,6 +30,8 @@ export async function listarProvincias() {
     const response = await api.get("/provincias");
     return response.data;
   } catch (error: any) {
-    throw new Error(error.response?.data?.message || "Error al listar provincias");
+    throw new Error(
+      error.response?.data?.message || "Error al listar provincias"
+    );
   }
 }

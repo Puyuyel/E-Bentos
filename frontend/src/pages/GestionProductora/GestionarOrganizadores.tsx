@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import SidebarGestor from "../../components/SidebarGestor";
-import "../../styles/GestionProductora/GestionarOrganizadores.css";
 import TablaAdmin from "../../components/TablaAdmin";
+import "../../styles/GestionProductora/GestionarOrganizadores.css";
 
 const GestionarOrganizador: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);

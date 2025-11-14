@@ -1,0 +1,31 @@
+/* Estilos para la vista previa */
+.preview-container {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+.preview-item {
+  width: 150px;
+  text-align: center;
+}
+
+.preview-image {
+  width: 150px;
+  height: 150px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f4f4f4;
+}
+
+.preview-image img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}

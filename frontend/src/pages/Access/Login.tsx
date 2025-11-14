@@ -22,6 +22,7 @@ const Login: React.FC = () => {
       GESTOR_LOCAL: "/gestor_local/gestionar-local",
       DUENHO_LOCAL: "/duenho_local/gestionar-local",
       TAQUILLERO: "/taquillero/home",
+      ORGANIZADOR_EVENTOS: "/organizador/eventos",
     };
 
     return roleRoutes[rol] || "/";
