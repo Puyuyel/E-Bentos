@@ -1,10 +1,10 @@
-.header {
+.header-total {
   background-color: #0a0f2c;
   color: white;
 }
 
 /* Remove unexpected spacing below header */
-.header {
+.header-total {
   margin: 0;
   padding: 0;
 }

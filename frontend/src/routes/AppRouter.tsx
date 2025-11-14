@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Login from "../pages/Access/Login"; // tu componente Login
-import Register from "../pages/Access/Register"; // tu componente Login
+import { useAuthStore } from "../store/useAuthStore";
+import Login from "../pages/Access/Login";
+import Register from "../pages/Access/Register";
 import ForgetPass from "../pages/Access/ForgetPass";
 import CodigoVerificacion from "../pages/Access/CodigoVerificacion";
 import NewPassword from "../pages/Access/NewPassword";
@@ -19,13 +20,28 @@ import ReporteOrganizador from "../pages/Reportes/ReporteOrganizador";
 import ReporteProductora from "../pages/Reportes/ReporteProductora";
 import ReporteTaquillero from "../pages/Reportes/ReporteTaquillero";
 
-import { ProtectedRoute } from "./ProtectedRoute"; // importa tu wrapper
+import { ProtectedRoute } from "./ProtectedRoute";
 import GestionarOrganizador from "../pages/GestionProductora/GestionarOrganizadores";
 import Metas from "../pages/GestionProductora/Metas";
 import MainEbentos from "../components/Cliente/MainEbentos";
 import GestionarDuenhos from "../pages/Gestion/GestorLocal/GestionarDuenhos";
 
 const AppRouter: React.FC = () => {
+  const { isLoggedIn, user } = useAuthStore();
+
+  // Función para obtener la ruta según el rol
+  const getRouteByRole = (rol: string): string => {
+    const roleRoutes: Record<string, string> = {
+      ADMIN: "/admin/gestionar-productora",
+      CLIENTE: "/home",
+      PRODUCTORA: "/productora/gestionar-organizador",
+      GESTOR_LOCAL: "/gestor_local/gestionar-local",
+      DUENHO_LOCAL: "/duenho_local/gestionar-local",
+      TAQUILLERO: "/home",
+    };
+    return roleRoutes[rol] || "/home";
+  };
+
   return (
     <BrowserRouter>
       <Routes>
@@ -44,6 +60,18 @@ const AppRouter: React.FC = () => {
 
         {/* Ruta /newpass */}
         <Route path="/newpass" element={<NewPassword />} />
+
+        {/* Ruta raíz - redirige según autenticación y rol */}
+        <Route
+          path="/"
+          element={
+            isLoggedIn && user ? (
+              <Navigate to={getRouteByRole(user.rol)} replace />
+            ) : (
+              <Navigate to="/home" replace />
+            )
+          }
+        />
 
         {/* Ruta /home */}
         <Route path="/home" element={<MainEbentos />} />
@@ -221,8 +249,17 @@ const AppRouter: React.FC = () => {
           }
         />
 
-        {/* Redirige cualquier ruta desconocida a /home */}
-        <Route path="*" element={<Navigate to="/home" />} />
+        {/* Redirige cualquier ruta desconocida según rol o a /home */}
+        <Route
+          path="*"
+          element={
+            isLoggedIn && user ? (
+              <Navigate to={getRouteByRole(user.rol)} replace />
+            ) : (
+              <Navigate to="/home" replace />
+            )
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
