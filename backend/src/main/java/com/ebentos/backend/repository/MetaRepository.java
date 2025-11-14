@@ -37,7 +37,9 @@ public interface MetaRepository extends JpaRepository<Meta, Integer> {
            "FROM PRODUCTORA P " +
            "JOIN GESTOR G ON G.USUARIO_CREADOR_ID = P.USUARIO_ID " +
            "JOIN EVENTO E ON E.GESTOR_USUARIO_ID = G.USUARIO_ID " +
-           "WHERE P.USUARIO_ID = :productoraId AND E.ESTADO = 'ACTIVO'",
+           "WHERE P.USUARIO_ID = :productoraId " +
+           "AND E.ESTADO = 'ACTIVO' " +
+           "AND E.FECHA_HORARIO_INICIO > NOW()",
            nativeQuery = true)
     List<Object[]> findEventosDisponiblesByProductoraId(@Param("productoraId") Integer productoraId);
 }

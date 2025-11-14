@@ -9,29 +9,26 @@ import {
   FormItem,
   Modal,
   InlineLoading,
+  TextArea,
 } from "@carbon/react";
-import { Location } from "@carbon/react/icons";
+import { Location, TrashCan } from "@carbon/react/icons";
 import CardVenueTag from "./CardVenueTag";
 import type { FormDataLocalUpdate, Local } from "../../types/locales.types";
 import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import editarLocal from "../../services/LocalesServices/editarLocalService";
 import uploadImage from "../../services/LocalesServices/uploadImageService";
+import eliminarLocal from "../../services/LocalesServices/eliminarLocalService";
+
+import {
+  COLORES_BACKGROUND_TIPO,
+  COLORES_FONT_TIPO,
+  MENSAJES_TIPO,
+} from "../../pages/utils/ColoresLocales";
 
 const imageBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL;
 
 // CONSTANTES
-const MENSAJES_TIPO = {
-  HABILITADO: "Habilitado",
-  EN_REVISION: "En revisión",
-  ELIMINADO: "De baja",
-} as const;
-
-const COLORES_TIPO = {
-  HABILITADO: "#4CAF50", // verde
-  EN_REVISION: "#FFC107", // amarillo
-  ELIMINADO: "#F44336", // rojo
-} as const;
 
 interface CardVenueProps {
   local: Local;
@@ -66,7 +63,12 @@ export default function CardVenue({ local }: CardVenueProps) {
     },
   });
   const [mensaje, setMensaje] = useState<string>("");
-  const [color, setColor] = useState<string>("gray");
+  const [motivo, setMotivo] = useState<string>("");
+  const [isInvalidMotive, setIsInvalidMotive] = useState(false);
+  const [color, setColor] = useState({
+    fondo: "",
+    fuente: "",
+  });
   const fileUploaderRef = useRef<HTMLButtonElement>(null);
   const [files, setFiles] = useState<File[]>([]);
 
@@ -74,19 +76,32 @@ export default function CardVenue({ local }: CardVenueProps) {
     switch (local.activo) {
       case 1:
         setMensaje(MENSAJES_TIPO.HABILITADO);
-        setColor(COLORES_TIPO.HABILITADO);
+        setColor((prev) => ({
+          ...prev,
+          fuente: COLORES_FONT_TIPO.HABILITADO,
+          fondo: COLORES_BACKGROUND_TIPO.HABILITADO,
+        }));
         break;
       case 2:
         setMensaje(MENSAJES_TIPO.EN_REVISION);
-        setColor(COLORES_TIPO.EN_REVISION);
+        setColor(() => ({
+          fuente: COLORES_FONT_TIPO.EN_REVISION,
+          fondo: COLORES_BACKGROUND_TIPO.EN_REVISION,
+        }));
         break;
       case 0:
         setMensaje(MENSAJES_TIPO.ELIMINADO);
-        setColor(COLORES_TIPO.ELIMINADO);
+        setColor(() => ({
+          fuente: COLORES_FONT_TIPO.EN_REVISION,
+          fondo: COLORES_BACKGROUND_TIPO.EN_REVISION,
+        }));
         break;
       default:
         setMensaje("Desconocido");
-        setColor("gray");
+        setColor(() => ({
+          fuente: "gray",
+          fondo: "transparent",
+        }));
         break;
     }
   }, [local]); // <- se ejecuta cada vez que 'local' cambie
@@ -99,27 +114,13 @@ export default function CardVenue({ local }: CardVenueProps) {
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
-  // Processing / result state for submit flow
-  const [isProcessing, setIsProcessing] = useState<boolean>(false);
-  const [resultOpen, setResultOpen] = useState<boolean>(false);
-  const [resultMessage, setResultMessage] = useState<string>("");
-  const [resultSuccess, setResultSuccess] = useState<boolean>(false);
-
-  const handleResultClose = () => {
-    setResultOpen(false);
-    // If the API call was successful, refresh the page to show updated data.
-    if (resultSuccess) {
-      // small delay so the modal can visually close before reload
-      setTimeout(() => {
-        window.location.reload();
-      }, 150);
-    }
-  };
-
   const submitModal = async (data: FormDataLocalUpdate) => {
     if (isProcessing) return; // evita envíos dobles
     setIsProcessing(true);
     try {
+      console.log("Modificando antes... data.localID", data.localId);
+      data.localId = local.localId;
+      console.log("Modificando después... data.localID", data.localId);
       if (data.fotoFile) {
         console.log(
           "Subiendo nueva imagen del local...",
@@ -148,6 +149,70 @@ export default function CardVenue({ local }: CardVenueProps) {
       setIsProcessing(false);
       setIsModalOpen(false);
       setResultOpen(true);
+    }
+  };
+
+  const handleDarLocalBaja = async () => {
+    // Lógica para dar de baja el local
+    console.log(`Dar de baja el local con ID: ${local.localId}`);
+    try {
+      const response = await eliminarLocal(local.localId);
+      return response;
+    } catch (error) {
+      console.error("Error al dar de baja el local:", error);
+      throw error;
+    }
+  };
+  const onDarBajaClick = async (e: MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    // open confirmation modal
+    setConfirmOpen(true);
+  };
+
+  // Confirmation + deletion states
+  const [confirmOpen, setConfirmOpen] = useState<boolean>(false);
+  const [deleting, setDeleting] = useState<boolean>(false);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [resultOpen, setResultOpen] = useState<boolean>(false);
+  const [resultMessage, setResultMessage] = useState<string>("");
+  const [resultSuccess, setResultSuccess] = useState<boolean | null>(null);
+
+  const handleConfirmCancel = () => {
+    setConfirmOpen(false);
+  };
+
+  const handleConfirmYes = async () => {
+    if (motivo.trim() === "") {
+      setIsInvalidMotive(true);
+      return;
+    }
+    setConfirmOpen(false);
+    setDeleting(true);
+    setResultOpen(true);
+    setResultMessage("Eliminando el local...");
+    try {
+      const response = await handleDarLocalBaja();
+      setDeleting(false);
+      if (response && response.status === 200) {
+        setResultSuccess(true);
+        setResultMessage("Local eliminado exitosamente.");
+      } else {
+        setResultSuccess(false);
+        setResultMessage("El local no se pudo eliminar.");
+      }
+    } catch {
+      setDeleting(false);
+      setResultSuccess(false);
+      setResultMessage("El local no se pudo eliminar.");
+    }
+  };
+
+  const handleResultClose = () => {
+    setResultOpen(false);
+    // If deletion was successful, reload the page so parent list updates
+    if (resultSuccess) {
+      // small timeout to ensure modal finishes closing visually
+      setTimeout(() => window.location.reload(), 150);
     }
   };
 
@@ -348,6 +413,51 @@ export default function CardVenue({ local }: CardVenueProps) {
         </p>
       </Modal>
 
+      {/* Confirm deletion modal */}
+      {confirmOpen && (
+        <Modal
+          aria-label="Confirmar eliminación"
+          modalHeading="Confirmación"
+          open={confirmOpen}
+          onRequestClose={handleConfirmCancel}
+          onRequestSubmit={handleConfirmYes}
+          onSecondarySubmit={handleConfirmCancel}
+          primaryButtonText="Sí"
+          secondaryButtonText="No"
+        >
+          <p style={{ marginBottom: "1rem" }}>
+            ¿Está seguro de eliminar el Local?
+          </p>
+          <TextArea
+            enableCounter
+            id="motivo-eliminacion"
+            invalid={isInvalidMotive}
+            invalidText="El motivo es obligatorio."
+            labelText="Motivo de eliminación"
+            maxCount={500}
+            placeholder="Ingrese un motivo para la elminación."
+            rows={4}
+            onChange={(e) => setMotivo(e.target.value)}
+          />
+        </Modal>
+      )}
+
+      {/* Result / loading modal */}
+      {resultOpen && (
+        <Modal
+          aria-label="Resultado eliminación"
+          modalHeading={
+            deleting ? "Eliminando..." : resultSuccess ? "Éxito" : "Error"
+          }
+          open={resultOpen}
+          onRequestClose={handleResultClose}
+          onRequestSubmit={handleResultClose}
+          primaryButtonText={deleting ? undefined : "Aceptar"}
+        >
+          <p>{resultMessage}</p>
+        </Modal>
+      )}
+
       <ClickableTile className="back_card" onClick={openModal}>
         <Grid>
           <Column sm={4} md={4} lg={4} xlg={4} max={4}>
@@ -364,6 +474,23 @@ export default function CardVenue({ local }: CardVenueProps) {
               ></div>
             </Stack>
           </Column>
+
+          <button
+            onClick={onDarBajaClick}
+            aria-label="Dar de baja"
+            style={{
+              position: "absolute",
+              bottom: "1rem",
+              left: "1rem",
+              zIndex: 3,
+              background: "rgba(0, 0, 0, 0)",
+              color: "#c62828",
+              border: "none",
+            }}
+          >
+            <TrashCan size={30} />
+          </button>
+
           <Column sm={4} md={4} lg={4} xlg={4} max={4}>
             <div
               style={{
@@ -377,7 +504,10 @@ export default function CardVenue({ local }: CardVenueProps) {
                 alt="Imagen del local"
                 style={{ width: "100%", objectFit: "cover" }}
               ></img>
-              <CardVenueTag mensaje={mensaje} color={color}></CardVenueTag>
+              <CardVenueTag
+                mensaje={mensaje}
+                color={{ fondo: color.fondo, fuente: color.fuente }}
+              ></CardVenueTag>
             </div>
           </Column>
         </Grid>

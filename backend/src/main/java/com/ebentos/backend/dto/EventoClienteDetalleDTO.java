@@ -12,6 +12,7 @@ public class EventoClienteDetalleDTO {
     private String direccionLocal;
     private String departamento;
     private LocalDateTime fecha;
+    private String descripcion;
     private List<ZonaEventoDTO> zonas;
 
     public EventoClienteDetalleDTO() {}
@@ -70,6 +71,14 @@ public class EventoClienteDetalleDTO {
 
     public void setFecha(LocalDateTime fecha) {
         this.fecha = fecha;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
 
     public List<ZonaEventoDTO> getZonas() {

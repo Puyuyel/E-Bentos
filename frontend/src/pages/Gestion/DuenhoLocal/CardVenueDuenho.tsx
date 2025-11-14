@@ -8,10 +8,11 @@ import {
   FileUploaderDropContainer,
   FileUploaderItem,
   FormItem,
+  InlineLoading,
   Modal,
   Button,
 } from "@carbon/react";
-import { Location } from "@carbon/react/icons";
+import { Location, TrashCan } from "@carbon/react/icons";
 import CardVenueTag from "../../../components/Gestion/CardVenueTag";
 import type { FormDataLocalUpdate, Local } from "../../../types/locales.types";
 import { useState, useEffect, useRef, type MouseEvent } from "react";
@@ -23,17 +24,11 @@ import eliminarLocal from "../../../services/LocalesServices/eliminarLocalServic
 const imageBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL;
 
 // CONSTANTES
-const MENSAJES_TIPO = {
-  HABILITADO: "Habilitado",
-  EN_REVISION: "En revisión",
-  ELIMINADO: "De baja",
-} as const;
-
-const COLORES_TIPO = {
-  HABILITADO: "#4CAF50", // verde
-  EN_REVISION: "#FFC107", // amarillo
-  ELIMINADO: "#F44336", // rojo
-} as const;
+import {
+  MENSAJES_TIPO,
+  COLORES_BACKGROUND_TIPO,
+  COLORES_FONT_TIPO,
+} from "../../../pages/utils/ColoresLocales";
 
 interface CardVenueProps {
   local: Local;
@@ -69,7 +64,10 @@ export default function CardVenue({ local }: CardVenueProps) {
   const [mensaje, setMensaje] = useState<string>("");
   const [motivo, setMotivo] = useState<string>("");
   const [isInvalidMotive, setIsInvalidMotive] = useState(false);
-  const [color, setColor] = useState<string>("gray");
+  const [color, setColor] = useState({
+    fondo: "",
+    fuente: "",
+  });
   const fileUploaderRef = useRef<HTMLButtonElement>(null);
   const [files, setFiles] = useState<File[]>([]);
 
@@ -77,19 +75,32 @@ export default function CardVenue({ local }: CardVenueProps) {
     switch (local.activo) {
       case 1:
         setMensaje(MENSAJES_TIPO.HABILITADO);
-        setColor(COLORES_TIPO.HABILITADO);
+        setColor((prev) => ({
+          ...prev,
+          fuente: COLORES_FONT_TIPO.HABILITADO,
+          fondo: COLORES_BACKGROUND_TIPO.HABILITADO,
+        }));
         break;
       case 2:
         setMensaje(MENSAJES_TIPO.EN_REVISION);
-        setColor(COLORES_TIPO.EN_REVISION);
+        setColor(() => ({
+          fuente: COLORES_FONT_TIPO.EN_REVISION,
+          fondo: COLORES_BACKGROUND_TIPO.EN_REVISION,
+        }));
         break;
       case 0:
         setMensaje(MENSAJES_TIPO.ELIMINADO);
-        setColor(COLORES_TIPO.ELIMINADO);
+        setColor(() => ({
+          fuente: COLORES_FONT_TIPO.EN_REVISION,
+          fondo: COLORES_BACKGROUND_TIPO.EN_REVISION,
+        }));
         break;
       default:
         setMensaje("Desconocido");
-        setColor("gray");
+        setColor(() => ({
+          fuente: "gray",
+          fondo: "transparent",
+        }));
         break;
     }
   }, [local]); // <- se ejecuta cada vez que 'local' cambie
@@ -103,31 +114,39 @@ export default function CardVenue({ local }: CardVenueProps) {
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
   const submitModal = async (data: FormDataLocalUpdate) => {
-    // TODO: manejar acción de submit si se requiere
+    if (isProcessing) return; // evita envíos dobles
+    setIsProcessing(true);
     try {
-      if (!data.fotoFile) {
-        console.log("No se ha seleccionado ninguna imagen.");
-        return;
-      }
-      await uploadImage(data);
-
+      data.localId = local.localId;
+      if (data.fotoFile) {
+        console.log(
+          "Subiendo nueva imagen del local...",
+          data.foto,
+          data.fotoFile
+        );
+        await uploadImage(data);
+        data.foto = `${data.direccion}-${data.foto}`;
+      } else data.foto = `${data.foto}`;
       data.distrito.distritoId = Number(data.distrito.distritoId);
-      data.foto = `${data.direccion}-${data.foto}`;
       // Registrar el local (llamada al backend o API)
       console.log("Datos del local a enviar:", data);
       const response = await editarLocal(data);
-      if (response.status === 200) {
-        return (
-          <Modal primaryButtonText="Aceptar" open={true} modalHeading="Éxito">
-            <p style={{ color: "green" }}>Local modificado con éxito.</p>
-          </Modal>
-        );
+      if (response && response.status === 200) {
+        setResultMessage("Local modificado con éxito.");
+        setResultSuccess(true);
+      } else {
+        setResultMessage("El local no se pudo modificar.");
+        setResultSuccess(false);
       }
       // Navegar al final
     } catch (error) {
       console.error("Error al modificar el local:", error);
+      setResultMessage("El local no se pudo modificar.");
+      setResultSuccess(false);
     } finally {
+      setIsProcessing(false);
       setIsModalOpen(false);
+      setResultOpen(true);
     }
   };
 
@@ -151,6 +170,7 @@ export default function CardVenue({ local }: CardVenueProps) {
   // Confirmation + deletion states
   const [confirmOpen, setConfirmOpen] = useState<boolean>(false);
   const [deleting, setDeleting] = useState<boolean>(false);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [resultOpen, setResultOpen] = useState<boolean>(false);
   const [resultMessage, setResultMessage] = useState<string>("");
   const [resultSuccess, setResultSuccess] = useState<boolean | null>(null);
@@ -366,6 +386,31 @@ export default function CardVenue({ local }: CardVenueProps) {
         </div>
       </Modal>
 
+      {/* Processing modal (shows while API request is in progress) */}
+      <Modal
+        open={isProcessing}
+        modalHeading="Procesando..."
+        passiveModal
+        onRequestClose={() => {}}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+          <InlineLoading description="Procesando..." status="active" />
+        </div>
+      </Modal>
+
+      {/* Result modal: success / error */}
+      <Modal
+        open={resultOpen}
+        modalHeading={resultSuccess ? "Éxito" : "Error"}
+        onRequestClose={handleResultClose}
+        onRequestSubmit={handleResultClose}
+        primaryButtonText="Aceptar"
+      >
+        <p style={{ color: resultSuccess ? "green" : "red" }}>
+          {resultMessage}
+        </p>
+      </Modal>
+
       {/* Confirm deletion modal */}
       {confirmOpen && (
         <Modal
@@ -417,27 +462,7 @@ export default function CardVenue({ local }: CardVenueProps) {
         style={{ position: "relative" }}
       >
         {/* Dar de baja button inside the tile but stopPropagation to avoid triggering the tile click */}
-        <Button
-          onClick={onDarBajaClick}
-          aria-label="Dar de baja"
-          style={{
-            position: "absolute",
-            bottom: "2px",
-            left: "5px",
-            zIndex: 3,
-            background: "#ffffff",
-            color: "#c62828",
-            border: "1px solid #c62828",
-            borderRadius: "4px",
-            fontSize: "0.8rem",
-            lineHeight: "1.5",
-            boxShadow: "0 1px 2px rgba(0,0,0,0.06)",
-            cursor: "pointer",
-            pointerEvents: "auto",
-          }}
-        >
-          Dar de baja
-        </Button>
+
         <Grid>
           <Column sm={4} md={4} lg={4} xlg={4} max={4}>
             <Stack gap={3}>
@@ -453,6 +478,23 @@ export default function CardVenue({ local }: CardVenueProps) {
               ></div>
             </Stack>
           </Column>
+
+          <button
+            onClick={onDarBajaClick}
+            aria-label="Dar de baja"
+            style={{
+              position: "absolute",
+              bottom: "1rem",
+              left: "1rem",
+              zIndex: 3,
+              background: "rgba(0, 0, 0, 0)",
+              color: "#c62828",
+              border: "none",
+            }}
+          >
+            <TrashCan size={30} />
+          </button>
+
           <Column sm={4} md={4} lg={4} xlg={4} max={4}>
             <div
               style={{
@@ -466,7 +508,13 @@ export default function CardVenue({ local }: CardVenueProps) {
                 alt="Imagen del local"
                 style={{ width: "100%", objectFit: "cover" }}
               ></img>
-              <CardVenueTag mensaje={mensaje} color={color}></CardVenueTag>
+
+              <div>
+                <CardVenueTag
+                  mensaje={mensaje}
+                  color={{ fondo: color.fondo, fuente: color.fuente }}
+                ></CardVenueTag>
+              </div>
             </div>
           </Column>
         </Grid>

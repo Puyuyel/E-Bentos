@@ -19,6 +19,8 @@ import ReporteLocal from "../pages/Reportes/ReporteLocal";
 import ReporteOrganizador from "../pages/Reportes/ReporteOrganizador";
 import ReporteProductora from "../pages/Reportes/ReporteProductora";
 import ReporteTaquillero from "../pages/Reportes/ReporteTaquillero";
+import GestionarEvento from "../pages/Gestion/GestionEvento/GestionarEvento";
+import EventoCRUD from "../pages/Gestion/GestionEvento/EventoCRUD";
 
 import { ProtectedRoute } from "./ProtectedRoute";
 import GestionarOrganizador from "../pages/GestionProductora/GestionarOrganizadores";
@@ -35,6 +37,7 @@ const AppRouter: React.FC = () => {
       ADMIN: "/admin/gestionar-productora",
       CLIENTE: "/home",
       PRODUCTORA: "/productora/gestionar-organizador",
+      ORGANIZADOR_EVENTOS: "/organizador/eventos",
       GESTOR_LOCAL: "/gestor_local/gestionar-local",
       DUENHO_LOCAL: "/duenho_local/gestionar-local",
       TAQUILLERO: "/home",
@@ -48,16 +51,12 @@ const AppRouter: React.FC = () => {
         {/* RUTAS PÚBLICAS */}
         {/* Rutas /login */}
         <Route path="/login" element={<Login />} />
-
         {/* Ruta /register */}
         <Route path="/register" element={<Register />} />
-
         {/* Ruta /forgetpass */}
         <Route path="/forgetpass" element={<ForgetPass />} />
-
         {/* Ruta /codigo_verificacion */}
         <Route path="/codigo_verificacion" element={<CodigoVerificacion />} />
-
         {/* Ruta /newpass */}
         <Route path="/newpass" element={<NewPassword />} />
 
@@ -75,7 +74,6 @@ const AppRouter: React.FC = () => {
 
         {/* Ruta /home */}
         <Route path="/home" element={<MainEbentos />} />
-
         {/* RUTAS PROTEGIDAS */}
         {/* Ruta /gestionar gestor local */}
         <Route
@@ -86,7 +84,6 @@ const AppRouter: React.FC = () => {
             </ProtectedRoute>
           }
         />
-
         {/* Ruta /gestionar productora */}
         <Route
           path="/admin/gestionar-productora"
@@ -96,7 +93,6 @@ const AppRouter: React.FC = () => {
             </ProtectedRoute>
           }
         />
-
         {/* Ruta /gestionar punto de venta */}
         <Route
           path="/admin/gestionar-punto-venta"
@@ -106,7 +102,6 @@ const AppRouter: React.FC = () => {
             </ProtectedRoute>
           }
         />
-
         {/* Ruta /gestionar taquillero */}
         <Route
           path="/admin/gestionar-taquillero"
@@ -116,7 +111,6 @@ const AppRouter: React.FC = () => {
             </ProtectedRoute>
           }
         />
-
         {/* Ruta /gestionar reporte cliente */}
         <Route
           path="/admin/reporte-cliente"
@@ -126,7 +120,6 @@ const AppRouter: React.FC = () => {
             </ProtectedRoute>
           }
         />
-
         {/* Ruta /gestionar reporte evento */}
         <Route
           path="/admin/reporte-evento"
@@ -136,7 +129,6 @@ const AppRouter: React.FC = () => {
             </ProtectedRoute>
           }
         />
-
         {/* Ruta /gestionar reporte local */}
         <Route
           path="/admin/reporte-local"
@@ -146,7 +138,6 @@ const AppRouter: React.FC = () => {
             </ProtectedRoute>
           }
         />
-
         {/* Ruta /gestionar reporte cliente */}
         <Route
           path="/admin/reporte-organizador"
@@ -156,7 +147,6 @@ const AppRouter: React.FC = () => {
             </ProtectedRoute>
           }
         />
-
         {/* Ruta /gestionar reporte cliente */}
         <Route
           path="/admin/reporte-productora"
@@ -166,7 +156,6 @@ const AppRouter: React.FC = () => {
             </ProtectedRoute>
           }
         />
-
         {/* Ruta /gestionar reporte cliente */}
         <Route
           path="/admin/reporte-taquillero"
@@ -176,7 +165,6 @@ const AppRouter: React.FC = () => {
             </ProtectedRoute>
           }
         />
-
         {/* Ruta /gestionar organizador */}
         <Route
           path="/productora/gestionar-organizador"
@@ -186,7 +174,6 @@ const AppRouter: React.FC = () => {
             </ProtectedRoute>
           }
         />
-
         {/* Ruta /mostrar metas*/}
         <Route
           path="/productora/metas"
@@ -196,7 +183,6 @@ const AppRouter: React.FC = () => {
             </ProtectedRoute>
           }
         />
-
         {/* RUTAS para GESTOR DE LOCAL */}
         {/* Ruta /listado duenhos*/}
         <Route
@@ -216,7 +202,6 @@ const AppRouter: React.FC = () => {
             </ProtectedRoute>
           }
         />
-
         {/* Ruta /registro locales*/}
         <Route
           path="/gestor_local/registrar-local"
@@ -226,7 +211,6 @@ const AppRouter: React.FC = () => {
             </ProtectedRoute>
           }
         />
-
         {/* RUTAS para DUEÑO DE LOCAL */}
         {/* Ruta /listado locales*/}
         <Route
@@ -237,16 +221,71 @@ const AppRouter: React.FC = () => {
             </ProtectedRoute>
           }
         />
-
+        {/* RUTAS para ORGANIZADOR DE EVENTOS */}
+        {/* Ruta /gestionar eventos*/}
+        <Route
+          path="/organizador/eventos"
+          element={
+            <ProtectedRoute requiredRole="ORGANIZADOR_EVENTOS">
+              <GestionarEvento />
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/organizador/eventos/crear"
+          element={
+            <ProtectedRoute requiredRole="ORGANIZADOR_EVENTOS">
+              <EventoCRUD modo="crear" />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/organizador/eventos/editar/:eventoId"
+          element={
+            <ProtectedRoute requiredRole="ORGANIZADOR_EVENTOS">
+              <EventoCRUD modo="editar" />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/organizador/eventos/ver/:eventoId"
+          element={
+            <ProtectedRoute requiredRole="ORGANIZADOR_EVENTOS">
+              <EventoCRUD modo="visualizar" />
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/organizador/eventos/crear"
+          element={
+            <ProtectedRoute requiredRole="ORGANIZADOR_EVENTOS">
+              <EventoCRUD modo="crear" />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/organizador/eventos/editar/:eventoId"
+          element={
+            <ProtectedRoute requiredRole="ORGANIZADOR_EVENTOS">
+              <EventoCRUD modo="editar" />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/organizador/eventos/ver/:eventoId"
+          element={
+            <ProtectedRoute requiredRole="ORGANIZADOR_EVENTOS">
+              <EventoCRUD modo="visualizar" />
+            </ProtectedRoute>
+          }
+        />
         {/* RUTAS para CLIENTE */}
         {/* Ruta /ver detalle evento*/}
         <Route
-          path="/cliente/ver-detalle-evento"
-          element={
-            <ProtectedRoute requiredRole="CLIENTE">
-              <VerDetalleEvento />
-            </ProtectedRoute>
-          }
+          path={`/cliente/ver-detalle-evento/:eventoId`}
+          element={<VerDetalleEvento />}
         />
 
         {/* Redirige cualquier ruta desconocida según rol o a /home */}

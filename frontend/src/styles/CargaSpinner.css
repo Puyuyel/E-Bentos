@@ -35,3 +35,10 @@
     transform: translateY(-15px);
   }
 }
+
+.cds--tooltip-content,
+.cds--popover-content {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}

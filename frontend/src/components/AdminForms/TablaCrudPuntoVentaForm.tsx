@@ -211,19 +211,20 @@ const TablaCrudPuntoVentaForm: React.FC<TablaCrudPuntoVentaFormProps> = ({
           <SelectItem key={dist.distritoId} value={dist.distritoId} text={dist.nombre} />
         ))}
       </Select>
-      
-      <Select
-        id={`estado-${uniqueId}`}
-        labelText="Estado"
-        value={formData.estado || 'Activo'}
-        onChange={(e) => setFormData(prev => ({ ...prev, estado: e.target.value }))}
-        readOnly={isReadOnly}
-        invalid={!!errors.estado && !isReadOnly}
-        invalidText={errors.estado}
-      >
-        <SelectItem value="Activo" text="Activo" />
-        <SelectItem value="Inactivo" text="Inactivo" />
-      </Select>
+      {(accion != 'Agregar' ) && (
+        <Select
+          id={`estado-${uniqueId}`}
+          labelText="Estado"
+          value={formData.estado || 'Activo'}
+          onChange={(e) => setFormData(prev => ({ ...prev, estado: e.target.value }))}
+          readOnly={isReadOnly}
+          invalid={!!errors.estado && !isReadOnly}
+          invalidText={errors.estado}
+        >
+          <SelectItem value="Activo" text="Activo" />
+          <SelectItem value="Inactivo" text="Inactivo" />
+        </Select>)
+      }
     </VStack>
   );
 };

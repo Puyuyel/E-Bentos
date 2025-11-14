@@ -9,20 +9,17 @@ import "../../styles/Cliente/MainEbentos.css";
 export default function MainEbentos() {
   return (
     <>
-    <Header />
-    <div className="app-container">
-      
-      <main>
-        <Carrusel />
-        <div className="main-content-container">
-          <Categories />
-          <EventGrid />
-        </div>
-      </main>
-      
-    </div>
-    <Footer />
+      <Header />
+      <div className="app-container">
+        <main>
+          <Carrusel />
+          <div className="main-content-container">
+            <Categories />
+            <EventGrid />
+          </div>
+        </main>
+      </div>
+      <Footer />
     </>
   );
 }
-

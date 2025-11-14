@@ -17,6 +17,7 @@ const TablaCrudButtons: React.FC<TablaCrudButtonsProps> = ({
   uniqueId
 }) => {
   //console.log(raw);
+  
   return (
     <div style={{ display: "flex" }}>
       <div

@@ -9,7 +9,7 @@ const GestionarDuenhos: React.FC = () => {
     <div className={`app-container ${sidebarOpen ? "sidebar-visible" : "sidebar-hidden"}`}>
       <SidebarGestor currentPath="gestionar-duenhos-de-local" onToggleSidebar={setSidebarOpen}/>
       <main className="app-main">
-        <h1 className="title">Panel de Gestión de Gestores Locales</h1>
+        <h1 className="title">Panel de Gestión de Dueños de Locales</h1>
         <TablaAdmin tipoGestor="Duenho"></TablaAdmin>
       </main>
     </div>

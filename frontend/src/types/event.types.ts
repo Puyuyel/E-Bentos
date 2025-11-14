@@ -13,3 +13,38 @@ export type Evento = {
   porcentajeVendido: number;
   popularidad: number;
 };
+
+// types/event.types.ts
+export interface Local {
+  localId: number;
+  nombre: string;
+  aforo: number;
+}
+
+export interface EventoBackend {
+  eventoId: number;
+  local: Local;
+  nombre: string;
+  fechaHorarioInicio: string;
+  duracionEstimada: number;
+  estado: string;
+}
+
+export interface EventoDetalle {
+  posterHorizontal: string;
+  posterVertical: string;
+  tipoLocal: string;
+  nombreLocal: string;
+  direccionLocal: string;
+  departamento: string;
+  fecha: string;
+  descripcion: string;
+  zonas: [
+    {
+      cantidadEntradasDisponible: number;
+      precioUnitario: number;
+      tipoZona: string;
+      letraZona: string;
+    }
+  ];
+}

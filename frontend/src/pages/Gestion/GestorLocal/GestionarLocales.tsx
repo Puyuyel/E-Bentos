@@ -10,7 +10,7 @@ const GestionarLocales: React.FC = () => {
     <div className="app-container">
       <SidebarGestor currentPath="gestionar-local" />
       <main className="app-main">
-        <h1 className="title">Panel de Gestión de Gestores Locales</h1>
+        <h1 className="title">Panel de Gestión de Locales</h1>
         <VenueList />
       </main>
     </div>

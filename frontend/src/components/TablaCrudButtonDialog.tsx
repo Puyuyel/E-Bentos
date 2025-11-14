@@ -36,6 +36,9 @@ const TablaCrudButtonDialog: React.FC<TablaCrudButtonDialogProps> = ({
   
   const [validationState, setValidationState] = useState(1);
 
+  const resultado = `${accion} ${separarConConector(entidad)}`;
+
+
   useEffect(() => {
     if (accion === 'Agregar') {
       setFormData({});
@@ -150,6 +153,14 @@ const TablaCrudButtonDialog: React.FC<TablaCrudButtonDialogProps> = ({
     }
   }, [raw, accion, entidad]);
 
+  function separarConConector(entidad: string): string {
+    const partes = entidad.replace(/([a-z])([A-Z])/g, '$1 $2').split(' ');
+    if (partes.length === 2) {
+      return `${partes[0]} de ${partes[1]}`;
+    }
+    return partes.join(' ');
+  }
+
   /**********************************
   Esta es la sección que arma los botones de Visualizar, Editar o Eliminar.
   Puede hacerse más genérico y armar una botonera personalizada con los parámetros, pero eso después...
@@ -176,10 +187,8 @@ const TablaCrudButtonDialog: React.FC<TablaCrudButtonDialogProps> = ({
           size="sm"
           align="bottom"
           kind="primary"
-          label={accion}
+          label=" "
           onClick={() => {
-            // Añadir lógica para abrir el diálogo de delete
-            // Provisional
             if(['Visualizar', 'Editar'].includes(accion))
               setIsOpen(true);
           }}
@@ -196,7 +205,7 @@ const TablaCrudButtonDialog: React.FC<TablaCrudButtonDialogProps> = ({
       >
         <DialogHeader>
           <DialogTitle id="title">
-            {accion + ' ' + entidad}
+            {resultado}
           </DialogTitle>
           <DialogControls>
             <DialogCloseButton onClick={() => setIsOpen(false)} />

@@ -4,6 +4,7 @@ import TablaCrudButtons from "./TablaCrudButtons";
 import { listarProductoras, listarProductorasPaginado } from "../services/productoraService";
 import { listarGestoresLocales, listarTaquilleros, listarOrganizadores, listarDuenhos } from "../services/gestorLocalService";
 import { listarPuntosVenta } from "../services/puntoVentaService";
+import { listarEventos } from "../services/eventoService";
 import '../styles/CargaSpinner.css'
 
 
@@ -53,10 +54,10 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
   const [allRows, setAllRows] = useState<DataRow[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
+
   /**********************************
   Fin de Sección de paginación de la tabla
   ***********************************/
-
   /**********************************
   Sección de cabeceras
   ***********************************/
@@ -188,6 +189,8 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
         const data = await fetcher();
         const mapped: DataRow[] = data.map(transform);
         setRows(mapped);
+        console.log("📋 Filas en rows:", rows);
+
       } catch (err: any) {
         console.error(`Error al listar ${tipoGestor}:`, err.message);
       } finally {
@@ -209,7 +212,7 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
   /**********************************
   Fin de Sección de actualización de Paginación de la tabla
   ***********************************/
-
+  //console.log(rows);
   const [searchTerm, setSearchTerm] = useState("");
   const filteredRows = useMemo(() => {
     if (!searchTerm.trim()) return rows;
@@ -219,13 +222,11 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
       )
     );
   }, [searchTerm, rows]);
-  
   useEffect(() => {
     const start = (currentPage - 1) * pageSize;
     const end = start + pageSize;
     setAllRows(filteredRows.slice(start, end));
   }, [currentPage, pageSize, filteredRows]);
-  
   // En esta sección se actualizan los objetos tras haber modificado o agregado un objeto //
 
   const actualizarTabla = async () => {
@@ -237,7 +238,6 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
       Organizador: listarOrganizadores,
       Duenho: listarDuenhos,
     };
-    //console.log(fetchers.Productora);
     const transformadores: Record<string, (item: any, index: number) => DataRow> = {
       Productora: (item: Productora, index) => ({
         id: index,
@@ -248,7 +248,8 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
           item.nombreComercial,
           item.email,
           item.telefono
-        ]
+        ],
+        raw: item
       }),
       GestorLocal: (item: GestorLocal, index) => ({
         id: index,
@@ -260,7 +261,8 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
           item.email,
           item.telefono,
           //item.puntoVenta?.nombre || '—'  //Cambiar despues porque el gestor de locales no tiene punto de venta
-        ]
+        ],
+        raw: item
       }),
       PuntoVenta: (item: PuntoVenta, index) => ({
         id: index,
@@ -272,7 +274,8 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
           item.distrito?.provincia?.nombre || '—',
           item.distrito?.nombre || '—',
           item.activo ? 'Activo' : 'Inactivo'
-        ]
+        ],
+        raw: item
       }),
       Taquillero: (item: GestorLocal, index) => ({
         id: index,
@@ -284,7 +287,8 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
           item.email,
           item.telefono,
           item.puntoVenta.nombre  // Taquillero siempre tiene un Punto de venta
-        ]
+        ],
+        raw: item
       }),
       Organizador: (item: GestorLocal, index) => ({
         id: index,
@@ -296,7 +300,8 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
           item.email,
           item.telefono,
           //item.puntoVenta?.nombre || '—'  //Cambiar despues porque el gestor de locales no tiene punto de venta
-        ]
+        ],
+        raw: item
       }),
       Duenho: (item: GestorLocal, index) => ({
         id: index,
@@ -311,17 +316,43 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
         ],
         raw: item
       }),
+      OrganizadorEvento: (item, index) => {
+        const fecha = new Date(item.fechaHorarioInicio);
+        const fechaInicio = fecha.toLocaleDateString('es-PE', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        });
+        const horaInicio = fecha.toLocaleTimeString('es-PE', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false
+        });
+
+        return {
+          id: index,
+          data: [
+            item.nombre || '—',
+            item.descripcion || '—',
+            fechaInicio,
+            horaInicio,
+            item.duracionEstimada ? `${item.duracionEstimada} min` : '—',
+            item.estado || '—'
+          ],
+          raw: item
+        };
+      },
     };
 
     const fetcher = fetchers[tipoGestor];
     const transform = transformadores[tipoGestor];
 
     if (!fetcher || !transform) return;
-
     try {
       const data = await fetcher();
       const mapped: DataRow[] = data.map(transform);
       setRows(mapped);
+      console.log("📋 Filas en rows:", rows);
 
       const start = (currentPage - 1) * pageSize;
       const end = start + pageSize;
@@ -351,7 +382,7 @@ const TablaAdmin: React.FC<TablaGestorProductorasProps> = ({
           <Search
             id="buscador"
             labelText="Buscar"
-            placeholder="Buscar por nombre, RUC, etc."
+            placeholder="Buscar..."
             size="lg"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
