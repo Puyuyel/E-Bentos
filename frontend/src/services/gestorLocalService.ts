@@ -70,7 +70,7 @@ export async function listarDuenhos(
       (gestor: any) => gestor.usuarioCreador.usuarioId === user.usuarioId
     );
     console.log(organizadoresFiltrados);
-    return organizadoresFiltrados;
+    return response.data.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "Error al listar duenhos");
   }
