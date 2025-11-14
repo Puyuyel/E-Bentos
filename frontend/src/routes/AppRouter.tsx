@@ -242,11 +242,7 @@ const AppRouter: React.FC = () => {
         {/* Ruta /ver detalle evento*/}
         <Route
           path={`/cliente/ver-detalle-evento/:eventoId`}
-          element={
-            <ProtectedRoute requiredRole="CLIENTE">
-              <VerDetalleEvento />
-            </ProtectedRoute>
-          }
+          element={<VerDetalleEvento />}
         />
 
         {/* Redirige cualquier ruta desconocida según rol o a /home */}

@@ -5,7 +5,7 @@ import api from "../apiBase";
 export async function obtenerDetalleEvento(idEvento?: number) {
   try {
     console.log("Obteniendo detalle para eventoId:", idEvento);
-    const response = await api.get(`/eventos/${idEvento}`);
+    const response = await api.get(`/eventosCliente/verDetalle/${idEvento}`);
     return response.data;
   } catch (error: any) {
     // (Sugerencia: Cambié el mensaje de error para que coincida con la ruta)
