@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -20,6 +22,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 import com.ebentos.backend.model.Rol;
 import com.ebentos.backend.repository.UsuarioRepository;
@@ -76,6 +79,8 @@ public class Securityconfig {
 
                                 // Autorización de Rutas
                                 .authorizeHttpRequests(authz -> authz
+                                                // Permitir preflight a cualquier ruta
+                                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                                                 // Rutas públicas (no requieren autenticación)
                                                 .requestMatchers(HttpMethod.POST, "/api/clientes").permitAll()
                                                 .requestMatchers(
@@ -201,8 +206,16 @@ public class Securityconfig {
                 // Usa allowedOriginPatterns para más flexibilidad con puertos/hosts
                 configuration.setAllowedOriginPatterns(origins);
                 configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-                configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With",
-                                "accept", "Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers"));
+                configuration.setAllowedHeaders(Arrays.asList(
+                                "Authorization",
+                                "Content-Type",
+                                "X-Requested-With",
+                                "accept",
+                                "Origin",
+                                "Access-Control-Request-Method",
+                                "Access-Control-Request-Headers",
+                                "Cookie" // por si algún proxy valida cabeceras
+                ));
                 configuration.setExposedHeaders(Arrays.asList("Access-Control-Allow-Origin",
                                 "Access-Control-Allow-Credentials", "Set-Cookie"));
                 configuration.setAllowCredentials(true);
@@ -211,6 +224,38 @@ public class Securityconfig {
                 UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
                 source.registerCorsConfiguration("/api/**", configuration); // Aplica a toda tu API
                 return source;
+        }
+
+        // Filtro CORS con máxima prioridad para asegurar que los headers CORS
+        // se agreguen incluso en respuestas de error (401/403) y preflights.
+        @Bean
+        @Order(Ordered.HIGHEST_PRECEDENCE)
+        public CorsFilter corsFilterHighPrecedence() {
+                CorsConfiguration cfg = new CorsConfiguration();
+                List<String> origins = Arrays.stream(allowedOriginsCsv.split(","))
+                                .map(String::trim)
+                                .filter(s -> !s.isEmpty())
+                                .collect(Collectors.toList());
+                cfg.setAllowedOriginPatterns(origins);
+                cfg.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+                cfg.setAllowedHeaders(Arrays.asList(
+                                "Authorization",
+                                "Content-Type",
+                                "X-Requested-With",
+                                "accept",
+                                "Origin",
+                                "Access-Control-Request-Method",
+                                "Access-Control-Request-Headers",
+                                "Cookie"));
+                cfg.setExposedHeaders(Arrays.asList("Access-Control-Allow-Origin",
+                                "Access-Control-Allow-Credentials", "Set-Cookie"));
+                cfg.setAllowCredentials(true);
+                cfg.setMaxAge(3600L);
+
+                UrlBasedCorsConfigurationSource src = new UrlBasedCorsConfigurationSource();
+                // Registramos para todo, por si algún proxy reescribe el path antes de /api
+                src.registerCorsConfiguration("/**", cfg);
+                return new CorsFilter(src);
         }
 
 }
