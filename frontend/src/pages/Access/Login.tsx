@@ -18,10 +18,10 @@ const Login: React.FC = () => {
       ADMIN: "/admin/gestionar-productora",
       CLIENTE: "/home",
       PRODUCTORA: "/productora/gestionar-organizador",
+      ORGANIZADOR_EVENTOS: "/organizador/eventos",
       GESTOR_LOCAL: "/gestor_local/gestionar-local",
       DUENHO_LOCAL: "/duenho_local/gestionar-local",
-      TAQUILLERO: "/taquillero/home",
-      ORGANIZADOR_EVENTOS: "/organizador/eventos",
+      TAQUILLERO: "/home",
     };
 
     return roleRoutes[rol] || "/";

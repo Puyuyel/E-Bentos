@@ -2,7 +2,7 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Pagination, Search, Button } from "@carbon/react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { listarEventos } from "../services/eventoService";
+import { listarEventosFiltrados } from "../services/eventoService";
 import '../styles/CargaSpinner.css';
 import type { EventoBackend } from "../types/event.types";
 import { useAuthStore } from "../store/useAuthStore";
@@ -32,7 +32,7 @@ const TablaEventos: React.FC = () => {
   const cargarEventos = async () => {
     setIsLoading(true);
     try {
-      const data = await listarEventos();
+      const data = await listarEventosFiltrados(Number(user?.id));
       console.log(data);
       setEventos(data);
     } catch (err: any) {

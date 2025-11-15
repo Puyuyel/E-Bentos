@@ -19,6 +19,7 @@ export default function ContenedorInformacionEvento({
   const ubicacionLocal = ubicacion;
   const fechaHoravento = fechaHora;
   const descripcionArtista = descripcion;
+  console.log("Descripcion artista:", `${imageBaseUrl}/${imagenArtista}`);
   return (
     <div
       style={{
@@ -77,7 +78,7 @@ export default function ContenedorInformacionEvento({
         <div
           className="img-banner"
           style={{
-            backgroundImage: `url(${imageBaseUrl}/${imagenArtista})`,
+            backgroundImage: `url(${imageBaseUrl}/${imgArtista})`,
           }}
         />
         <div

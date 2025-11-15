@@ -48,10 +48,20 @@ const Header: React.FC = () => {
     setSearchTerm(e.target.value);
   };
 
+  const handleClickHeader = () => {
+    navigate("/home");
+  };
+
   return (
     <header className="header-total">
       <div className="header-container">
-        <div className="header-content">
+        <div
+          className="header-content"
+          onClick={handleClickHeader}
+          style={{
+            cursor: "pointer",
+          }}
+        >
           <img src={logo} alt="e-Bentos logo" className="header-logo" />
           <div className="logo-text">e-Bentos</div>
         </div>

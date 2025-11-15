@@ -37,6 +37,7 @@ const AppRouter: React.FC = () => {
       ADMIN: "/admin/gestionar-productora",
       CLIENTE: "/home",
       PRODUCTORA: "/productora/gestionar-organizador",
+      ORGANIZADOR_EVENTOS: "/organizador/eventos",
       GESTOR_LOCAL: "/gestor_local/gestionar-local",
       DUENHO_LOCAL: "/duenho_local/gestionar-local",
       TAQUILLERO: "/home",
@@ -284,11 +285,7 @@ const AppRouter: React.FC = () => {
         {/* Ruta /ver detalle evento*/}
         <Route
           path={`/cliente/ver-detalle-evento/:eventoId`}
-          element={
-            <ProtectedRoute requiredRole="CLIENTE">
-              <VerDetalleEvento />
-            </ProtectedRoute>
-          }
+          element={<VerDetalleEvento />}
         />
 
         {/* Redirige cualquier ruta desconocida según rol o a /home */}
