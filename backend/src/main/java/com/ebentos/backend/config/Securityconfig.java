@@ -226,36 +226,4 @@ public class Securityconfig {
                 return source;
         }
 
-        // Filtro CORS con máxima prioridad para asegurar que los headers CORS
-        // se agreguen incluso en respuestas de error (401/403) y preflights.
-        @Bean
-        @Order(Ordered.HIGHEST_PRECEDENCE)
-        public CorsFilter corsFilterHighPrecedence() {
-                CorsConfiguration cfg = new CorsConfiguration();
-                List<String> origins = Arrays.stream(allowedOriginsCsv.split(","))
-                                .map(String::trim)
-                                .filter(s -> !s.isEmpty())
-                                .collect(Collectors.toList());
-                cfg.setAllowedOriginPatterns(origins);
-                cfg.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-                cfg.setAllowedHeaders(Arrays.asList(
-                                "Authorization",
-                                "Content-Type",
-                                "X-Requested-With",
-                                "accept",
-                                "Origin",
-                                "Access-Control-Request-Method",
-                                "Access-Control-Request-Headers",
-                                "Cookie"));
-                cfg.setExposedHeaders(Arrays.asList("Access-Control-Allow-Origin",
-                                "Access-Control-Allow-Credentials", "Set-Cookie"));
-                cfg.setAllowCredentials(true);
-                cfg.setMaxAge(3600L);
-
-                UrlBasedCorsConfigurationSource src = new UrlBasedCorsConfigurationSource();
-                // Registramos para todo, por si algún proxy reescribe el path antes de /api
-                src.registerCorsConfiguration("/**", cfg);
-                return new CorsFilter(src);
-        }
-
 }
