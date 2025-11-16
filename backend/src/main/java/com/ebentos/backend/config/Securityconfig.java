@@ -203,8 +203,8 @@ public class Securityconfig {
                                 .filter(s -> !s.isEmpty())
                                 .collect(Collectors.toList());
 
-                // Usa allowedOriginPatterns para más flexibilidad con puertos/hosts
-                configuration.setAllowedOriginPatterns(origins);
+                // Usa allowedOrigins (exactos) cuando allowCredentials=true
+                configuration.setAllowedOrigins(origins);
                 configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
                 configuration.setAllowedHeaders(Arrays.asList(
                                 "Authorization",
