@@ -13,6 +13,7 @@ import GestionarPuntoDeVenta from "../pages/Gestion/GestionarPuntoDeVenta";
 import GestionarTaquillero from "../pages/Gestion/GestionarTaquillero";
 import GestionarDuenhoLocal from "../pages/Gestion/DuenhoLocal/GestionarDuenhoLocal";
 import VerDetalleEvento from "../pages/Cliente/VerDetalleEvento";
+import ComprarEvento from "../pages/Cliente/ComprarEvento";
 import ReporteCliente from "../pages/Reportes/ReporteCliente";
 import ReporteEvento from "../pages/Reportes/ReporteEvento";
 import ReporteLocal from "../pages/Reportes/ReporteLocal";
@@ -231,7 +232,7 @@ const AppRouter: React.FC = () => {
             </ProtectedRoute>
           }
         />
-        
+
         <Route
           path="/organizador/eventos/crear"
           element={
@@ -256,7 +257,7 @@ const AppRouter: React.FC = () => {
             </ProtectedRoute>
           }
         />
-        
+
         <Route
           path="/organizador/eventos/crear"
           element={
@@ -286,6 +287,16 @@ const AppRouter: React.FC = () => {
         <Route
           path={`/cliente/ver-detalle-evento/:eventoId`}
           element={<VerDetalleEvento />}
+        />
+
+        {/* Ruta /comprar entrada evento*/}
+        <Route
+          path={`/cliente/comprar-entradas-evento/:eventoId`}
+          element={
+            <ProtectedRoute requiredRole="CLIENTE">
+              <ComprarEvento />
+            </ProtectedRoute>
+          }
         />
 
         {/* Redirige cualquier ruta desconocida según rol o a /home */}
