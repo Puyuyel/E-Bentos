@@ -1,6 +1,8 @@
 package com.ebentos.backend.model;
 
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.*;
 
 @Getter
@@ -46,5 +48,7 @@ public class Venta {
     @Enumerated(EnumType.STRING)
     @Column(name = "METODO_PAGO", nullable = false)
     private MetodoPago metodoPago;
-
+    
+    @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Entrada> entradas = new ArrayList<>();
 }

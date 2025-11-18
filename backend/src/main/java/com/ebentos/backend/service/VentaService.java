@@ -1,7 +1,9 @@
 package com.ebentos.backend.service;
 
+import com.ebentos.backend.dto.EntradaDTO;
 import com.ebentos.backend.dto.EventoSimpleDTO;
 import com.ebentos.backend.dto.LocalSimpleParaVentasDTO;
+import com.ebentos.backend.dto.VentaConEntradasDTO;
 import com.ebentos.backend.dto.VentaDTO;
 import com.ebentos.backend.model.Venta;
 import com.ebentos.backend.repository.VentaRepository;
@@ -30,10 +32,25 @@ public class VentaService {
         return ventaDTO;
     }
     
-    public List<VentaDTO> listarTodas() {
+    public List<VentaDTO> listarPasadas(Integer clienteId) {
+    return ventaRepository.findEventosPasadosByCliente(clienteId)
+            .stream()
+            .map(this::llenarDTO)
+            .collect(Collectors.toList());
+}
+
+    public List<VentaConEntradasDTO> listarActivas(Integer clienteId) {
+        return ventaRepository.findEventosFuturosByCliente(clienteId)
+                .stream()
+                .map(this::llenarDTOConEntradas)
+                .collect(Collectors.toList());
+    }
+
+    
+    public List<VentaConEntradasDTO> listarTodas() {
         return ventaRepository.findAll()
                 .stream()
-                .map(this::llenarDTO)
+                .map(this::llenarDTOConEntradas)
                 .collect(Collectors.toList());
     }
     
@@ -50,16 +67,59 @@ public class VentaService {
             eventoDTO.setNombre(venta.getEvento().getNombre());
             eventoDTO.setFechaHorarioInicio(venta.getEvento().getFechaHorarioInicio());
             ventaDTO.setEvento(eventoDTO);
+            
+            if (venta.getEvento().getLocal() != null){
+                LocalSimpleParaVentasDTO localDTO = new LocalSimpleParaVentasDTO();
+                localDTO.setLocalId(venta.getEvento().getLocal().getLocalId());
+                localDTO.setNombre(venta.getEvento().getLocal().getNombre());
+                localDTO.setDireccion(venta.getEvento().getLocal().getDireccion());
+                ventaDTO.setLocal(localDTO);
+            } 
+            
         }
-        
-        if (venta.getEvento().getLocal() != null){
-            LocalSimpleParaVentasDTO localDTO = new LocalSimpleParaVentasDTO();
-            localDTO.setLocalId(venta.getEvento().getLocal().getLocalId());
-            localDTO.setNombre(venta.getEvento().getLocal().getNombre());
-            localDTO.setDireccion(venta.getEvento().getLocal().getDireccion());
-            ventaDTO.setLocal(localDTO);
-        } 
         
         return ventaDTO;
     }
+    
+    private VentaConEntradasDTO llenarDTOConEntradas(Venta venta) {
+        VentaConEntradasDTO dto = new VentaConEntradasDTO();
+
+        dto.setVentaId(venta.getVentaId());
+        dto.setMontoTotalFinal(venta.getMontoTotalFinal());
+        dto.setPuntosGanados((int) (venta.getMontoTotalFinal() * 0.1));
+
+        // Evento
+        if (venta.getEvento() != null) {
+            EventoSimpleDTO eventoDTO = new EventoSimpleDTO();
+            eventoDTO.setEventoId(venta.getEvento().getEventoId());
+            eventoDTO.setNombre(venta.getEvento().getNombre());
+            eventoDTO.setFechaHorarioInicio(venta.getEvento().getFechaHorarioInicio());
+            dto.setEvento(eventoDTO);
+
+            // Local
+            if (venta.getEvento().getLocal() != null) {
+                LocalSimpleParaVentasDTO localDTO = new LocalSimpleParaVentasDTO();
+                localDTO.setLocalId(venta.getEvento().getLocal().getLocalId());
+                localDTO.setNombre(venta.getEvento().getLocal().getNombre());
+                localDTO.setDireccion(venta.getEvento().getLocal().getDireccion());
+                dto.setLocal(localDTO);
+            }
+        }
+
+        // Entradas
+        if (venta.getEntradas() != null && !venta.getEntradas().isEmpty()) {
+            List<EntradaDTO> entradasDTO = venta.getEntradas().stream()
+                .map(entrada -> {
+                    EntradaDTO entradaDTO = new EntradaDTO();
+                    entradaDTO.setEntradaId(entrada.getEntradaId());
+                    entradaDTO.setQr(entrada.getQr()); // ahora QR es String
+                    return entradaDTO;
+                })
+                .collect(Collectors.toList());
+            dto.setEntradas(entradasDTO);
+        }
+
+        return dto;
+    }
+
 }
