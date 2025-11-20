@@ -1,6 +1,7 @@
 package com.ebentos.backend.dto;
 
 import com.ebentos.backend.model.MetodoPago;
+import java.util.List;
 import lombok.*;
 
 @Getter
@@ -8,7 +9,7 @@ import lombok.*;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class VentaDTO {
+public class VentaConEntradasDTO {
     
     private Integer ventaId;
     private EventoSimpleDTO evento;
@@ -16,4 +17,6 @@ public class VentaDTO {
     private LocalSimpleParaVentasDTO local;
     private Double montoTotalFinal;
     private MetodoPago metodoDepago;
+    private List<EntradaDTO> entradas;
+    
 }

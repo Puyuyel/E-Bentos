@@ -13,11 +13,17 @@ import { obtenerDetalleEvento } from "../../services/ClientServices/detalleEvent
 import { useParams } from "react-router-dom";
 import type { EventoDetalle } from "../../types/event.types";
 import { obtenerFecha } from "../../components/util/obtenerFecha";
+import { useNavigate } from "react-router-dom";
 import { getLocalPorIdService } from "../../services/LocalesServices/getLocalPorId";
 import type { Local } from "../../types/locales.types";
 import { ConvertToCloud } from "@carbon/icons-react";
+import { useAuthStore } from "../../store/useAuthStore";
+
+const imageBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL;
 
 export default function VerDetalleEvento() {
+  const navigate = useNavigate();
+  const { isLoggedIn } = useAuthStore();
   const [datosEvento, setDatosEvento] = useState<EventoDetalle>();
   const { eventoId } = useParams();
   useEffect(() => {
@@ -50,6 +56,7 @@ export default function VerDetalleEvento() {
   }, []);
 
   const [loading, setLoading] = useState<boolean>(true);
+  const [loginModalOpen, setLoginModalOpen] = useState<boolean>(false);
 
   if (loading) {
     return (
@@ -63,9 +70,35 @@ export default function VerDetalleEvento() {
 
   if (!datosEvento) return <div>Sin datos disponibles.</div>;
 
+  const handleComprarEntradas = () => {
+    if (isLoggedIn === false) {
+      setLoginModalOpen(true);
+      return;
+    }
+    navigate(`/cliente/comprar-entradas-evento/${eventoId}`);
+  };
+
   return (
     <div className={styles.pageRoot}>
       <HeaderEbentos />
+      <Modal
+        open={loginModalOpen}
+        modalHeading="Necesitas iniciar sesión"
+        primaryButtonText="Iniciar sesión"
+        secondaryButtonText="Cerrar"
+        onRequestClose={() => setLoginModalOpen(false)}
+        onRequestSubmit={() =>
+          navigate(
+            `/login?redirect=${encodeURIComponent(
+              `/cliente/comprar-entradas-evento/${eventoId}`
+            )}`
+          )
+        }
+      >
+        <div style={{ padding: "0.5rem 0" }}>
+          <p>Debe iniciar sesión para comprar entradas.</p>
+        </div>
+      </Modal>
       <ContenedorImagenEvento
         imagen={datosEvento.posterHorizontal}
         className={styles.hero}
@@ -81,7 +114,7 @@ export default function VerDetalleEvento() {
           }}
           className={styles.ctaWrap}
         >
-          <Button>Comprar Entradas</Button>
+          <Button onClick={handleComprarEntradas}>Comprar Entradas</Button>
         </div>
         <ContenedorInformacionEvento
           ubicacion={datosEvento.direccionLocal}

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
 @Getter
 @Setter
@@ -14,7 +13,6 @@ import org.hibernate.annotations.Where;
 @AllArgsConstructor
 @ToString
 @SQLDelete(sql = "UPDATE EVENTO SET ESTADO = 'CANCELADO' WHERE EVENTO_ID = ?")
-@Where(clause = "ESTADO IN ('PENDIENTE', 'ACTIVO', 'SOLICITUD_RECHAZADA')")
 @Table(name = "EVENTO")
 public class Evento {
     

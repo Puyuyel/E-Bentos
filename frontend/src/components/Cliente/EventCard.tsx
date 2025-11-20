@@ -21,7 +21,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
   const imageSrc = isLarge ? event.posterVertical : event.posterHorizontal;
 
   const handleClickCard = async () => {
-    try{
+    try {
       console.log("Añadiendo vista para el evento ID:", event.eventoId);
       await añadirVista(event.eventoId);
     } catch (error) {
