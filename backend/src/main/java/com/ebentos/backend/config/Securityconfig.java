@@ -220,11 +220,4 @@ public class Securityconfig {
                 return source;
         }
 
-        // BEAN: Filtro CORS con alta prioridad (se ejecuta ANTES que Security)
-        @Bean
-        @Order(Ordered.HIGHEST_PRECEDENCE)
-        public CorsFilter corsFilter() {
-                return new CorsFilter(corsConfigurationSource());
-        }
-
 }
