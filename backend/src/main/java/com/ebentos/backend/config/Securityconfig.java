@@ -203,26 +203,20 @@ public class Securityconfig {
                                 .filter(s -> !s.isEmpty())
                                 .collect(Collectors.toList());
 
-                // Usa allowedOrigins (exactos) cuando allowCredentials=true
-                configuration.setAllowedOrigins(origins);
+                // DEBUG: Imprime los origins parseados
+                System.out.println("🔍 CORS Origins configurados: " + origins);
+
+                // Usa allowedOriginPatterns en lugar de allowedOrigins (más permisivo)
+                configuration.setAllowedOriginPatterns(Arrays.asList("*"));
                 configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-                configuration.setAllowedHeaders(Arrays.asList(
-                                "Authorization",
-                                "Content-Type",
-                                "X-Requested-With",
-                                "accept",
-                                "Origin",
-                                "Access-Control-Request-Method",
-                                "Access-Control-Request-Headers",
-                                "Cookie" // por si algún proxy valida cabeceras
-                ));
+                configuration.setAllowedHeaders(Arrays.asList("*"));
                 configuration.setExposedHeaders(Arrays.asList("Access-Control-Allow-Origin",
                                 "Access-Control-Allow-Credentials", "Set-Cookie"));
                 configuration.setAllowCredentials(true);
                 configuration.setMaxAge(3600L); // 1 hora en segundos
 
                 UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-                source.registerCorsConfiguration("/**", configuration); // Aplica a todas las rutas
+                source.registerCorsConfiguration("/**", configuration);
                 return source;
         }
 
