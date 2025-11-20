@@ -71,11 +71,11 @@ public class Securityconfig {
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
                 http
-                                // Configuración de CORS (para que React se conecte)
-                                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-
                                 // Desactivar CSRF (común para APIs REST stateless)
                                 .csrf(csrf -> csrf.disable())
+
+                                // Configuración de CORS (debe ir ANTES de autorización)
+                                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
                                 // Autorización de Rutas
                                 .authorizeHttpRequests(authz -> authz
@@ -222,8 +222,15 @@ public class Securityconfig {
                 configuration.setMaxAge(3600L); // 1 hora en segundos
 
                 UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-                source.registerCorsConfiguration("/api/**", configuration); // Aplica a toda tu API
+                source.registerCorsConfiguration("/**", configuration); // Aplica a todas las rutas
                 return source;
+        }
+
+        // BEAN: Filtro CORS con alta prioridad (se ejecuta ANTES que Security)
+        @Bean
+        @Order(Ordered.HIGHEST_PRECEDENCE)
+        public CorsFilter corsFilter() {
+                return new CorsFilter(corsConfigurationSource());
         }
 
 }
