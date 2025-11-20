@@ -6,6 +6,8 @@ import com.ebentos.backend.dto.VentaDTO;
 import com.ebentos.backend.service.VentaService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -46,4 +48,20 @@ public class VentaController {
         Integer clienteId = user.getUsuarioId();
         return ventaService.listarActivas(clienteId);
     }
+    
+    @GetMapping("/{ventaId}/descargar")
+    public ResponseEntity<byte[]> descargarEntradas(@PathVariable Integer ventaId,
+            Authentication authentication) {
+
+        UsuarioDetails user = (UsuarioDetails) authentication.getPrincipal();
+        Integer clienteId = user.getUsuarioId();
+
+        byte[] pdf = ventaService.generarPdfEntradas(ventaId, clienteId);
+
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=entradas_" + ventaId + ".pdf")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdf);
+    }
+
 }
