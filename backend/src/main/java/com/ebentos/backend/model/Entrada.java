@@ -37,7 +37,6 @@ public class Entrada {
     @Column(name = "PRECIO_FINAL", nullable = false)
     private Double precioFinal;
 
-    // El QR se guardará como BLOB
     @Column(name = "QR", length = 255, nullable = false)
     private String qr;
     
