@@ -4,6 +4,7 @@ import com.ebentos.backend.dto.ClienteActualizaDTO;
 import com.ebentos.backend.dto.ClienteDTO;
 import com.ebentos.backend.dto.RegistroClienteDTO;
 import com.ebentos.backend.model.Cliente;
+import com.ebentos.backend.model.Descuento;
 import com.ebentos.backend.model.Rol;
 import com.ebentos.backend.repository.ClienteRepository;
 import com.ebentos.backend.repository.RolRepository;
@@ -13,6 +14,7 @@ import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ClienteService {
@@ -128,4 +130,46 @@ public class ClienteService {
             throw new RuntimeException("Productora no encontrada con id: " + id);
         }
     }
+
+    //Metodos adicionales para el ciente
+    @Transactional
+    public void aumentarPuntos(Integer idCliente, Double totalPagado) {
+
+        Cliente cliente = clienteRepository.findById(idCliente)
+                .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+
+        //Convertimos el total pagado a puntos
+        Integer puntosGanados = (int) (totalPagado * 0.01);
+        Integer puntosNuevos = cliente.getPuntosAcumulados() + puntosGanados;
+        // Cambiamos los puntos
+        cliente.setPuntosAcumulados(puntosNuevos);
+
+        // Al salir, @Transactional hace commit
+        // JPA detecta que se cambió y ejecuta por sí solo el update
+    }
+
+    public void canjearPuntos(Integer idCliente, Integer porcentaje){
+        Integer cantPuntosAQuitar = 0;
+        if( porcentaje == 5){
+            cantPuntosAQuitar = 75;
+        }else if( porcentaje == 10){
+            cantPuntosAQuitar = 125;
+        }else if( porcentaje == 15){
+            cantPuntosAQuitar = 150;
+        }
+        //Quitar puntos ganados y aumentar puntos gastados
+        Cliente cliente = clienteRepository.findById(idCliente)
+                .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+        Integer puntosAcumulados= cliente.getPuntosAcumulados();
+        Integer puntosGastados =  cliente.getPuntosGastados();
+        cliente.setPuntosAcumulados(puntosAcumulados-cantPuntosAQuitar);
+        cliente.setPuntosGastados(puntosGastados+cantPuntosAQuitar);
+        clienteRepository.save(cliente);
+        //Insertar en la tabla descuento el nuevo descuento
+        Descuento descuento = new Descuento();
+
+        //Insertar en la tabla descuento x cliente
+
+    }
+
 }

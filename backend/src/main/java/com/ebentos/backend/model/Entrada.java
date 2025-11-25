@@ -20,11 +20,13 @@ public class Entrada {
     // Relación con Venta
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "VENTA_ID", nullable = false)
+    @ToString.Exclude
     private Venta venta;
 
     // Relación con Zona
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ZONA_ID", nullable = false)
+    @ToString.Exclude
     private Zona zona;
 
     // Campos normales
