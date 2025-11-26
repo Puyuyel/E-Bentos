@@ -58,4 +58,28 @@ public class ClienteController {
     public void eliminar(@PathVariable Integer id) {
         clienteService.eliminar(id);
     }
+    
+    @GetMapping("/{id}/puntos")
+    public ResponseEntity<?> obtenerMisPuntos(@PathVariable Integer id) {
+        try {
+            return ResponseEntity.ok(clienteService.listarMisPuntos(id));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+    
+    @PostMapping("/{id}/canjear/{descuentoId}")
+    public ResponseEntity<?> canjearPuntos(
+            @PathVariable Integer id,
+            @PathVariable Integer descuentoId) {
+
+        try {
+            clienteService.canjearPuntos(id, descuentoId);
+            return ResponseEntity.ok("Descuento canjeado correctamente");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+    
+    
 }
