@@ -3,7 +3,7 @@ import HeaderEbentos from "../../components/Cliente/HeaderEbentos";
 import Footer from "../../components/Cliente/Footer";
 import { Search, Filter, Ticket, Calendar, Map, CurrencyDollar, Star } from "@carbon/icons-react";
 import styles from"../../styles/Cliente/MisEntradas.module.css";//styles/Cliente/MisEntradas.module.css";
-import { listarVentasActivas, listarVentasPasadas } from "../../services/VentaServices/VentaService";
+import { listarVentasActivas, listarVentasPasadas } from "../../services/VentaServices/ventaService";
 import type { EstadoVenta, VentaConEstado } from "../../types/venta.types";
 
 const formatDate = (isoDate: string) => {
