@@ -2,6 +2,7 @@ package com.ebentos.backend.service;
 
 import com.ebentos.backend.dto.EventoActualizaDTO;
 import com.ebentos.backend.dto.SolicitudDTO;
+import com.ebentos.backend.dto.SolicitudInfoDTO;
 import com.ebentos.backend.model.*;
 import com.ebentos.backend.repository.SolicitudRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -117,15 +118,16 @@ public class SolicitudService {
     }
 
     //Listar paginado
-    public Map<String, Object> listarPaginado(Integer gestorUsuarioId, Integer  page, Integer size){
+    public Map<String, Object> listarPaginado(Integer gestorUsuarioId, Integer page, Integer size){
         Pageable pageable = PageRequest.of(page, size);
-        Page<Solicitud> solicitudesPage = solicitudRepository.findByGestorUsuarioId(gestorUsuarioId, pageable);
 
-        List<SolicitudDTO> solicitudesDTO = solicitudesPage.getContent().stream().map(this::llenarADTO).collect(Collectors.toList());
+        Page<SolicitudInfoDTO> solicitudesPage = solicitudRepository.findByGestorUsuarioId(gestorUsuarioId, pageable);
 
-        // Construimos la respuesta con la estructura pedida
+        List<SolicitudInfoDTO> dataLista = solicitudesPage.getContent();
+
+        // Construimos la respuesta
         Map<String, Object> response = new HashMap<>();
-        response.put("data", solicitudesDTO);
+        response.put("data", dataLista); // 3. CAMBIO: Ponemos la lista directa
 
         Map<String, Object> pagination = new HashMap<>();
         pagination.put("totalItems", solicitudesPage.getTotalElements());
