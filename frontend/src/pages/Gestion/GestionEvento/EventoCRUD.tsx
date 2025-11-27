@@ -951,7 +951,7 @@ function VenueForm({
       </Grid>
 
       {/* Sección de Zonas */}
-      <SeccionZonas modo={modo} isDisabled={modo === "visualizar" || modo === "editar"} />
+      <SeccionZonas modo={modo} isDisabled={isDisabled} />
     </FormGroup>
   );
 }
