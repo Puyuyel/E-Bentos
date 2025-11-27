@@ -43,6 +43,7 @@ export default function MiPerfil() {
     email: "",
     telefono: "",
     genero: "" as Genero | "",
+    contrasenha: "",
   });
 
   useEffect(() => {
@@ -63,6 +64,7 @@ export default function MiPerfil() {
           email: data.email || "",
           telefono: data.telefono || "",
           genero: data.genero ?? "",
+          contrasenha: "",
         });
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : "No pudimos cargar tu perfil";
@@ -109,10 +111,11 @@ export default function MiPerfil() {
         telefono: formState.telefono,
         genero: formState.genero,
         activo: 1,
-        contrasenha: '8J7e7e??',
+        contrasenha: formState.contrasenha ? formState.contrasenha : '',
       };
       const actualizado = await actualizarCliente(cliente.usuarioId, payload);
       setCliente(actualizado);
+      setFormState((prev) => ({ ...prev, contrasenha: "" }));
       setFeedback("Datos actualizados correctamente");
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "No pudimos guardar los cambios";
@@ -341,6 +344,18 @@ export default function MiPerfil() {
                 <p className={styles.muted}>
                   Actualiza tus datos de contacto y preferencias. Los cambios se aplican a futuras compras.
                 </p>
+                
+                <label className={styles.field}>
+                  <span>Nueva contraseña</span>
+                  <input
+                    type="password"
+                    name="contrasenha"
+                    value={formState.contrasenha}
+                    onChange={handleInputChange}
+                    placeholder="Ingresa una nueva contraseña"
+                  />
+                  <small>Déjalo en blanco si no deseas cambiar tu contraseña.</small>
+                </label>
 
                 <div className={styles.actions}>
                   <button type="submit" className={styles.primaryButton} disabled={saving}>
