@@ -17,9 +17,10 @@ import type { FormDataEvento } from "./EventoCRUD";
 interface SeccionZonasProps {
   modo: string;
   isDisabled: boolean;
+  imagenZonasExistente?: string;
 }
 
-export default function SeccionZonas({ modo, isDisabled }: SeccionZonasProps) {
+export default function SeccionZonas({ modo, isDisabled, imagenZonasExistente }: SeccionZonasProps) {
   const { register, setValue, control, watch } = useFormContext<FormDataEvento>();
   
   // Hook para manejar la lista dinámica
@@ -30,32 +31,57 @@ export default function SeccionZonas({ modo, isDisabled }: SeccionZonasProps) {
 
   // Observar el archivo de imagen de zonas
   const imagenZonasFile = watch("imagenZonasFile");
-  const [imagenZonasExistente, setImagenZonasExistente] = useState<string | null>(null);
+  const [mostrarImagenExistente, setMostrarImagenExistente] = useState(true);
 
-  // Cargar imagen de zonas existente si estamos en editar/visualizar
+  // Cargar imagen de zonas existente cuando cambie la prop
   useEffect(() => {
-    if (modo !== "crear") {
-      // En una implementación real, aquí obtendrías la imagen de zonas del evento
-      const baseUrl = "https://ebentos.blob.core.windows.net/images/";
-      // Esto debería venir de tu API
-      setImagenZonasExistente(`${baseUrl}eventos/1/zona_example.jpg`);
+    if (modo !== "crear" && imagenZonasExistente && imagenZonasExistente !== "") {
+      console.log("🖼️ Imagen de zonas existente disponible:", imagenZonasExistente);
+      setMostrarImagenExistente(true);
+    } else {
+      setMostrarImagenExistente(false);
     }
-  }, [modo]);
+  }, [modo, imagenZonasExistente]);
+
+  // Cuando se sube una nueva imagen, ocultar la existente
+  useEffect(() => {
+    if (imagenZonasFile) {
+      setMostrarImagenExistente(false);
+    } else if (modo !== "crear" && imagenZonasExistente) {
+      setMostrarImagenExistente(true);
+    }
+  }, [imagenZonasFile, modo, imagenZonasExistente]);
 
   const handleImageUpload = (_: any, { addedFiles }: any) => {
     if (addedFiles.length > 0 && !isDisabled) {
       setValue("imagenZonasFile", addedFiles[0]);
-      setImagenZonasExistente(null); // Ocultar imagen existente al subir nueva
+      setMostrarImagenExistente(false); // Ocultar imagen existente al subir nueva
     }
   };
 
   const handleRemoveImage = () => {
     if (!isDisabled) {
       setValue("imagenZonasFile", null);
-      // Volver a mostrar la imagen existente si hay una
-      if (imagenZonasExistente) {
-        setImagenZonasExistente(imagenZonasExistente);
+      
+      // Si estamos en modo editar y hay imagen existente, volver a mostrarla
+      if (modo !== "crear" && imagenZonasExistente) {
+        setMostrarImagenExistente(true);
+      } else {
+        setMostrarImagenExistente(false);
       }
+    }
+  };
+
+  // Función para manejar error al cargar imagen
+  const handleImageError = () => {
+    console.error("❌ Error cargando imagen de zonas:", imagenZonasExistente);
+    setMostrarImagenExistente(false);
+  };
+
+  // Función para cambiar a modo de subir nueva imagen
+  const handleCambiarImagen = () => {
+    if (!isDisabled) {
+      setMostrarImagenExistente(false);
     }
   };
 
@@ -70,33 +96,60 @@ export default function SeccionZonas({ modo, isDisabled }: SeccionZonasProps) {
           <p className="cds--label-description">
             {isDisabled ? "Mapa de zonas del evento" : "Sube una imagen referencial de las zonas."}
           </p>
-          
-          {!isDisabled && (
-            <FileUploaderDropContainer
-              accept={["image/jpg", "image/png"]}
-              labelText="Arrastra el mapa aquí"
-              onAddFiles={handleImageUpload}
-              disabled={isDisabled}
-            />
-          )}
 
-          {/* Mostrar imagen existente en modo visualizar/editar */}
-          {!imagenZonasFile && imagenZonasExistente && (
+          {/* MODO 1: Mostrar imagen existente (solo en editar/visualizar) */}
+          {mostrarImagenExistente && imagenZonasExistente && !imagenZonasFile && (
             <div className="preview-imagen-container">
               <img 
                 src={imagenZonasExistente} 
                 alt="Mapa de zonas existente" 
                 className="preview-imagen"
+                onError={handleImageError}
               />
-              {isDisabled && (
+              {isDisabled ? (
                 <p style={{ fontSize: "0.75rem", textAlign: "center", marginTop: "8px" }}>
                   Mapa de zonas actual
                 </p>
+              ) : (
+                <div style={{ display: "flex", gap: "8px", flexDirection: "column", alignItems: "center" }}>
+                  <Button kind="ghost" size="sm" onClick={handleCambiarImagen}>
+                    Cambiar imagen
+                  </Button>
+                  <p style={{ fontSize: "0.75rem", color: "#666", textAlign: "center" }}>
+                    Puedes reemplazar la imagen actual
+                  </p>
+                </div>
               )}
             </div>
           )}
 
-          {/* Mostrar nueva imagen subida */}
+          {/* MODO 2: Mostrar opción para subir nueva imagen (cuando no hay imagen existente o se quiere cambiar) */}
+          {(!mostrarImagenExistente || modo === "crear") && !imagenZonasFile && (
+            <>
+              {!isDisabled && (
+                <FileUploaderDropContainer
+                  accept={["image/jpg", "image/jpeg", "image/png"]}
+                  labelText="Arrastra el mapa aquí"
+                  onAddFiles={handleImageUpload}
+                  disabled={isDisabled}
+                />
+              )}
+              
+              {/* Botón para volver a ver imagen existente (solo en editar cuando hay imagen existente) */}
+              {modo === "editar" && imagenZonasExistente && !isDisabled && (
+                <Button
+                  kind="ghost"
+                  size="sm"
+                  onClick={() => setMostrarImagenExistente(true)}
+                  style={{ marginTop: "16px" }}
+                >
+                  Ver imagen actual
+                </Button>
+              )}
+            </>
+          )}
+
+          {/* MODO 3: Mostrar nueva imagen subida */}
           {imagenZonasFile && (
             <div className="preview-imagen-container">
               <img 
@@ -106,16 +159,23 @@ export default function SeccionZonas({ modo, isDisabled }: SeccionZonasProps) {
               />
               {!isDisabled && (
                 <Button kind="ghost" size="sm" onClick={handleRemoveImage}>
-                  Quitar imagen
+                  {modo === "crear" ? "Quitar imagen" : "Cancelar cambio"}
                 </Button>
               )}
             </div>
           )}
 
-          {/* Mensaje si no hay imagen */}
-          {!imagenZonasFile && !imagenZonasExistente && isDisabled && (
-            <p style={{ fontStyle: "italic", color: "#6f6f6f" }}>
+          {/* Mensaje si no hay imagen en modo visualizar */}
+          {isDisabled && !mostrarImagenExistente && !imagenZonasExistente && (
+            <p style={{ fontStyle: "italic", color: "#6f6f6f", textAlign: "center" }}>
               No hay mapa de zonas disponible
+            </p>
+          )}
+
+          {/* Mensaje si no hay imagen en modo crear/editar */}
+          {!isDisabled && !mostrarImagenExistente && !imagenZonasFile && !imagenZonasExistente && (
+            <p style={{ fontStyle: "italic", color: "#6f6f6f", textAlign: "center" }}>
+              No se ha subido ningún mapa de zonas
             </p>
           )}
         </div>
