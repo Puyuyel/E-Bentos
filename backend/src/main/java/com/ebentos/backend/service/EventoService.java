@@ -81,6 +81,7 @@ public class EventoService {
         evento.setDescripcion(registroEventoDTO.getDescripcion());
         evento.setPosterHorizontal(registroEventoDTO.getPosterHorizontal());
         evento.setPosterVertical(registroEventoDTO.getPosterVertical());
+        evento.setImagenZonas(registroEventoDTO.getImagenZonas());
         evento.setFechaHorarioInicio(registroEventoDTO.getFechaHorarioInicio());
         evento.setDuracionEstimada(registroEventoDTO.getDuracionEstimada());
         evento.setCostoTotal(registroEventoDTO.getCostoTotal());
@@ -158,6 +159,9 @@ public class EventoService {
         }
         if (!Objects.equals(eventoActualizaDTO.getPosterVertical(), eventoExistente.getPosterVertical())){
             eventoExistente.setPosterVertical(eventoActualizaDTO.getPosterVertical());
+        }
+        if (!Objects.equals(eventoActualizaDTO.getImagenZonas(), eventoExistente.getImagenZonas())){
+            eventoExistente.setImagenZonas(eventoActualizaDTO.getImagenZonas());
         }
         if (!Objects.equals(eventoActualizaDTO.getFechaHorarioInicio(), eventoExistente.getFechaHorarioInicio())){
             eventoExistente.setFechaHorarioInicio(eventoActualizaDTO.getFechaHorarioInicio());
@@ -240,6 +244,7 @@ public class EventoService {
         eventoDTO.setDescripcion(evento.getDescripcion());
         eventoDTO.setPosterHorizontal(evento.getPosterHorizontal());
         eventoDTO.setPosterVertical(evento.getPosterVertical());
+        eventoDTO.setImagenZonas(evento.getImagenZonas());
         eventoDTO.setFechaHorarioInicio(evento.getFechaHorarioInicio());
         eventoDTO.setDuracionEstimada(evento.getDuracionEstimada());
         eventoDTO.setCostoTotal(evento.getCostoTotal());
@@ -299,6 +304,7 @@ public class EventoService {
         eventoActualizaDTO.setDescripcion(evento.getDescripcion());
         eventoActualizaDTO.setPosterHorizontal(evento.getPosterHorizontal());
         eventoActualizaDTO.setPosterVertical(evento.getPosterVertical());
+        eventoActualizaDTO.setImagenZonas(evento.getImagenZonas());
         eventoActualizaDTO.setFechaHorarioInicio(evento.getFechaHorarioInicio());
         eventoActualizaDTO.setDuracionEstimada(evento.getDuracionEstimada());
         eventoActualizaDTO.setCostoTotal(evento.getCostoTotal());
