@@ -90,10 +90,8 @@ public class VentaController {
     public ResponseEntity<?> confirmarVenta(@PathVariable Integer reservaId, @RequestParam String correo, @RequestBody RegistroVentaDTO registroVentaDTO) {
         try {
             // Llama al servicio que valida los 4 minutos y guarda la venta final
-            Venta ventaRealizada = ventaService.confirmarVenta(correo, reservaId, registroVentaDTO);
-
+            VentaConEntradasDTO ventaRealizada = ventaService.confirmarVenta(correo, reservaId, registroVentaDTO);
             return ResponseEntity.ok(ventaRealizada);
-
         } catch (RuntimeException e) {
             // Si expiró el tiempo o la reserva no existe
             return ResponseEntity.badRequest().body(Collections.singletonMap("error", e.getMessage()));
