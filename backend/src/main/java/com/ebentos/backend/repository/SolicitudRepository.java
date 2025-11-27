@@ -1,5 +1,6 @@
 package com.ebentos.backend.repository;
 
+import com.ebentos.backend.dto.SolicitudInfoDTO;
 import com.ebentos.backend.model.Solicitud;
 import com.ebentos.backend.model.SolicitudId;
 import org.springframework.data.domain.Page;
@@ -11,15 +12,24 @@ import org.springframework.data.domain.Pageable;
 
 public interface SolicitudRepository extends JpaRepository<Solicitud, SolicitudId> {
 
-    @Query("SELECT s FROM Solicitud s " +
-            "LEFT JOIN s.local l " +
-            "LEFT JOIN l.gestor lg " +
-            "LEFT JOIN s.evento e " +
-            "LEFT JOIN e.gestor eg " +
-            "WHERE lg.usuarioId = :gestorId OR eg.usuarioId = :gestorId")
-    Page<Solicitud> findByGestorUsuarioId(
-            @Param("gestorId") Integer gestorId,
-            Pageable pageable
-    );
+        @Query("SELECT new com.ebentos.backend.dto.SolicitudInfoDTO(" +
+                "l.localId, " +
+                "e.eventoId, " +
+                "e.nombre, " +
+                "l.nombre, " +
+                "e.fechaHorarioInicio, " +
+                "COALESCE(lg.nombres, eg.nombres), " +
+                "e.descripcion, " +
+                "s.estado) " +
+                "FROM Solicitud s " +
+                "LEFT JOIN s.local l " +
+                "LEFT JOIN l.gestor lg " +
+                "LEFT JOIN s.evento e " +
+                "LEFT JOIN e.gestor eg " +
+                "WHERE lg.usuarioId = :gestorId OR eg.usuarioId = :gestorId")
+        Page<SolicitudInfoDTO> findByGestorUsuarioId(
+                @Param("gestorId") Integer gestorId,
+                Pageable pageable
+        );
 
 }
