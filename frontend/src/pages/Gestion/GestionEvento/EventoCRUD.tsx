@@ -186,6 +186,31 @@ export default function EventoCRUD({ modo }: EventoCRUDProps) {
   const onSubmit = async (data: FormDataEvento) => {
     console.log("Submit form called - data: ", data);
 
+    // Validar que las 3 imágenes estén subidas al crear
+    if (modo === "crear") {
+      if (!data.fotoHorizontal) {
+        alert("Debe subir la imagen horizontal del evento");
+        return;
+      }
+      if (!data.fotoVertical) {
+        alert("Debe subir la imagen vertical del evento");
+        return;
+      }
+      if (!data.imagenZonasFile) {
+        alert("Debe subir la imagen del mapa de zonas");
+        return;
+      }
+    }
+
+    // Validar que la suma de aforos de zonas sea igual al aforo total
+    if (data.zonas && data.zonas.length > 0) {
+      const sumaAforosZonas = data.zonas.reduce((sum, zona) => sum + (Number(zona.aforo) || 0), 0);
+      if (sumaAforosZonas !== data.aforo) {
+        alert(`La suma de los aforos de las zonas (${sumaAforosZonas}) debe ser igual al aforo total del local (${data.aforo})`);
+        return;
+      }
+    }
+
     try {
       if (modo === "crear") {
         const eventoCreado = await crearEvento(data, Number(user?.id));
