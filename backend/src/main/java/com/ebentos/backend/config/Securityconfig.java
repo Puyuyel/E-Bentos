@@ -112,7 +112,7 @@ public class Securityconfig {
                                                 .hasAnyRole("ADMIN", "PRODUCTORA", "GESTOR_LOCAL",
                                                                 "DUENHO_LOCAL", "TAQUILLERO", "ORGANIZADOR_EVENTOS")
                                                 .requestMatchers(HttpMethod.GET,
-                                                                "/api/clientes/*")
+                                                                "/api/clientes/**")
                                                 .hasAnyRole("CLIENTE", "TAQUILLERO")
                                                 .requestMatchers("/api/productoras/**", "/api/puntoventas/**")
                                                 .hasRole("ADMIN")
