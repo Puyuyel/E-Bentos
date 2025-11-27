@@ -1,0 +1,137 @@
+/* src/styles/Solicitudes/TablaSolicitudes.css */
+
+.tabla-solicitudes-container {
+  width: 100%;
+  max-width: calc(100vw - 17rem);
+  overflow-x: auto;
+  box-sizing: border-box;
+}
+
+.tabla-solicitudes-container .cds--data-table-container {
+  margin-bottom: 1rem;
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.tabla-solicitudes-container .cds--data-table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.tabla-solicitudes-container .cds--data-table td,
+.tabla-solicitudes-container .cds--data-table th {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Columna de expansión */
+.tabla-solicitudes-container .cds--data-table td:first-child,
+.tabla-solicitudes-container .cds--data-table th:first-child {
+  width: 48px;
+  min-width: 48px;
+  max-width: 48px;
+}
+
+/* Columna de estado */
+.tabla-solicitudes-container .cds--data-table td:last-child,
+.tabla-solicitudes-container .cds--data-table th:last-child {
+  width: 120px;
+  min-width: 120px;
+}
+
+/* Estilos para los badges de estado */
+.estado-aprobado {
+  background-color: #4ade80 !important;
+  color: #fff !important;
+}
+
+.estado-rechazado {
+  background-color: #f87171 !important;
+  color: #fff !important;
+}
+
+.estado-pendiente {
+  background-color: #fcd34d !important;
+  color: #333 !important;
+}
+
+.estado-solicitado {
+  background-color: #60a5fa !important;
+  color: #fff !important;
+}
+
+/* Estilos para la fila expandida */
+.tabla-solicitudes-container .cds--expandable-row[data-child-row] > td {
+  padding: 0;
+}
+
+.tabla-solicitudes-container .cds--expandable-row[data-child-row] > td > div {
+  padding: 0;
+}
+
+/* Header de la tabla */
+.tabla-solicitudes-container .cds--data-table thead {
+  background-color: #e8f0fe;
+}
+
+.tabla-solicitudes-container .cds--data-table thead th {
+  background-color: #e8f0fe;
+  color: #1a73e8;
+  font-weight: 600;
+  border-bottom: 2px solid #1a73e8;
+}
+
+/* Filas de la tabla */
+.tabla-solicitudes-container .cds--data-table tbody tr {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tabla-solicitudes-container .cds--data-table tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+/* Estilos para el botón de expandir */
+.tabla-solicitudes-container .cds--table-expand {
+  padding: 0.5rem;
+}
+
+.tabla-solicitudes-container .cds--table-expand__button {
+  cursor: pointer;
+}
+
+/* Paginación */
+.tabla-solicitudes-container .cds--pagination {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 1rem;
+}
+
+/* Contenedor de detalle expandido */
+.solicitud-detalle-expandido {
+  background-color: #e0e8f8;
+  padding: 1.5rem;
+  border-radius: 4px;
+  margin: 0.5rem 1rem;
+}
+
+.solicitud-detalle-expandido__header {
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #1e40af;
+}
+
+.solicitud-detalle-expandido__content {
+  white-space: pre-wrap;
+  line-height: 1.6;
+  color: #333;
+  font-size: 0.875rem;
+}
+
+.solicitud-detalle-expandido__content ul {
+  padding-left: 1.5rem;
+  margin: 0.5rem 0;
+}
+
+.solicitud-detalle-expandido__content li {
+  margin-bottom: 0.25rem;
+}

@@ -240,7 +240,6 @@ export default function SeccionZonas({ modo, isDisabled, imagenZonasExistente }:
                     label="Aforo"
                     hideLabel
                     min={0}
-                    value={watch(`zonas.${index}.aforo`) || 0}
                     {...register(`zonas.${index}.aforo`, { 
                       valueAsNumber: true,
                       required: true 
@@ -256,7 +255,6 @@ export default function SeccionZonas({ modo, isDisabled, imagenZonasExistente }:
                     label="Precio"
                     hideLabel
                     min={0}
-                    value={watch(`zonas.${index}.precio`) || 0}
                     {...register(`zonas.${index}.precio`, { 
                       valueAsNumber: true,
                       required: true 

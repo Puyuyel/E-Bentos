@@ -2,9 +2,12 @@
 .app-main {
   padding: 1.25rem;
   overflow-y: auto;
+  overflow-x: hidden;
   max-height: 100vh;
   box-sizing: border-box;
   transition: margin-left 0.3s ease;
+  flex: 1;
+  min-width: 0;
 }
 
 @media (min-width: 768px) {
