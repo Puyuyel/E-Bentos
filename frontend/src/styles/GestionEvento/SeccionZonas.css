@@ -1,0 +1,241 @@
+/* Contenedor principal de la sección */
+.seccion-zonas-container {
+  margin-top: 2rem;
+  padding: 2rem;
+  border-top: 2px solid #e0e0e0;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: visible;
+}
+
+.seccion-titulo {
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+  padding: 2rem 0 0 0;
+}
+
+/* Layout flexible: Izquierda (mapa) - Derecha (lista) */
+.zonas-layout {
+  display: flex;
+  flex-direction: row;
+  gap: 3rem;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  width: 100%;
+  overflow: visible;
+}
+
+.columna-mapa {
+  flex: 0 0 auto;
+  width: 100%;
+  max-width: 400px;
+  min-width: 350px;
+}
+
+.columna-lista {
+  flex: 1 1 auto;
+  min-width: 500px;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Estilos para la imagen previa */
+.preview-imagen-container {
+  margin-top: 1rem;
+  border: 1px solid #e0e0e0;
+  padding: 0.5rem;
+  background-color: #f4f4f4;
+  display: block;
+  width: 100%;
+}
+
+.preview-imagen {
+  max-width: 100%;
+  max-height: 250px;
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Cabecera de la lista (Título + Botón Agregar) */
+.lista-header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+/* Encabezados falsos para simular tabla */
+.fila-encabezados {
+  display: grid;
+  grid-template-columns: 1fr 0.8fr 1.2fr 1.2fr 60px;
+  gap: 1.5rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #0f62fe;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #161616;
+  text-transform: uppercase;
+  align-items: center;
+  background-color: #f4f4f4;
+  border-radius: 4px 4px 0 0;
+}
+
+/* Filas de inputs */
+.fila-zona {
+  display: grid;
+  grid-template-columns: 1fr 0.8fr 1.2fr 1.2fr 60px;
+  gap: 1.5rem;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 1.5rem;
+  background-color: #fff;
+  border-radius: 4px;
+  border: 1px solid #d0d0d0;
+  transition: all 0.2s ease;
+}
+
+.fila-zona:hover {
+  background-color: #f8f9fa;
+  border-color: #0f62fe;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* Control de anchos de columnas */
+.col-nombre, .campo-nombre { min-width: 0; }
+.col-letra, .campo-letra   { min-width: 0; }
+.col-aforo, .campo-numero  { min-width: 0; }
+.col-precio                { min-width: 0; }
+.col-borrar, .campo-accion { 
+  display: flex; 
+  justify-content: center;
+  align-items: center;
+  min-width: 48px;
+}
+
+.mensaje-vacio {
+  color: #6f6f6f;
+  font-style: italic;
+  margin-top: 1rem;
+  padding: 1rem;
+  text-align: center;
+}
+
+/* Estilos para inputs en las zonas */
+.campo-nombre input,
+.campo-letra input,
+.campo-numero input {
+  width: 100% !important;
+}
+
+.lista-items {
+  max-height: 500px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  padding-right: 0.5rem;
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+}
+
+.lista-items::-webkit-scrollbar {
+  width: 8px;
+}
+
+.lista-items::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.lista-items::-webkit-scrollbar-thumb {
+  background: #c4c4c4;
+  border-radius: 4px;
+}
+
+.lista-items::-webkit-scrollbar-thumb:hover {
+  background: #a0a0a0;
+}
+
+/* Mejoras de responsividad y layout */
+@media (max-width: 1400px) {
+  .zonas-layout {
+    gap: 2rem;
+  }
+  
+  .columna-mapa {
+    max-width: 350px;
+  }
+  
+  .columna-lista {
+    min-width: 400px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .zonas-layout {
+    flex-wrap: wrap;
+  }
+  
+  .columna-mapa {
+    flex: 1 1 100%;
+    max-width: none;
+  }
+  
+  .columna-lista {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+  
+  .fila-encabezados,
+  .fila-zona {
+    grid-template-columns: 1fr 0.8fr 1fr 1fr 50px;
+  }
+}
+
+@media (max-width: 768px) {
+  .seccion-zonas-container {
+    padding: 1rem;
+  }
+  
+  .zonas-layout {
+    gap: 1rem;
+  }
+  
+  .fila-encabezados,
+  .fila-zona {
+    grid-template-columns: 1fr 0.7fr 0.9fr 0.9fr 45px;
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+}
+
+/* Asegurar que los inputs se comportan correctamente */
+.campo-nombre,
+.campo-letra,
+.campo-numero {
+  overflow: hidden;
+}
+
+/* Prevenir que el contenedor se desborde */
+.seccion-zonas-container {
+  overflow: visible;
+}
+
+/* Estilos para TextInput y NumberInput dentro de las zonas */
+.fila-zona .cds--text-input__field-wrapper,
+.fila-zona .cds--number-input__field-wrapper,
+.fila-zona input[type="text"],
+.fila-zona input[type="number"] {
+  width: 100%;
+}
+
+/* Asegurar que el icono de borrar esté bien alineado */
+.campo-accion button {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
