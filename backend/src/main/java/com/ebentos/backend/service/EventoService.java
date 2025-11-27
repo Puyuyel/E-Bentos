@@ -313,7 +313,7 @@ public class EventoService {
         eventoActualizaDTO.setCostoTotal(evento.getCostoTotal());
         eventoActualizaDTO.setEstado(evento.getEstado());
         eventoActualizaDTO.setCategoriaEvento(evento.getCategoriaEvento());
-
+        eventoActualizaDTO.setZonas(null);
         if (evento.getLocal() != null) {
             LocalSimpleDTO localDTO = new LocalSimpleDTO();
             localDTO.setLocalId(evento.getLocal().getLocalId());
