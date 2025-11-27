@@ -28,6 +28,7 @@ import GestionarOrganizador from "../pages/GestionProductora/GestionarOrganizado
 import Metas from "../pages/GestionProductora/Metas";
 import MainEbentos from "../components/Cliente/MainEbentos";
 import GestionarDuenhos from "../pages/Gestion/GestorLocal/GestionarDuenhos";
+import MisEntradas from "../pages/Cliente/MisEntradas";
 
 const AppRouter: React.FC = () => {
   const { isLoggedIn, user } = useAuthStore();
@@ -295,6 +296,15 @@ const AppRouter: React.FC = () => {
           element={
             <ProtectedRoute requiredRole="CLIENTE">
               <ComprarEvento />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/mis-entradas"
+          element={
+            <ProtectedRoute requiredRole="CLIENTE">
+              <MisEntradas />
             </ProtectedRoute>
           }
         />

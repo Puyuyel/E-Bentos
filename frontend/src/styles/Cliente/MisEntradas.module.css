@@ -1,0 +1,233 @@
+.pageRoot {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: radial-gradient(circle at 10% 20%, rgba(130, 150, 252, 0.12), transparent 30%),
+    radial-gradient(circle at 80% 0%, rgba(255, 186, 122, 0.14), transparent 25%),
+    #0f172a;
+  color: #e2e8f0;
+}
+
+.hero {
+  padding: 3.5rem clamp(1rem, 4vw, 3rem) 2rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.kicker {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.8rem;
+  color: #a5b4fc;
+  margin-bottom: 0.4rem;
+}
+
+.title {
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  font-weight: 700;
+  color: #fff;
+  margin: 0.15rem 0 0.5rem;
+}
+
+.subtitle {
+  max-width: 720px;
+  margin: 0;
+  color: #cbd5e1;
+  line-height: 1.6;
+}
+
+.heroBadge {
+  background: linear-gradient(135deg, rgba(130, 150, 252, 0.2), rgba(59, 130, 246, 0.2));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 1.2rem 1.5rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  color: #fff;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+}
+
+.heroBadge strong {
+  font-size: 1.1rem;
+}
+
+.content {
+  padding: 2rem clamp(1rem, 4vw, 3rem) 3rem;
+  flex: 1;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  align-items: center;
+}
+
+.searchBox {
+  flex: 1;
+  min-width: 260px;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 0.9rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  color: #fff;
+}
+
+.searchBox input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: inherit;
+  font-size: 1rem;
+}
+
+.filterActions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.filterLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #cbd5e1;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.85rem;
+}
+
+.filterActions select {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #e2e8f0;
+  padding: 0.65rem 0.75rem;
+  border-radius: 10px;
+  min-width: 160px;
+}
+
+.cardsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.25rem;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(6px);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.eventName {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0;
+  color: #fff;
+}
+
+.cardMeta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0.15rem 0;
+  color: #cbd5e1;
+  font-size: 0.95rem;
+}
+
+.cardMetaMuted {
+  color: #94a3b8;
+  margin: 0 0 0.75rem;
+}
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+}
+
+.tagsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.65rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #e2e8f0;
+  font-weight: 600;
+}
+
+.statusChip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.statusChip.activa {
+  background: #a5b4fc;
+}
+
+.statusChip.pasada {
+  background: #cbd5e1;
+}
+
+.empty,
+.error {
+  text-align: center;
+  padding: 3rem 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  color: #cbd5e1;
+}
+
+.error {
+  color: #fecdd3;
+  border-color: rgba(248, 113, 113, 0.4);
+}
+
+@media (max-width: 768px) {
+  .hero {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .filterActions {
+    width: 100%;
+  }
+
+  .filterActions select {
+    flex: 1;
+  }
+}
