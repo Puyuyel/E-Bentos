@@ -3,24 +3,15 @@
 export type EstadoSolicitud = 'APROBADO' | 'EN_REVISION' | 'RECHAZADO';
 
 export interface Solicitud {
-  solicitudId?: number;
-  eventoId: number;
   localId: number;
+  eventoId: number;
+  nombreEvento: string;
+  nombreLocal: string;
+  fechaInicio: string;
+  nombreGestor: string;
+  descripcionEvento: string;
   estado: EstadoSolicitud;
-  justificacion: string | null;
-  // Campos adicionales que pueden venir del backend
-  evento?: {
-    eventoId: number;
-    nombre: string;
-    fechaHorarioInicio: string;
-    descripcion?: string;
-  };
-  local?: {
-    localId: number;
-    nombre: string;
-  };
-  fechaSolicitud?: string;
-  solicitadoPor?: string;
+  justificacion?: string | null;
 }
 
 export interface SolicitudPaginacion {

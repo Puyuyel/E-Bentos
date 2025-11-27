@@ -32,8 +32,8 @@ const TablaSolicitudes: React.FC = () => {
   const headers = [
     { key: "nombreEvento", header: "Nombre del Evento" },
     { key: "nombreLocal", header: "Nombre del Local" },
-    { key: "fechaEvento", header: "Fecha de Evento" },
-    { key: "fechaSolicitud", header: "Fecha de Solicitud" },
+    { key: "fechaInicio", header: "Fecha de Evento" },
+    { key: "nombreGestor", header: "Solicitado por" },
     { key: "estado", header: "Estado" },
   ];
 
@@ -132,14 +132,13 @@ const TablaSolicitudes: React.FC = () => {
   }
 
   // Transformar datos para DataTable
-  const rows = solicitudes.map((solicitud, index) => ({
-    id: String(solicitud.solicitudId || solicitud.eventoId || index),
-    nombreEvento: solicitud.evento?.nombre || `Evento #${solicitud.eventoId}`,
-    nombreLocal: solicitud.local?.nombre || `Local #${solicitud.localId}`,
-    fechaEvento: formatearFecha(solicitud.evento?.fechaHorarioInicio),
-    fechaSolicitud: formatearFecha(solicitud.fechaSolicitud),
+  const rows = solicitudes.map((solicitud) => ({
+    id: `${solicitud.localId}-${solicitud.eventoId}`,
+    nombreEvento: solicitud.nombreEvento,
+    nombreLocal: solicitud.nombreLocal,
+    fechaInicio: formatearFecha(solicitud.fechaInicio),
+    nombreGestor: solicitud.nombreGestor,
     estado: solicitud.estado,
-    raw: solicitud,
   }));
 
   return (
@@ -171,7 +170,7 @@ const TablaSolicitudes: React.FC = () => {
               <TableBody>
                 {tableRows.map((row) => {
                   const solicitudOriginal = solicitudes.find(
-                    (s) => String(s.solicitudId || s.eventoId) === row.id
+                    (s) => `${s.localId}-${s.eventoId}` === row.id
                   );
                   // Solo es expandible si está EN_REVISION
                   const isExpandable = solicitudOriginal?.estado === "EN_REVISION";

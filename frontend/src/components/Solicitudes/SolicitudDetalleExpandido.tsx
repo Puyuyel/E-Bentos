@@ -18,11 +18,9 @@ const SolicitudDetalleExpandido: React.FC<SolicitudDetalleExpandidoProps> = ({
         margin: "0.5rem 0",
       }}
     >
-      {solicitud.solicitadoPor && (
-        <div style={{ marginBottom: "1rem" }}>
-          <strong>Solicitado por: {solicitud.solicitadoPor}</strong>
-        </div>
-      )}
+      <div style={{ marginBottom: "1rem" }}>
+        <strong>Solicitado por: {solicitud.nombreGestor}</strong>
+      </div>
       <div
         style={{
           whiteSpace: "pre-wrap",
@@ -31,10 +29,7 @@ const SolicitudDetalleExpandido: React.FC<SolicitudDetalleExpandidoProps> = ({
           fontSize: "0.875rem",
         }}
       >
-        {solicitud.justificacion || solicitud.evento?.descripcion || "Sin descripción disponible"}
-      </div>
-      <div style={{ marginTop: "1rem", fontSize: "0.8rem", color: "#666" }}>
-        <strong>Evento ID:</strong> {solicitud.eventoId} | <strong>Local ID:</strong> {solicitud.localId}
+        {solicitud.descripcionEvento || "Sin descripción disponible"}
       </div>
     </div>
   );
