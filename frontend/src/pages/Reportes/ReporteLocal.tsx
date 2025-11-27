@@ -1,16 +1,15 @@
-import React, {useEffect, useState} from 'react';
-import Sidebar from '../../components/Sidebar';
-import Lollipop from '../../components/Lollipop';
-import GroupedBar from '../../components/GroupedBar';
-import Donut from '../../components/Donut';
-import Gauge from '../../components/Gauge';
-import FilterBar from '../../components/FilterBar.tsx';
-import '../../styles/Reportes/Reporte.css';
-import '../../styles/CargaSpinner.css'
-import { getReporteLocales } from "../../services/reporteLocalService.ts";
+import React, { useEffect, useState } from "react";
+import Sidebar from "../../components/Sidebar";
+import Lollipop from "../../components/Lollipop";
+import GroupedBar from "../../components/GroupedBar";
+import Donut from "../../components/Donut";
+import Gauge from "../../components/Gauge";
+import FilterBar from "../../components/FilterBar.tsx";
+import "../../styles/Reportes/Reporte.css";
+import "../../styles/CargaSpinner.css";
+import { getReporteGeneral } from "../../services/reporteGeneralService.ts";
 import type { ChartDatum } from "../../components/util/types.ts";
 import { calculateGaugeData } from "../../components/util/calculateGaugeData.ts";
-
 
 interface ReporteLocalItem {
   categoriaEvento: string;
@@ -26,7 +25,6 @@ interface ReporteLocalItem {
 }
 
 const ReporteLocal: React.FC = () => {
-
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [reportes, setReportes] = useState<ReporteLocalItem[]>([]);
   const [filters, setFilters] = useState<Record<string, any>>({});
@@ -35,7 +33,7 @@ const ReporteLocal: React.FC = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const data = await getReporteLocales();
+        const data = await getReporteGeneral();
         console.log("Datos del backend:", data);
         setReportes(data);
       } catch (error) {
@@ -50,7 +48,9 @@ const ReporteLocal: React.FC = () => {
   // Mover el cálculo de datos antes del return
   const filteredReportes = reportes.filter((r) => {
     const fecha = new Date(r.fechaEvento);
-    const fechaInicio = filters.fechaInicio ? new Date(filters.fechaInicio) : null;
+    const fechaInicio = filters.fechaInicio
+      ? new Date(filters.fechaInicio)
+      : null;
     const fechaFin = filters.fechaFin ? new Date(filters.fechaFin) : null;
 
     // Filtrar por fecha
@@ -63,22 +63,27 @@ const ReporteLocal: React.FC = () => {
     }
 
     // Filtrar por categoría
-    if (filters.categoriaEvento && filters.categoriaEvento !== 'default') {
-      if (r.categoriaEvento?.toLowerCase() !== filters.categoriaEvento.toLowerCase()) {
+    if (filters.categoriaEvento && filters.categoriaEvento !== "default") {
+      if (
+        r.categoriaEvento?.toLowerCase() !==
+        filters.categoriaEvento.toLowerCase()
+      ) {
         return false;
       }
     }
 
     // Filtrar por local
-    if (filters.local && filters.local !== 'default') {
+    if (filters.local && filters.local !== "default") {
       if (r.nombreLocal?.toLowerCase() !== filters.local.toLowerCase()) {
         return false;
       }
     }
 
     // Filtrar por productora
-    if (filters.productora && filters.productora !== 'default') {
-      if (r.nombreProductora?.toLowerCase() !== filters.productora.toLowerCase()) {
+    if (filters.productora && filters.productora !== "default") {
+      if (
+        r.nombreProductora?.toLowerCase() !== filters.productora.toLowerCase()
+      ) {
         return false;
       }
     }
@@ -94,14 +99,24 @@ const ReporteLocal: React.FC = () => {
     (filters.productora && filters.productora !== "default");
 
   const dataToDisplay = hayFiltrosActivos ? filteredReportes : reportes;
-  
-  const totalAforo = dataToDisplay.reduce((acc, r) => acc + Number(r.aforoLocal), 0);
-  const totalAsistentes = dataToDisplay.reduce((acc, r) => acc + Number(r.asistentes), 0);
+  const noDataAvailable = dataToDisplay.length === 0;
 
-  const ingresosPorLocal = dataToDisplay.reduce<Record<number, number>>((acc, r) => {
-    acc[r.idLocal] = (acc[r.idLocal] || 0) + Number(r.montoRecaudado);
-    return acc;
-  }, {});
+  const totalAforo = dataToDisplay.reduce(
+    (acc, r) => acc + Number(r.aforoLocal),
+    0
+  );
+  const totalAsistentes = dataToDisplay.reduce(
+    (acc, r) => acc + Number(r.asistentes),
+    0
+  );
+
+  const ingresosPorLocal = dataToDisplay.reduce<Record<number, number>>(
+    (acc, r) => {
+      acc[r.idLocal] = (acc[r.idLocal] || 0) + Number(r.montoRecaudado);
+      return acc;
+    },
+    {}
+  );
 
   const incomeData: ChartDatum[] = Object.entries(ingresosPorLocal).map(
     ([idLocal, montoTotal]) => {
@@ -113,7 +128,7 @@ const ReporteLocal: React.FC = () => {
       };
     }
   );
-  
+
   const groupedData: ChartDatum[] = dataToDisplay.map((r) => ({
     group: r.categoriaEvento,
     key: r.nombreLocal,
@@ -121,33 +136,52 @@ const ReporteLocal: React.FC = () => {
   }));
 
   return (
-    <div className={`app-container ${sidebarOpen ? "sidebar-visible" : "sidebar-hidden"}`}>
-      <Sidebar currentPath="reporte-local" onToggleSidebar={setSidebarOpen}/>
+    <div
+      className={`app-container ${
+        sidebarOpen ? "sidebar-visible" : "sidebar-hidden"
+      }`}
+    >
+      <Sidebar currentPath="reporte-local" onToggleSidebar={setSidebarOpen} />
 
       <main className="app-main">
-        <h1 className="title">
-          Visión General de Locales
-        </h1>
+        <h1 className="title">Visión General de Locales</h1>
 
-        <FilterBar onFilterChange={(newFilter) => {setFilters((prev) => ({ ...prev, ...newFilter }));}} />
-        
+        <FilterBar
+          onFilterChange={(newFilter) => {
+            setFilters((prev) => ({ ...prev, ...newFilter }));
+          }}
+        />
+
         {loading ? (
           <div className="loader">
-            <span></span><span></span><span></span><span></span><span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        ) : noDataAvailable ? (
+          <div className="no-data-message">
+            <div className="icon">📊</div>
+            <h2>No hay datos para los criterios seleccionados</h2>
+            <p>Intenta ajustar los filtros para ver resultados.</p>
           </div>
         ) : (
           <div className="chart-container">
             <div className="chart-item">
-              <Gauge totalCapacity={totalAforo} usedCapacity={totalAsistentes} />
+              <Gauge
+                totalCapacity={totalAforo}
+                usedCapacity={totalAsistentes}
+              />
             </div>
             <div className="chart-item">
-              <Donut data={incomeData}/>
+              <Donut data={incomeData} />
             </div>
             <div className="chart-item">
-              <GroupedBar data={groupedData}/>
+              <GroupedBar data={groupedData} />
             </div>
             <div className="chart-item">
-              <Lollipop data={incomeData}/>
+              <Lollipop data={incomeData} />
             </div>
           </div>
         )}
