@@ -26,6 +26,7 @@ interface EventoData {
   descripcion: string;
   posterHorizontal: string;
   posterVertical: string;
+  imagenZonas: string;
   fechaHorarioInicio: string;
   duracionEstimada: number;
   costoTotal: number;
@@ -70,12 +71,14 @@ function generateImageName(file: File, eventoId: number, tipo: 'horizontal' | 'v
   return `eventos/${eventoId}/${tipo}_${timestamp}_${randomString}.${fileExtension}`;
 }
 
+// En la función editarEvento, actualizar para manejar imagenZonas:
+// En editarEvento.ts, actualizar la función editarEvento:
 export default async function editarEvento(
   eventoId: number, 
   data: FormDataEvento, 
   usuarioId: number,
-  imagenesExistentes?: { posterHorizontal: string; posterVertical: string },
-  estadoExistente: string = "PENDIENTE" // Estado por defecto si no se proporciona
+  imagenesExistentes?: { posterHorizontal: string; posterVertical: string; imagenZonas?: string },
+  estadoExistente: string = "PENDIENTE"
 ) {
   try {
     console.log("📝 Iniciando edición del evento:", eventoId, "para usuario:", usuarioId);
@@ -105,13 +108,25 @@ export default async function editarEvento(
 
     // 2. Preparar datos para la actualización
     const fechaCompleta = combinarFechaHoraAISO(data.fechaHorarioInicio, data.horaEvento);    
-    // Convertir duración a minutos
     const [horas, minutos] = data.duracion.split(' ')[0].split(':');
     const duracionEnMinutos = parseInt(horas) * 60 + parseInt(minutos);
 
-    // 3. Manejo de imágenes - usar solo nombres de archivo
-    let posterHorizontal = imagenesExistentes?.posterHorizontal || "placeholder_horizontal.jpg";
-    let posterVertical = imagenesExistentes?.posterVertical || "placeholder_vertical.jpg";
+    // 3. CORREGIDO: Manejo de imágenes - extraer solo el nombre del archivo de las URLs existentes
+    const baseUrl = "https://ebentos.blob.core.windows.net/images/";
+    
+    // Función para extraer solo el nombre del archivo de una URL
+    const extraerNombreArchivo = (url: string): string => {
+      if (!url || url.includes('placeholder')) return url;
+      if (url.includes(baseUrl)) {
+        return url.replace(baseUrl, '');
+      }
+      // Si ya es solo un nombre de archivo, devolverlo tal cual
+      return url;
+    };
+
+    let posterHorizontal = extraerNombreArchivo(imagenesExistentes?.posterHorizontal || "placeholder_horizontal.jpg");
+    let posterVertical = extraerNombreArchivo(imagenesExistentes?.posterVertical || "placeholder_vertical.jpg");
+    let imagenZonas = extraerNombreArchivo(imagenesExistentes?.imagenZonas || "placeholder_zonas.jpg");
     
     // Generar nombres para nuevas imágenes
     let horizontalBlobName: string | null = null;
@@ -128,9 +143,15 @@ export default async function editarEvento(
       posterVertical = verticalBlobName; // Solo el nombre del archivo
     }
 
+    if (data.imagenZonasFile) {
+      zonasBlobName = generateImageName(data.imagenZonasFile, eventoId, 'zona');
+      imagenZonas = zonasBlobName; // Solo el nombre del archivo
+    }
+
     console.log("📄 Nombres de archivos para actualización:", {
       posterHorizontal,
-      posterVertical
+      posterVertical,
+      imagenZonas
     });
 
     // 4. Preparar zonas
@@ -148,7 +169,7 @@ export default async function editarEvento(
           precioUnitario: data.costo / data.aforo,
         }];
 
-    // 5. Preparar datos del evento según la estructura exacta de tu API
+    // 5. Preparar datos del evento
     const eventoData: EventoData = {
       local: {
         localId: data.localId,
@@ -161,10 +182,11 @@ export default async function editarEvento(
       descripcion: data.descripcion,
       posterHorizontal: posterHorizontal, // ✅ Solo nombre del archivo
       posterVertical: posterVertical,     // ✅ Solo nombre del archivo
+      imagenZonas: imagenZonas,           // ✅ Solo nombre del archivo
       fechaHorarioInicio: new Date(fechaCompleta).toISOString(),
       duracionEstimada: duracionEnMinutos,
       costoTotal: data.costo,
-      estado: estadoExistente, // Usar el estado existente de la BD
+      estado: estadoExistente,
       zonas: zonas,
     };
 
@@ -204,17 +226,18 @@ export default async function editarEvento(
       );
     }
 
-    // Si hay imagen de zonas, subirla
-    if (data.imagenZonasFile) {
-      zonasBlobName = generateImageName(data.imagenZonasFile, eventoId, 'zona');
+    // Subir imagen de zonas si existe
+    if (data.imagenZonasFile && zonasBlobName) {
       console.log("📤 Subiendo nueva imagen de zonas...");
-      
-      try {
-        await uploadEventImage(data.imagenZonasFile, eventoId, 'zona', zonasBlobName);
-        console.log("✅ Imagen de zonas subida:", zonasBlobName);
-      } catch (uploadError) {
-        console.error("⚠️ Error subiendo imagen de zonas:", uploadError);
-      }
+      uploadPromises.push(
+        uploadEventImage(data.imagenZonasFile, eventoId, 'zona', zonasBlobName)
+          .then(blobName => {
+            console.log("✅ Imagen de zonas subida:", blobName);
+          })
+          .catch(error => {
+            console.error("⚠️ Error subiendo imagen de zonas:", error);
+          })
+      );
     }
 
     // Esperar a que todas las imágenes se suban
