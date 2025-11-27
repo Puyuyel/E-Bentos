@@ -1,5 +1,5 @@
 import api from "../apiBase";
-import { uploadEventImages, validateImageFiles } from "./uploadEventImages";
+import { uploadEventImage, validateImageFiles } from "./uploadEventImages";
 
 // Interfaces según tu API
 interface Local {
@@ -51,25 +51,23 @@ interface FormDataEvento {
   duracion: string;
   costo: number;
   aforo: number;
-  fotoFiles: File[];
+  fotoHorizontal: File | null;
+  fotoVertical: File | null;
+  imagenZonasFile: File | null;
+  zonas: {
+    nombre: string;
+    letra: string;
+    aforo: number;
+    precio: number;
+  }[];
 }
 
 // Función para generar nombres únicos de archivos
-function generateImageNames(files: File[], eventoId: number): { blobNames: string[], publicUrls: string[] } {
-  const blobNames: string[] = [];
-  const publicUrls: string[] = [];
-
-  files.forEach((file, index) => {
-    const fileExtension = file.name.split('.').pop();
-    const timestamp = new Date().getTime();
-    const randomString = Math.random().toString(36).substring(2, 15);
-    const blobName = `eventos/${eventoId}/imagen_${timestamp}_${randomString}.${fileExtension}`;
-    
-    blobNames.push(blobName);
-    publicUrls.push(`${import.meta.env.VITE_IMAGE_BASE_URL}/${blobName}`);
-  });
-
-  return { blobNames, publicUrls };
+function generateImageName(file: File, eventoId: number, tipo: 'horizontal' | 'vertical' | 'zona'): string {
+  const fileExtension = file.name.split('.').pop();
+  const timestamp = new Date().getTime();
+  const randomString = Math.random().toString(36).substring(2, 15);
+  return `eventos/${eventoId}/${tipo}_${timestamp}_${randomString}.${fileExtension}`;
 }
 
 export default async function editarEvento(
@@ -92,9 +90,14 @@ export default async function editarEvento(
     }
 
     // 1. Validar nuevas imágenes si existen
-    if (data.fotoFiles && data.fotoFiles.length > 0) {
-      console.log(`🖼️ Validando ${data.fotoFiles.length} nuevas imágenes...`);
-      const validation = validateImageFiles(data.fotoFiles);
+    const filesToValidate: File[] = [];
+    if (data.fotoHorizontal) filesToValidate.push(data.fotoHorizontal);
+    if (data.fotoVertical) filesToValidate.push(data.fotoVertical);
+    if (data.imagenZonasFile) filesToValidate.push(data.imagenZonasFile);
+
+    if (filesToValidate.length > 0) {
+      console.log(`🖼️ Validando ${filesToValidate.length} nuevas imágenes...`);
+      const validation = validateImageFiles(filesToValidate);
       if (!validation.isValid) {
         throw new Error(validation.errors.join(', '));
       }
@@ -106,27 +109,44 @@ export default async function editarEvento(
     const [horas, minutos] = data.duracion.split(' ')[0].split(':');
     const duracionEnMinutos = parseInt(horas) * 60 + parseInt(minutos);
 
-    // 3. Manejo de imágenes
+    // 3. Manejo de imágenes - usar solo nombres de archivo
     let posterHorizontal = imagenesExistentes?.posterHorizontal || "placeholder_horizontal.jpg";
     let posterVertical = imagenesExistentes?.posterVertical || "placeholder_vertical.jpg";
-    let imageBlobNames: string[] = [];
+    
+    // Generar nombres para nuevas imágenes
+    let horizontalBlobName: string | null = null;
+    let verticalBlobName: string | null = null;
+    let zonasBlobName: string | null = null;
 
-    if (data.fotoFiles && data.fotoFiles.length > 0) {
-      const { blobNames, publicUrls } = generateImageNames(data.fotoFiles, eventoId);
-      imageBlobNames = blobNames;
-      posterHorizontal = publicUrls[0] || posterHorizontal;
-      posterVertical = publicUrls[1] || publicUrls[0] || posterVertical;
+    if (data.fotoHorizontal) {
+      horizontalBlobName = generateImageName(data.fotoHorizontal, eventoId, 'horizontal');
+      posterHorizontal = horizontalBlobName; // Solo el nombre del archivo
     }
 
-    // 4. Preparar zonas (sin IDs por ahora)
-    const zonas: Zona[] = [
-      {
-        capacidadTotal: data.aforo,
-        tipoZona: "General",
-        letraZona: "A",
-        precioUnitario: data.costo / data.aforo,
-      },
-    ];
+    if (data.fotoVertical) {
+      verticalBlobName = generateImageName(data.fotoVertical, eventoId, 'vertical');
+      posterVertical = verticalBlobName; // Solo el nombre del archivo
+    }
+
+    console.log("📄 Nombres de archivos para actualización:", {
+      posterHorizontal,
+      posterVertical
+    });
+
+    // 4. Preparar zonas
+    const zonas: Zona[] = data.zonas && data.zonas.length > 0 
+      ? data.zonas.map(zona => ({
+          capacidadTotal: zona.aforo,
+          tipoZona: zona.nombre,
+          letraZona: zona.letra,
+          precioUnitario: zona.precio,
+        }))
+      : [{
+          capacidadTotal: data.aforo,
+          tipoZona: "General",
+          letraZona: "A",
+          precioUnitario: data.costo / data.aforo,
+        }];
 
     // 5. Preparar datos del evento según la estructura exacta de tu API
     const eventoData: EventoData = {
@@ -139,8 +159,8 @@ export default async function editarEvento(
       },
       nombre: data.nombre,
       descripcion: data.descripcion,
-      posterHorizontal: posterHorizontal,
-      posterVertical: posterVertical,
+      posterHorizontal: posterHorizontal, // ✅ Solo nombre del archivo
+      posterVertical: posterVertical,     // ✅ Solo nombre del archivo
       fechaHorarioInicio: new Date(fechaCompleta).toISOString(),
       duracionEstimada: duracionEnMinutos,
       costoTotal: data.costo,
@@ -156,36 +176,51 @@ export default async function editarEvento(
     console.log("✅ Evento actualizado en BD:", eventoActualizado);
 
     // 7. Si hay nuevas imágenes, subirlas
-    if (data.fotoFiles && data.fotoFiles.length > 0) {
-      console.log(`📤 Subiendo ${data.fotoFiles.length} nuevas imágenes...`);
+    const uploadPromises: Promise<void>[] = [];
+
+    if (data.fotoHorizontal && horizontalBlobName) {
+      console.log("📤 Subiendo nueva imagen horizontal...");
+      uploadPromises.push(
+        uploadEventImage(data.fotoHorizontal, eventoId, 'horizontal', horizontalBlobName)
+          .then(blobName => {
+            console.log("✅ Imagen horizontal subida:", blobName);
+          })
+          .catch(error => {
+            console.error("⚠️ Error subiendo imagen horizontal:", error);
+          })
+      );
+    }
+
+    if (data.fotoVertical && verticalBlobName) {
+      console.log("📤 Subiendo nueva imagen vertical...");
+      uploadPromises.push(
+        uploadEventImage(data.fotoVertical, eventoId, 'vertical', verticalBlobName)
+          .then(blobName => {
+            console.log("✅ Imagen vertical subida:", blobName);
+          })
+          .catch(error => {
+            console.error("⚠️ Error subiendo imagen vertical:", error);
+          })
+      );
+    }
+
+    // Si hay imagen de zonas, subirla
+    if (data.imagenZonasFile) {
+      zonasBlobName = generateImageName(data.imagenZonasFile, eventoId, 'zona');
+      console.log("📤 Subiendo nueva imagen de zonas...");
       
       try {
-        const imageUrls = await uploadEventImages(
-          data.fotoFiles, 
-          eventoId, 
-          imageBlobNames
-        );
-        
-        console.log("✅ Nuevas imágenes subidas:", imageUrls);
-
-        // Actualizar con las URLs finales si es necesario
-        if (imageUrls.length > 0 && 
-            (imageUrls[0] !== posterHorizontal || 
-             (imageUrls[1] || imageUrls[0]) !== posterVertical)) {
-          
-          console.log("🔄 Actualizando evento con URLs finales de imágenes...");
-          const updateData = {
-            posterHorizontal: imageUrls[0],
-            posterVertical: imageUrls[1] || imageUrls[0],
-          };
-
-          await api.patch(`/eventos/${eventoId}`, updateData);
-          console.log("✅ Evento actualizado con URLs finales de imágenes");
-        }
-
+        await uploadEventImage(data.imagenZonasFile, eventoId, 'zona', zonasBlobName);
+        console.log("✅ Imagen de zonas subida:", zonasBlobName);
       } catch (uploadError) {
-        console.error("⚠️ Error subiendo nuevas imágenes, pero el evento fue actualizado:", uploadError);
+        console.error("⚠️ Error subiendo imagen de zonas:", uploadError);
       }
+    }
+
+    // Esperar a que todas las imágenes se suban
+    if (uploadPromises.length > 0) {
+      await Promise.all(uploadPromises);
+      console.log("✅ Todas las nuevas imágenes han sido procesadas");
     }
 
     return eventoActualizado;
