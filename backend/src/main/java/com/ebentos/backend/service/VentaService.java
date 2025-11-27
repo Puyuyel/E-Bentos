@@ -56,11 +56,11 @@ public class VentaService {
     }
 
 
-    public VentaDTO obtenerPorId(Integer id) {
-        Venta venta = ventaRepository.findById(id)
+    public VentaConEntradasDTO obtenerPorId(Integer id, Integer clienteId) {
+        Venta venta = ventaRepository.findByVentaIdAndCliente_UsuarioId(id, clienteId)
                 .orElseThrow(() -> new EntityNotFoundException("Venta no encontrada con ID: " + id));
 
-        VentaDTO ventaDTO = llenarDTO(venta);
+        VentaConEntradasDTO ventaDTO = llenarDTOConEntradas(venta);
 
         return ventaDTO;
     }
@@ -72,18 +72,18 @@ public class VentaService {
             .collect(Collectors.toList());
 }
 
-    public List<VentaConEntradasDTO> listarActivas(Integer clienteId) {
+    public List<VentaDTO> listarActivas(Integer clienteId) {
         return ventaRepository.findEventosFuturosByCliente(clienteId)
                 .stream()
-                .map(this::llenarDTOConEntradas)
+                .map(this::llenarDTO)
                 .collect(Collectors.toList());
     }
 
     
-    public List<VentaConEntradasDTO> listarTodas() {
+    public List<VentaDTO> listarTodas() {
         return ventaRepository.findAll()
                 .stream()
-                .map(this::llenarDTOConEntradas)
+                .map(this::llenarDTO)
                 .collect(Collectors.toList());
     }
     private Image generarQR(String textoQR) throws Exception {
@@ -169,12 +169,16 @@ public class VentaService {
                 if (counter > 1) {
                     document.newPage();
                 }
-
+                
+                Zona zona = zonaRepository.findById(entrada.getZona().getZonaId())
+                        .orElseThrow(() -> new RuntimeException("Zona no encontrada"));
+                entrada.setZona(zona);
+                
                 Paragraph entradaTitulo = new Paragraph("ENTRADA #" + counter + "\n",
                         new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD));
                 entradaTitulo.setAlignment(Paragraph.ALIGN_CENTER);
                 document.add(entradaTitulo);
-
+                 
                 document.add(new Paragraph(linea('-', 130) + "\n"));
                 document.add(new Paragraph("Zona: " + entrada.getZona().getTipoZona()));
                 document.add(new Paragraph("Precio Original: S/ " + String.format("%.2f", entrada.getPrecioOriginal())));
