@@ -30,6 +30,7 @@ import MainEbentos from "../components/Cliente/MainEbentos";
 import GestionarDuenhos from "../pages/Gestion/GestorLocal/GestionarDuenhos";
 import GestionarSolicitudes from "../pages/Gestion/DuenhoLocal/GestionarSolicitudes";
 import MisEntradas from "../pages/Cliente/MisEntradas";
+import MiPerfil from "../pages/Cliente/MiPerfil";
 
 const AppRouter: React.FC = () => {
   const { isLoggedIn, user } = useAuthStore();
@@ -305,6 +306,15 @@ const AppRouter: React.FC = () => {
           element={
             <ProtectedRoute requiredRole="CLIENTE">
               <ComprarEvento />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/perfil"
+          element={
+            <ProtectedRoute requiredRole="CLIENTE">
+              <MiPerfil />
             </ProtectedRoute>
           }
         />

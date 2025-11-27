@@ -2,10 +2,10 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background: radial-gradient(circle at 10% 20%, rgba(130, 150, 252, 0.12), transparent 30%),
-    radial-gradient(circle at 80% 0%, rgba(255, 186, 122, 0.14), transparent 25%),
-    #0f172a;
-  color: #e2e8f0;
+  background: radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.12), transparent 32%),
+    radial-gradient(circle at 80% 0%, rgba(125, 211, 252, 0.18), transparent 28%),
+    #f8fafc;
+  color: #0f172a;
 }
 
 .hero {
@@ -14,41 +14,41 @@
   justify-content: space-between;
   gap: 1.5rem;
   align-items: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .kicker {
   text-transform: uppercase;
   letter-spacing: 0.12em;
   font-size: 0.8rem;
-  color: #a5b4fc;
+  color: #2563eb;
   margin-bottom: 0.4rem;
 }
 
 .title {
   font-size: clamp(1.8rem, 3vw, 2.6rem);
   font-weight: 700;
-  color: #fff;
+  color: #0f172a;
   margin: 0.15rem 0 0.5rem;
 }
 
 .subtitle {
   max-width: 720px;
   margin: 0;
-  color: #cbd5e1;
+  color: #334155;
   line-height: 1.6;
 }
 
 .heroBadge {
-  background: linear-gradient(135deg, rgba(130, 150, 252, 0.2), rgba(59, 130, 246, 0.2));
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(125, 211, 252, 0.16));
+  border: 1px solid #dbeafe;
   border-radius: 18px;
   padding: 1.2rem 1.5rem;
   display: flex;
   gap: 0.75rem;
   align-items: center;
-  color: #fff;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+  color: #0f172a;
+  box-shadow: 0 12px 40px rgba(37, 99, 235, 0.18);
 }
 
 .heroBadge strong {
@@ -75,10 +75,11 @@
   align-items: center;
   gap: 0.6rem;
   padding: 0.75rem 0.9rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: 14px;
-  color: #fff;
+  color: #0f172a;
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.08);
 }
 
 .searchBox input {
@@ -101,19 +102,20 @@
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  color: #cbd5e1;
+  color: #1d4ed8;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-size: 0.85rem;
 }
 
 .filterActions select {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #e2e8f0;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #0f172a;
   padding: 0.65rem 0.75rem;
   border-radius: 10px;
   min-width: 160px;
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.05);
 }
 
 .cardsGrid {
@@ -123,12 +125,12 @@
 }
 
 .card {
-  background: rgba(15, 23, 42, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: 16px;
   padding: 1.25rem;
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(6px);
+  box-shadow: 0 16px 40px rgba(37, 99, 235, 0.12);
+  backdrop-filter: blur(2px);
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
@@ -145,7 +147,7 @@
   font-size: 1.05rem;
   font-weight: 700;
   margin: 0;
-  color: #fff;
+  color: #0f172a;
 }
 
 .cardMeta {
@@ -153,12 +155,12 @@
   align-items: center;
   gap: 0.35rem;
   margin: 0.15rem 0;
-  color: #cbd5e1;
+  color: #1f2937;
   font-size: 0.95rem;
 }
 
 .cardMetaMuted {
-  color: #94a3b8;
+  color: #475569;
   margin: 0 0 0.75rem;
 }
 
@@ -179,8 +181,8 @@
   gap: 0.35rem;
   padding: 0.45rem 0.65rem;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.06);
-  color: #e2e8f0;
+  background: #eff6ff;
+  color: #1d4ed8;
   font-weight: 600;
 }
 
@@ -195,26 +197,27 @@
 }
 
 .statusChip.activa {
-  background: #a5b4fc;
+  background: #bfdbfe;
 }
 
 .statusChip.pasada {
-  background: #cbd5e1;
+  background: #e2e8f0;
 }
 
 .empty,
 .error {
   text-align: center;
   padding: 3rem 1rem;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px dashed rgba(255, 255, 255, 0.08);
+  background: #ffffff;
+  border: 1px dashed #dbeafe;
   border-radius: 16px;
-  color: #cbd5e1;
+  color: #1f2937;
+  box-shadow: 0 10px 30px rgba(37, 99, 235, 0.08);
 }
 
 .error {
-  color: #fecdd3;
-  border-color: rgba(248, 113, 113, 0.4);
+  color: #b91c1c;
+  border-color: #fecdd3;
 }
 
 @media (max-width: 768px) {
