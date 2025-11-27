@@ -106,6 +106,7 @@ export default function EventoCRUD({ modo }: EventoCRUDProps) {
   });
 
   const { handleSubmit, reset } = methods;
+  const [imagenZonasExistente, setImagenZonasExistente] = useState<string>("");
 
   // Cargar datos del evento si es editar o visualizar
   useEffect(() => {
@@ -125,6 +126,16 @@ export default function EventoCRUD({ modo }: EventoCRUDProps) {
               ? evento.posterVertical
               : `${baseUrl}${evento.posterVertical}`,
           });
+
+
+          if (evento.imagenZonas && !evento.imagenZonas.includes('placeholder')) {
+            const imagenZonasUrl = evento.imagenZonas.includes('http') 
+              ? evento.imagenZonas 
+              : `${baseUrl}${evento.imagenZonas}`;
+            setImagenZonasExistente(imagenZonasUrl);
+          } else {
+            setImagenZonasExistente("");
+          }
           // Pre-llenar el formulario con los datos del evento
           reset({
             nombre: evento.nombre,
@@ -254,6 +265,7 @@ export default function EventoCRUD({ modo }: EventoCRUDProps) {
                   modo={modo}
                   permiteCambiarLocal={permiteCambiarLocal}
                   imagenesExistentes={imagenesExistentes}
+                  imagenZonasExistente={imagenZonasExistente}
                 />
                 {modo !== "visualizar" && (
                   <BottomButtons
@@ -322,12 +334,14 @@ interface VenueFormProps {
   modo: "crear" | "editar" | "visualizar";
   permiteCambiarLocal: boolean;
   imagenesExistentes: { posterHorizontal: string; posterVertical: string };
+  imagenZonasExistente?: string;
 }
 
 function VenueForm({
   modo,
   permiteCambiarLocal,
   imagenesExistentes,
+  imagenZonasExistente,
 }: VenueFormProps) {
   const {
     register,
@@ -951,7 +965,7 @@ function VenueForm({
       </Grid>
 
       {/* Sección de Zonas */}
-      <SeccionZonas modo={modo} isDisabled={isDisabled} />
+      <SeccionZonas modo={modo} isDisabled={isDisabled} imagenZonasExistente={imagenZonasExistente}/>
     </FormGroup>
   );
 }
