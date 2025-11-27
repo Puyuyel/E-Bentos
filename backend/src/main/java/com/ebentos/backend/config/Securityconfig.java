@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -20,6 +22,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 import com.ebentos.backend.model.Rol;
 import com.ebentos.backend.repository.UsuarioRepository;
@@ -76,6 +79,8 @@ public class Securityconfig {
 
                                 // Autorización de Rutas
                                 .authorizeHttpRequests(authz -> authz
+                                                // Permitir preflight a cualquier ruta
+                                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                                                 // Rutas públicas (no requieren autenticación)
                                                 .requestMatchers(HttpMethod.POST, "/api/clientes").permitAll()
                                                 .requestMatchers(
@@ -198,11 +203,19 @@ public class Securityconfig {
                                 .filter(s -> !s.isEmpty())
                                 .collect(Collectors.toList());
 
-                // Usa allowedOriginPatterns para más flexibilidad con puertos/hosts
-                configuration.setAllowedOriginPatterns(origins);
+                // Usa allowedOrigins (exactos) cuando allowCredentials=true
+                configuration.setAllowedOrigins(origins);
                 configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-                configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With",
-                                "accept", "Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers"));
+                configuration.setAllowedHeaders(Arrays.asList(
+                                "Authorization",
+                                "Content-Type",
+                                "X-Requested-With",
+                                "accept",
+                                "Origin",
+                                "Access-Control-Request-Method",
+                                "Access-Control-Request-Headers",
+                                "Cookie" // por si algún proxy valida cabeceras
+                ));
                 configuration.setExposedHeaders(Arrays.asList("Access-Control-Allow-Origin",
                                 "Access-Control-Allow-Credentials", "Set-Cookie"));
                 configuration.setAllowCredentials(true);

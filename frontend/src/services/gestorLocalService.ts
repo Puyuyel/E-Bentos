@@ -101,7 +101,7 @@ export async function actualizarOrganizador(id: number, payload: Partial<GestorL
     const response = await api.put(`/gestores/${id}`, payload);
     console.log(response.data);
     return response.data;
-  } catch (error: any) {
+  } catch (error: any) { 
     throw new Error(error.response?.data?.message || "Error al actualizar organizador");
   }
 }
@@ -122,7 +122,11 @@ export async function registrarGestorLocal(payload: Partial<GestorLocal>) {
     console.log(response.data);
     return response.data;
   } catch (error: any) {
-    throw new Error(error.response?.data?.message || "Error al agregar gestor");
+    if (error.response) {
+      const mensaje = error.response.data;
+      alert(mensaje);
+    }
+    throw new Error(error.response?.data || "Error al agregar gestor");
   }
 }
 
@@ -132,7 +136,11 @@ export async function registrarTaquillero(payload: Partial<GestorLocal>) {
     console.log(response.data);
     return response.data;
   } catch (error: any) {
-    throw new Error(error.response?.data?.message || "Error al agregar taquillero");
+    if (error.response) {
+      const mensaje = error.response.data;
+      alert(mensaje);
+    }
+    throw new Error(error.response?.data || "Error al agregar taquillero");
   }
 }
 
@@ -142,7 +150,11 @@ export async function registrarOrganizador(payload: Partial<GestorLocal>) {
     console.log(response.data);
     return response.data;
   } catch (error: any) {
-    throw new Error(error.response?.data?.message || "Error al agregar organizador");
+    if (error.response) {
+      const mensaje = error.response.data;
+      alert(mensaje);
+    }
+    throw new Error(error.response?.data || "Error al agregar organizador");
   }
 }
 
@@ -152,7 +164,11 @@ export async function registrarDuenho(payload: Partial<GestorLocal>) {
     console.log(response.data);
     return response.data;
   } catch (error: any) {
-    throw new Error(error.response?.data?.message || "Error al agregar duenho");
+    if (error.response) {
+      const mensaje = error.response.data;
+      alert(mensaje);
+    }
+    throw new Error(error.response?.data || "Error al agregar duenho");
   }
 }
 

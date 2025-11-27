@@ -4,6 +4,7 @@ import { LocationIcon } from "../icons";
 import type { Evento } from "../../types/event.types";
 import { useNavigate } from "react-router-dom";
 import VerDetalleEvento from "../../pages/Cliente/VerDetalleEvento";
+import { añadirVista } from "../../services/ClientServices/eventService";
 
 const imageBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL;
 
@@ -19,7 +20,13 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
 
   const imageSrc = isLarge ? event.posterVertical : event.posterHorizontal;
 
-  const handleClickCard = () => {
+  const handleClickCard = async () => {
+    try {
+      console.log("Añadiendo vista para el evento ID:", event.eventoId);
+      await añadirVista(event.eventoId);
+    } catch (error) {
+      console.error("Error al añadir vista:", error);
+    }
     navigate(`/cliente/ver-detalle-evento/${event.eventoId}`);
   };
 
