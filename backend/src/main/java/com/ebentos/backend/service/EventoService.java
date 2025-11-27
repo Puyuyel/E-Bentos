@@ -193,44 +193,47 @@ public class EventoService {
             eventoExistente.setCategoriaEvento(eventoActualizaDTO.getCategoriaEvento());
         }
         
-        Map<Integer, Zona> zonasExistentes = eventoExistente.getZonas().stream()
-        .collect(Collectors.toMap(Zona::getZonaId, z -> z));
+        if(eventoActualizaDTO.getZonas()!=null){
+            Map<Integer, Zona> zonasExistentes = eventoExistente.getZonas().stream()
+            .collect(Collectors.toMap(Zona::getZonaId, z -> z));
 
-        List<Zona> nuevasZonas = new ArrayList<>();
+            List<Zona> nuevasZonas = new ArrayList<>();
 
-        for (ZonaDTO zonaDTO : eventoActualizaDTO.getZonas()) {
-            Zona zona;
-            if (zonaDTO.getZonaId() != null && zonasExistentes.containsKey(zonaDTO.getZonaId())) {
-                // Actualizar zona existente
-                zona = zonasExistentes.get(zonaDTO.getZonaId());
-                zona.setCapacidadTotal(zonaDTO.getCapacidadTotal());
-                zona.setCantidadEntradasDisponibles(zonaDTO.getCapacidadTotal());
-                zona.setLetraZona(zonaDTO.getLetraZona());
-                zona.setTipoZona(zonaDTO.getTipoZona());
-                zona.setPrecioUnitario(zonaDTO.getPrecioUnitario());
-                zonasExistentes.remove(zonaDTO.getZonaId());
-            } else {
-                // Crear zona nueva
-                zona = new Zona();
-                zona.setCapacidadTotal(zonaDTO.getCapacidadTotal());
-                zona.setLetraZona(zonaDTO.getLetraZona());
-                zona.setTipoZona(zonaDTO.getTipoZona());
-                zona.setPrecioUnitario(zonaDTO.getPrecioUnitario());
-                zona.setActivo(1);
-                zona.setCantidadEntradasDisponibles(zonaDTO.getCapacidadTotal());
-                zona.setLocal(eventoExistente.getLocal());
-                zona.setMontoTotalRecaudado(0.0);
-                zona.setEvento(eventoExistente);
+            for (ZonaDTO zonaDTO : eventoActualizaDTO.getZonas()) {
+                Zona zona;
+                if (zonaDTO.getZonaId() != null && zonasExistentes.containsKey(zonaDTO.getZonaId())) {
+                    // Actualizar zona existente
+                    zona = zonasExistentes.get(zonaDTO.getZonaId());
+                    zona.setCapacidadTotal(zonaDTO.getCapacidadTotal());
+                    zona.setCantidadEntradasDisponibles(zonaDTO.getCapacidadTotal());
+                    zona.setLetraZona(zonaDTO.getLetraZona());
+                    zona.setTipoZona(zonaDTO.getTipoZona());
+                    zona.setPrecioUnitario(zonaDTO.getPrecioUnitario());
+                    zonasExistentes.remove(zonaDTO.getZonaId());
+                } else {
+                    // Crear zona nueva
+                    zona = new Zona();
+                    zona.setCapacidadTotal(zonaDTO.getCapacidadTotal());
+                    zona.setLetraZona(zonaDTO.getLetraZona());
+                    zona.setTipoZona(zonaDTO.getTipoZona());
+                    zona.setPrecioUnitario(zonaDTO.getPrecioUnitario());
+                    zona.setActivo(1);
+                    zona.setCantidadEntradasDisponibles(zonaDTO.getCapacidadTotal());
+                    zona.setLocal(eventoExistente.getLocal());
+                    zona.setMontoTotalRecaudado(0.0);
+                    zona.setEvento(eventoExistente);
+                }
+                nuevasZonas.add(zona);
             }
-            nuevasZonas.add(zona);
-        }
 
-        // Eliminar las zonas que ya no están en el DTO
-        for (Zona zonaEliminada : zonasExistentes.values()) {
-            zonaEliminada.setActivo(0);
-        }
+            // Eliminar las zonas que ya no están en el DTO
+            for (Zona zonaEliminada : zonasExistentes.values()) {
+                zonaEliminada.setActivo(0);
+            }
 
-        eventoExistente.setZonas(nuevasZonas);
+            eventoExistente.setZonas(nuevasZonas);
+        }
+        
 
         Evento eventoActualizado = eventoRepository.save(eventoExistente);
         return mapToEventoDTO(eventoActualizado);
