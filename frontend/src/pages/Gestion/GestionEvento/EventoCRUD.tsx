@@ -30,6 +30,7 @@ import BottomButtons from "../../../components/Gestion/BottomButtons.tsx";
 import SidebarGestor from "../../../components/SidebarGestor.tsx";
 import { getLocales } from "../../../services/localService.ts";
 import "../../../styles/DatePicker.css";
+import "../../../styles/GestionEvento/EventoCRUD.css";
 import crearEvento from "../../../services/EventosServices/agregarEvento.ts";
 import { useAuthStore } from "../../../store/useAuthStore.ts";
 import editarEvento, {
@@ -37,9 +38,10 @@ import editarEvento, {
 } from "../../../services/EventosServices/editarEvento.ts";
 import "../../../styles/CargaSpinner.css";
 import { verificarEstadoSolicitudLocal } from "../../../services/EventosServices/solicitudLocal.ts";
+import SeccionZonas from "./SeccionZonas";
 
 // Define el tipo para el formulario de evento
-interface FormDataEvento {
+export interface FormDataEvento {
   nombre: string;
   descripcion: string;
   localId: number;
@@ -50,6 +52,13 @@ interface FormDataEvento {
   costo: number;
   aforo: number;
   fotoFiles: File[];
+  imagenZonasFiles: File[];  // Para la imagen del mapa de zonas
+  zonas: {
+    nombre: string;
+    letra: string;
+    aforo: number;
+    precio: number;
+  }[];
 }
 
 interface Lookup {
@@ -89,6 +98,8 @@ export default function EventoCRUD({ modo }: EventoCRUDProps) {
       costo: 0,
       aforo: 0,
       fotoFiles: [],
+      imagenZonasFiles: [],
+      zonas: []
     },
   });
 
@@ -792,7 +803,6 @@ function VenueForm({
             </FormItem>
           </Column>
         )}
-
         {/* Mostrar imágenes existentes en modo visualizar o editar (cuando no hay nuevas) */}
         {(modo === "visualizar" ||
           (modo === "editar" && mostrarImagenesExistentes)) &&
@@ -896,6 +906,9 @@ function VenueForm({
             </Column>
           )}
       </Grid>
+
+      {/* Sección de Zonas - Fuera del Grid Principal para ancho completo */}
+      <SeccionZonas modo={modo} isDisabled={isDisabled} />
     </FormGroup>
   );
 }
