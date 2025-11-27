@@ -1,0 +1,37 @@
+/* Sobrescribir estilos específicos para el formulario de eventos */
+
+/* Permitir que el contenedor crezca sin límite */
+.app-container {
+  min-height: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Permitir que el main crezca más allá de 100vh */
+.app-main {
+  max-height: none;
+  min-height: auto;
+  overflow-y: visible;
+  flex: 1;
+  padding: 1.25rem;
+  box-sizing: border-box;
+}
+
+/* Asegurar que el formulario ocupe el espacio necesario */
+.cds--form-group {
+  overflow: visible;
+}
+
+.cds--form-group .cds--grid {
+  overflow: visible;
+}
+
+/* Evitar que stack cause problemas */
+.cds--stack {
+  overflow: visible;
+}
+
+.form-group-evento{
+    height: 100vh !important;
+}
+
