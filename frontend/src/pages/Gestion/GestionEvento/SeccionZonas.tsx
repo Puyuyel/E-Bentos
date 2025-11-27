@@ -156,7 +156,6 @@ export default function SeccionZonas({ modo, isDisabled }: SeccionZonasProps) {
                     labelText="Nombre"
                     hideLabel
                     placeholder="Ej. VIP"
-                    value={field.nombre || ""}
                     {...register(`zonas.${index}.nombre`, { required: true })}
                     readOnly={isDisabled}
                     disabled={isDisabled}
@@ -169,7 +168,6 @@ export default function SeccionZonas({ modo, isDisabled }: SeccionZonasProps) {
                     labelText="Letra"
                     hideLabel
                     placeholder="A"
-                    value={field.letra || ""}
                     {...register(`zonas.${index}.letra`, { required: true })}
                     readOnly={isDisabled}
                     disabled={isDisabled}
@@ -182,7 +180,6 @@ export default function SeccionZonas({ modo, isDisabled }: SeccionZonasProps) {
                     label="Aforo"
                     hideLabel
                     min={0}
-                    value={field.aforo || 0}
                     {...register(`zonas.${index}.aforo`, { 
                       valueAsNumber: true,
                       required: true 
@@ -198,7 +195,6 @@ export default function SeccionZonas({ modo, isDisabled }: SeccionZonasProps) {
                     label="Precio"
                     hideLabel
                     min={0}
-                    value={field.precio || 0}
                     {...register(`zonas.${index}.precio`, { 
                       valueAsNumber: true,
                       required: true 
