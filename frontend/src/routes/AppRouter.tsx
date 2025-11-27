@@ -31,6 +31,7 @@ import GestionarDuenhos from "../pages/Gestion/GestorLocal/GestionarDuenhos";
 import GestionarSolicitudes from "../pages/Gestion/DuenhoLocal/GestionarSolicitudes";
 import MisEntradas from "../pages/Cliente/MisEntradas";
 import MiPerfil from "../pages/Cliente/MiPerfil";
+import MisPuntos from "../pages/Cliente/MisPuntos";
 
 const AppRouter: React.FC = () => {
   const { isLoggedIn, user } = useAuthStore();
@@ -324,6 +325,15 @@ const AppRouter: React.FC = () => {
           element={
             <ProtectedRoute requiredRole="CLIENTE">
               <MisEntradas />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/mis-puntos"
+          element={
+            <ProtectedRoute requiredRole="CLIENTE">
+              <MisPuntos />
             </ProtectedRoute>
           }
         />
