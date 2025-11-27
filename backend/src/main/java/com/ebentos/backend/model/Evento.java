@@ -46,6 +46,9 @@ public class Evento {
     
     @Column(name = "POSTER_VERTICAL", length = 100, nullable = false)
     private String posterVertical;
+    
+    @Column(name = "IMAGEN_ZONAS", length = 100, nullable = false)
+    private String imagenZonas;
 
     @Column(name = "FECHA_HORARIO_INICIO", nullable = false)
     private LocalDateTime fechaHorarioInicio;

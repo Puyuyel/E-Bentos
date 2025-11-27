@@ -7,6 +7,7 @@ public class EventoClienteDetalleDTO {
 
     private String posterHorizontal;
     private String posterVertical;
+    private String imagenZonas;
     private String tipoLocal;
     private String nombreLocal;
     private String direccionLocal;

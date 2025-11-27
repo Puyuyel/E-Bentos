@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Grid,
   Column,
@@ -12,22 +12,16 @@ import {
 import { Add, TrashCan } from "@carbon/icons-react";
 import { useFormContext, useFieldArray } from "react-hook-form";
 import "../../../styles/GestionEvento/SeccionZonas.css";
-
-// Importamos la interfaz desde tu archivo principal. 
-// Asegúrate de que la ruta sea correcta según donde guardes este archivo.
-// Importamos la interfaz desde tu archivo principal. 
-// Asegúrate de que la ruta sea correcta según donde guardes este archivo.
-import type { FormDataEvento } from "./EventoCRUD"; 
-// NOTA: Si te da error la importación de arriba, puedes borrarla 
-// y copiar/pegar la interfaz 'FormDataEvento' aquí mismo temporalmente.
+import type { FormDataEvento } from "./EventoCRUD";
 
 interface SeccionZonasProps {
   modo: string;
   isDisabled: boolean;
+  imagenZonasExistente?: string;
 }
 
-export default function SeccionZonas({ modo, isDisabled }: SeccionZonasProps) {
-  const { register, setValue, control } = useFormContext<FormDataEvento>();
+export default function SeccionZonas({ modo, isDisabled, imagenZonasExistente }: SeccionZonasProps) {
+  const { register, setValue, control, watch } = useFormContext<FormDataEvento>();
   
   // Hook para manejar la lista dinámica
   const { fields, append, remove } = useFieldArray({
@@ -35,12 +29,59 @@ export default function SeccionZonas({ modo, isDisabled }: SeccionZonasProps) {
     name: "zonas",
   });
 
-  const [localImage, setLocalImage] = useState<File | null>(null);
+  // Observar el archivo de imagen de zonas
+  const imagenZonasFile = watch("imagenZonasFile");
+  const [mostrarImagenExistente, setMostrarImagenExistente] = useState(true);
+
+  // Cargar imagen de zonas existente cuando cambie la prop
+  useEffect(() => {
+    if (modo !== "crear" && imagenZonasExistente && imagenZonasExistente !== "") {
+      console.log("🖼️ Imagen de zonas existente disponible:", imagenZonasExistente);
+      setMostrarImagenExistente(true);
+    } else {
+      setMostrarImagenExistente(false);
+    }
+  }, [modo, imagenZonasExistente]);
+
+  // Cuando se sube una nueva imagen, ocultar la existente
+  useEffect(() => {
+    if (imagenZonasFile) {
+      setMostrarImagenExistente(false);
+    } else if (modo !== "crear" && imagenZonasExistente) {
+      setMostrarImagenExistente(true);
+    }
+  }, [imagenZonasFile, modo, imagenZonasExistente]);
 
   const handleImageUpload = (_: any, { addedFiles }: any) => {
-    if (addedFiles.length > 0) {
-      setLocalImage(addedFiles[0]);
-      setValue("imagenZonasFiles", [addedFiles[0]]);
+    if (addedFiles.length > 0 && !isDisabled) {
+      setValue("imagenZonasFile", addedFiles[0]);
+      setMostrarImagenExistente(false); // Ocultar imagen existente al subir nueva
+    }
+  };
+
+  const handleRemoveImage = () => {
+    if (!isDisabled) {
+      setValue("imagenZonasFile", null);
+      
+      // Si estamos en modo editar y hay imagen existente, volver a mostrarla
+      if (modo !== "crear" && imagenZonasExistente) {
+        setMostrarImagenExistente(true);
+      } else {
+        setMostrarImagenExistente(false);
+      }
+    }
+  };
+
+  // Función para manejar error al cargar imagen
+  const handleImageError = () => {
+    console.error("❌ Error cargando imagen de zonas:", imagenZonasExistente);
+    setMostrarImagenExistente(false);
+  };
+
+  // Función para cambiar a modo de subir nueva imagen
+  const handleCambiarImagen = () => {
+    if (!isDisabled) {
+      setMostrarImagenExistente(false);
     }
   };
 
@@ -53,31 +94,89 @@ export default function SeccionZonas({ modo, isDisabled }: SeccionZonasProps) {
         <div className="columna-mapa">
           <p className="cds--file--label">Mapa de Zonas</p>
           <p className="cds--label-description">
-            Sube una imagen referencial de las zonas.
+            {isDisabled ? "Mapa de zonas del evento" : "Sube una imagen referencial de las zonas."}
           </p>
-          
-          {!isDisabled && (
-             <FileUploaderDropContainer
-               accept={["image/jpg", "image/png"]}
-               labelText="Arrastra el mapa aquí"
-               onAddFiles={handleImageUpload}
-               disabled={isDisabled}
-             />
+
+          {/* MODO 1: Mostrar imagen existente (solo en editar/visualizar) */}
+          {mostrarImagenExistente && imagenZonasExistente && !imagenZonasFile && (
+            <div className="preview-imagen-container">
+              <img 
+                src={imagenZonasExistente} 
+                alt="Mapa de zonas existente" 
+                className="preview-imagen"
+                onError={handleImageError}
+              />
+              {isDisabled ? (
+                <p style={{ fontSize: "0.75rem", textAlign: "center", marginTop: "8px" }}>
+                  Mapa de zonas actual
+                </p>
+              ) : (
+                <div style={{ display: "flex", gap: "8px", flexDirection: "column", alignItems: "center" }}>
+                  <Button kind="ghost" size="sm" onClick={handleCambiarImagen}>
+                    Cambiar imagen
+                  </Button>
+                  <p style={{ fontSize: "0.75rem", color: "#666", textAlign: "center" }}>
+                    Puedes reemplazar la imagen actual
+                  </p>
+                </div>
+              )}
+            </div>
           )}
 
-          {localImage && (
+          {/* MODO 2: Mostrar opción para subir nueva imagen (cuando no hay imagen existente o se quiere cambiar) */}
+          {(!mostrarImagenExistente || modo === "crear") && !imagenZonasFile && (
+            <>
+              {!isDisabled && (
+                <FileUploaderDropContainer
+                  accept={["image/jpg", "image/jpeg", "image/png"]}
+                  labelText="Arrastra el mapa aquí"
+                  onAddFiles={handleImageUpload}
+                  disabled={isDisabled}
+                />
+              )}
+              
+              {/* Botón para volver a ver imagen existente (solo en editar cuando hay imagen existente) */}
+              {modo === "editar" && imagenZonasExistente && !isDisabled && (
+                <Button
+                  kind="ghost"
+                  size="sm"
+                  onClick={() => setMostrarImagenExistente(true)}
+                  style={{ marginTop: "16px" }}
+                >
+                  Ver imagen actual
+                </Button>
+              )}
+            </>
+          )}
+
+          {/* MODO 3: Mostrar nueva imagen subida */}
+          {imagenZonasFile && (
             <div className="preview-imagen-container">
-               <img 
-                 src={URL.createObjectURL(localImage)} 
-                 alt="Mapa de zonas" 
-                 className="preview-imagen"
-               />
-               {!isDisabled && (
-                 <Button kind="ghost" size="sm" onClick={() => { setLocalImage(null); setValue("imagenZonasFiles", []); }}>
-                   Quitar imagen
-                 </Button>
-               )}
+              <img 
+                src={URL.createObjectURL(imagenZonasFile)} 
+                alt="Nuevo mapa de zonas" 
+                className="preview-imagen"
+              />
+              {!isDisabled && (
+                <Button kind="ghost" size="sm" onClick={handleRemoveImage}>
+                  {modo === "crear" ? "Quitar imagen" : "Cancelar cambio"}
+                </Button>
+              )}
             </div>
+          )}
+
+          {/* Mensaje si no hay imagen en modo visualizar */}
+          {isDisabled && !mostrarImagenExistente && !imagenZonasExistente && (
+            <p style={{ fontStyle: "italic", color: "#6f6f6f", textAlign: "center" }}>
+              No hay mapa de zonas disponible
+            </p>
+          )}
+
+          {/* Mensaje si no hay imagen en modo crear/editar */}
+          {!isDisabled && !mostrarImagenExistente && !imagenZonasFile && !imagenZonasExistente && (
+            <p style={{ fontStyle: "italic", color: "#6f6f6f", textAlign: "center" }}>
+              No se ha subido ningún mapa de zonas
+            </p>
           )}
         </div>
 
@@ -104,7 +203,7 @@ export default function SeccionZonas({ modo, isDisabled }: SeccionZonasProps) {
               <span className="col-letra">Letra</span>
               <span className="col-aforo">Aforo</span>
               <span className="col-precio">Precio</span>
-              <span className="col-borrar"></span>
+              {!isDisabled && <span className="col-borrar"></span>}
             </div>
           )}
 
@@ -115,10 +214,11 @@ export default function SeccionZonas({ modo, isDisabled }: SeccionZonasProps) {
                   <TextInput
                     id={`zona-nombre-${index}`}
                     labelText="Nombre"
-                    hideLabel // Ocultamos el label visualmente
+                    hideLabel
                     placeholder="Ej. VIP"
                     {...register(`zonas.${index}.nombre`, { required: true })}
                     readOnly={isDisabled}
+                    disabled={isDisabled}
                     size="lg"
                   />
                 </div>
@@ -130,6 +230,7 @@ export default function SeccionZonas({ modo, isDisabled }: SeccionZonasProps) {
                     placeholder="A"
                     {...register(`zonas.${index}.letra`, { required: true })}
                     readOnly={isDisabled}
+                    disabled={isDisabled}
                     size="lg"
                   />
                 </div>
@@ -139,8 +240,13 @@ export default function SeccionZonas({ modo, isDisabled }: SeccionZonasProps) {
                     label="Aforo"
                     hideLabel
                     min={0}
-                    {...register(`zonas.${index}.aforo`, { valueAsNumber: true })}
+                    value={watch(`zonas.${index}.aforo`) || 0}
+                    {...register(`zonas.${index}.aforo`, { 
+                      valueAsNumber: true,
+                      required: true 
+                    })}
                     readOnly={isDisabled}
+                    disabled={isDisabled}
                     size="lg"
                   />
                 </div>
@@ -150,8 +256,13 @@ export default function SeccionZonas({ modo, isDisabled }: SeccionZonasProps) {
                     label="Precio"
                     hideLabel
                     min={0}
-                    {...register(`zonas.${index}.precio`, { valueAsNumber: true })}
+                    value={watch(`zonas.${index}.precio`) || 0}
+                    {...register(`zonas.${index}.precio`, { 
+                      valueAsNumber: true,
+                      required: true 
+                    })}
                     readOnly={isDisabled}
+                    disabled={isDisabled}
                     size="lg"
                   />
                 </div>
@@ -172,7 +283,12 @@ export default function SeccionZonas({ modo, isDisabled }: SeccionZonasProps) {
             ))}
             
             {fields.length === 0 && (
-              <p className="mensaje-vacio">No hay zonas configuradas. Agrega una para comenzar.</p>
+              <p className="mensaje-vacio">
+                {isDisabled 
+                  ? "No hay zonas configuradas para este evento." 
+                  : "No hay zonas configuradas. Agrega una para comenzar."
+                }
+              </p>
             )}
           </div>
         </div>
