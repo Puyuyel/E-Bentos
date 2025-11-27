@@ -28,6 +28,7 @@ import GestionarOrganizador from "../pages/GestionProductora/GestionarOrganizado
 import Metas from "../pages/GestionProductora/Metas";
 import MainEbentos from "../components/Cliente/MainEbentos";
 import GestionarDuenhos from "../pages/Gestion/GestorLocal/GestionarDuenhos";
+import GestionarSolicitudes from "../pages/Gestion/DuenhoLocal/GestionarSolicitudes";
 import MisEntradas from "../pages/Cliente/MisEntradas";
 import MiPerfil from "../pages/Cliente/MiPerfil";
 
@@ -216,6 +217,14 @@ const AppRouter: React.FC = () => {
         />
         {/* RUTAS para DUEÑO DE LOCAL */}
         {/* Ruta /listado locales*/}
+        <Route
+          path="/duenho_local/gestionar-solicitud"
+          element={
+            <ProtectedRoute requiredRole="DUENHO_LOCAL">
+              <GestionarSolicitudes />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/duenho_local/gestionar-local"
           element={

@@ -1,16 +1,13 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
-  Grid,
-  Column,
   TextInput,
   NumberInput,
   Button,
   FileUploaderDropContainer,
-  Stack,
   IconButton,
 } from "@carbon/react";
-import { Add, TrashCan } from "@carbon/icons-react";
-import { useFormContext, useFieldArray } from "react-hook-form";
+import { Add, TrashCan, WarningFilled, CheckmarkFilled } from "@carbon/icons-react";
+import { useFormContext, useFieldArray, Controller } from "react-hook-form";
 import "../../../styles/GestionEvento/SeccionZonas.css";
 import type { FormDataEvento } from "./EventoCRUD";
 
@@ -29,8 +26,20 @@ export default function SeccionZonas({ modo, isDisabled, imagenZonasExistente }:
     name: "zonas",
   });
 
-  // Observar el archivo de imagen de zonas
+  // Observar el archivo de imagen de zonas y el aforo total
   const imagenZonasFile = watch("imagenZonasFile");
+  const aforoTotal = watch("aforo");
+  const zonas = watch("zonas");
+
+  // Calcular la suma de aforos de las zonas
+  const sumaAforosZonas = useMemo(() => {
+    if (!zonas || zonas.length === 0) return 0;
+    return zonas.reduce((sum, zona) => sum + (Number(zona.aforo) || 0), 0);
+  }, [zonas]);
+
+  // Verificar si la suma coincide con el aforo total
+  const aforoCoincide = sumaAforosZonas === aforoTotal;
+  const tieneZonas = zonas && zonas.length > 0;
   const [mostrarImagenExistente, setMostrarImagenExistente] = useState(true);
 
   // Cargar imagen de zonas existente cuando cambie la prop
@@ -196,6 +205,67 @@ export default function SeccionZonas({ modo, isDisabled, imagenZonasExistente }:
             )}
           </div>
 
+          {/* Indicador de validación de aforo */}
+          {tieneZonas && (
+            <div className="aforo-validation-container" style={{ marginBottom: "16px" }}>
+              <div 
+                className={`aforo-validation-message ${aforoCoincide ? 'aforo-valido' : 'aforo-invalido'}`}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  padding: "12px 16px",
+                  borderRadius: "4px",
+                  backgroundColor: aforoCoincide ? "#defbe6" : "#fff1f1",
+                  border: `1px solid ${aforoCoincide ? "#42be65" : "#da1e28"}`,
+                }}
+              >
+                {aforoCoincide ? (
+                  <CheckmarkFilled size={20} style={{ color: "#24a148" }} />
+                ) : (
+                  <WarningFilled size={20} style={{ color: "#da1e28" }} />
+                )}
+                <div style={{ flex: 1 }}>
+                  <p style={{ 
+                    margin: 0, 
+                    fontWeight: 600, 
+                    color: aforoCoincide ? "#0e6027" : "#da1e28",
+                    fontSize: "0.875rem"
+                  }}>
+                    {aforoCoincide 
+                      ? "Aforo válido" 
+                      : "La suma de aforos no coincide"
+                    }
+                  </p>
+                  <p style={{ 
+                    margin: "4px 0 0 0", 
+                    fontSize: "0.8125rem",
+                    color: aforoCoincide ? "#198038" : "#750e13"
+                  }}>
+                    Suma de zonas: <strong>{sumaAforosZonas}</strong> | Aforo total del local: <strong>{aforoTotal}</strong>
+                    {!aforoCoincide && (
+                      <span style={{ marginLeft: "8px" }}>
+                        (Diferencia: {Math.abs(sumaAforosZonas - aforoTotal)})
+                      </span>
+                    )}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Mensaje informativo cuando no hay zonas */}
+          {!tieneZonas && !isDisabled && (
+            <p style={{ 
+              fontSize: "0.8125rem", 
+              color: "#525252", 
+              fontStyle: "italic",
+              marginBottom: "12px"
+            }}>
+              💡 La suma de los aforos de todas las zonas debe ser igual al aforo total del local ({aforoTotal}).
+            </p>
+          )}
+
           {/* Encabezados de la "Tabla" para no repetir labels */}
           {fields.length > 0 && (
             <div className="fila-encabezados">
@@ -235,35 +305,61 @@ export default function SeccionZonas({ modo, isDisabled, imagenZonasExistente }:
                   />
                 </div>
                 <div className="campo-numero">
-                  <NumberInput
-                    id={`zona-aforo-${index}`}
-                    label="Aforo"
-                    hideLabel
-                    min={0}
-                    value={watch(`zonas.${index}.aforo`) || 0}
-                    {...register(`zonas.${index}.aforo`, { 
-                      valueAsNumber: true,
-                      required: true 
-                    })}
-                    readOnly={isDisabled}
-                    disabled={isDisabled}
-                    size="lg"
+                  <Controller
+                    name={`zonas.${index}.aforo`}
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field }) => (
+                      <NumberInput
+                        id={`zona-aforo-${index}`}
+                        label="Aforo"
+                        hideLabel
+                        min={0}
+                        value={field.value || 0}
+                        onChange={(_: any, { value }: { value: number | string }) => {
+                          const numValue = Number(value) || 0;
+                          field.onChange(numValue);
+                          setValue(`zonas.${index}.aforo`, numValue, { shouldDirty: true });
+                        }}
+                        onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
+                          const numValue = Number(e.target.value) || 0;
+                          field.onChange(numValue);
+                          setValue(`zonas.${index}.aforo`, numValue, { shouldDirty: true });
+                        }}
+                        readOnly={isDisabled}
+                        disabled={isDisabled}
+                        size="lg"
+                      />
+                    )}
                   />
                 </div>
                 <div className="campo-numero">
-                  <NumberInput
-                    id={`zona-precio-${index}`}
-                    label="Precio"
-                    hideLabel
-                    min={0}
-                    value={watch(`zonas.${index}.precio`) || 0}
-                    {...register(`zonas.${index}.precio`, { 
-                      valueAsNumber: true,
-                      required: true 
-                    })}
-                    readOnly={isDisabled}
-                    disabled={isDisabled}
-                    size="lg"
+                  <Controller
+                    name={`zonas.${index}.precio`}
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field }) => (
+                      <NumberInput
+                        id={`zona-precio-${index}`}
+                        label="Precio"
+                        hideLabel
+                        min={0}
+                        value={field.value || 0}
+                        onChange={(_: any, { value }: { value: number | string }) => {
+                          const numValue = Number(value) || 0;
+                          field.onChange(numValue);
+                          setValue(`zonas.${index}.precio`, numValue, { shouldDirty: true });
+                        }}
+                        onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
+                          const numValue = Number(e.target.value) || 0;
+                          field.onChange(numValue);
+                          setValue(`zonas.${index}.precio`, numValue, { shouldDirty: true });
+                        }}
+                        readOnly={isDisabled}
+                        disabled={isDisabled}
+                        size="lg"
+                      />
+                    )}
                   />
                 </div>
                 
