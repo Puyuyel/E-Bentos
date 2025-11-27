@@ -205,7 +205,7 @@ const SidebarGestor: React.FC<SidebarProps> = ({
           {
             icon: <ClipboardIcon />,
             label: "Solicitudes",
-            route: "gestionar-solicitudes",
+            route: "gestionar-solicitud",
           },
         ];
 
