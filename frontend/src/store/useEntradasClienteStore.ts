@@ -49,7 +49,19 @@ export const useEntradasClienteStore = create<EntradasStore>()(
           delete copy[eventId];
           return { pendingSelections: copy };
         }),
-      clearAll: () => set({ pendingSelections: {} }),
+      clearAll: () =>
+        set(() => ({
+          pendingSelections: {},
+          cliente: {
+            correoCli: "",
+            cvvTarjeta: "",
+            fechaVencimiento: "",
+            nombreTitularTarjeta: "",
+            numTarjeta: "",
+          },
+          metodoPago: "TARJETA_DE_CREDITO",
+          reservaId: -1,
+        })),
       setCorreoCli: (correo) =>
         set((state) => ({
           cliente: { ...state.cliente, correoCli: correo },

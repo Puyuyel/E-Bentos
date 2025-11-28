@@ -53,11 +53,26 @@ export default function ContenedorZonasPrecios({
         }}
       >
         <div
-          className="img-zonas"
           style={{
-            backgroundImage: `url(${imageBaseUrl}/${imagenZonas})`,
+            flex: "0 0 40%",
+            maxWidth: "420px",
+            minWidth: "140px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
-        ></div>
+        >
+          <img
+            src={`${imageBaseUrl}/${imagenZonas}`}
+            alt="Zonas del evento"
+            style={{
+              width: "100%",
+              height: "auto",
+              objectFit: "contain",
+              display: "block",
+            }}
+          />
+        </div>
 
         <div>
           <StructuredListWrapper>
