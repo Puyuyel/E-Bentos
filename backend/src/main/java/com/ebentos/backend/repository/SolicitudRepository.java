@@ -18,7 +18,7 @@ public interface SolicitudRepository extends JpaRepository<Solicitud, SolicitudI
                 "e.nombre, " +
                 "l.nombre, " +
                 "e.fechaHorarioInicio, " +
-                "COALESCE(lg.nombres, eg.nombres), " +
+                "COALESCE(eg.nombres), " +
                 "e.descripcion, " +
                 "s.estado) " +
                 "FROM Solicitud s " +
