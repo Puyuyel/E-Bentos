@@ -9,6 +9,7 @@ import "../../styles/CargaSpinner.css";
 import { getReporteGeneral } from "../../services/reporteGeneralService.ts";
 import type { ChartDatum } from "../../components/util/types.ts";
 import AreaChartROI from "../../components/AreaChartROI.tsx";
+import GaugeROI from "../../components/GaugeROI.tsx";
 
 interface ReporteEventoItem {
   categoriaEvento: string;
@@ -111,36 +112,71 @@ const ReporteEvento: React.FC = () => {
     0
   );
 
-  // ROI promedio para el gauge
-  const roiPromedio =
-    dataToDisplay.length > 0
-      ? dataToDisplay.reduce((acc, evento) => {
-          const inversion = Number(evento.costoTotalEvento);
-          const ganancia = Number(evento.montoRecaudado);
-          const roi =
-            inversion > 0 ? ((ganancia - inversion) / inversion) * 100 : 0;
-          return acc + roi;
-        }, 0) / dataToDisplay.length
-      : 0;
-
-  // Datos para ingresos por categoría
-  const ingresosPorCategoria = dataToDisplay.reduce<Record<string, number>>(
-    (acc, r) => {
-      acc[r.categoriaEvento] =
-        (acc[r.categoriaEvento] || 0) + Number(r.montoRecaudado);
-      return acc;
-    },
-    {}
+  const costoTotal = dataToDisplay.reduce(
+    (acc, r) => acc + Number(r.costoTotalEvento),
+    0
   );
 
-  const ingresosCategoriaData: ChartDatum[] = Object.entries(
-    ingresosPorCategoria
-  ).map(([categoria, montoTotal]) => ({
-    group: categoria,
-    key: categoria,
-    value: montoTotal,
-  }));
+  // ROI CORREGIDO: (Ganancia Total - Inversión Total) / Inversión Total * 100
+  const roiPromedio =
+    costoTotal > 0 ? ((ingresosTotales - costoTotal) / costoTotal) * 100 : 0;
 
+  // Datos para ingresos por categoría
+  // Datos para ingresos por estado y categoría (GroupedBar modificado)
+  // Datos para ingresos por categoría y estado (GroupedBar corregido)
+  const ingresosPorCategoriaYEstado = dataToDisplay.reduce<
+    Record<string, Record<string, number>>
+  >((acc, r) => {
+    const categoria = r.categoriaEvento;
+    const estado = r.estadoEvento;
+
+    if (!acc[categoria]) {
+      acc[categoria] = {};
+    }
+
+    if (!acc[categoria][estado]) {
+      acc[categoria][estado] = 0;
+    }
+
+    acc[categoria][estado] += Number(r.montoRecaudado);
+    return acc;
+  }, {});
+
+  // Preparar datos para GroupedBar con categorías como grupo principal y estados como sub-grupo
+  const ingresosCategoriaEstadoData: ChartDatum[] = [];
+
+  // Crear datos en el formato que GroupedBar necesita
+  Object.entries(ingresosPorCategoriaYEstado).forEach(
+    ([categoria, estados]) => {
+      Object.entries(estados).forEach(([estado, monto]) => {
+        ingresosCategoriaEstadoData.push({
+          group: categoria, // Categoría como grupo principal (aparecerá en leyenda)
+          key: estado, // Estado como sub-grupo (aparecerá en eje X)
+          value: monto,
+        });
+      });
+    }
+  );
+
+  // Si no hay datos, crear datos vacíos para evitar errores
+  if (ingresosCategoriaEstadoData.length === 0) {
+    const estadosUnicos = [
+      ...new Set(dataToDisplay.map((r) => r.estadoEvento)),
+    ];
+    const categoriasUnicas = [
+      ...new Set(dataToDisplay.map((r) => r.categoriaEvento)),
+    ];
+
+    categoriasUnicas.forEach((categoria) => {
+      estadosUnicos.forEach((estado) => {
+        ingresosCategoriaEstadoData.push({
+          group: categoria,
+          key: estado,
+          value: 0,
+        });
+      });
+    });
+  }
   // Datos para estados de eventos
   const eventosPorEstado = dataToDisplay.reduce<Record<string, number>>(
     (acc, r) => {
@@ -158,12 +194,22 @@ const ReporteEvento: React.FC = () => {
     })
   );
 
-  // CORRECCIÓN: Datos para ingresos por mes
-  const ingresosPorMes = dataToDisplay.reduce<
-    Record<string, { nombre: string; monto: number }>
-  >((acc, r) => {
-    const fecha = new Date(r.fechaEvento);
-    const mes = `${fecha.getFullYear()}-${(fecha.getMonth() + 1)
+  // En el ReporteEvento.tsx, reemplaza la sección del área chart con esto:
+
+  // Datos para el Area Chart de ROI por mes
+  // Datos para el Area Chart de CANTIDAD de eventos por ROI por mes
+  const eventosPorROIPorMes = dataToDisplay.reduce<
+    Record<
+      string,
+      {
+        positivos: number;
+        negativos: number;
+        nombre: string;
+      }
+    >
+  >((acc, evento) => {
+    const fecha = new Date(evento.fechaEvento);
+    const mesKey = `${fecha.getFullYear()}-${(fecha.getMonth() + 1)
       .toString()
       .padStart(2, "0")}`;
     const nombreMes = fecha.toLocaleDateString("es-ES", {
@@ -171,74 +217,65 @@ const ReporteEvento: React.FC = () => {
       year: "numeric",
     });
 
-    if (!acc[mes]) {
-      acc[mes] = { nombre: nombreMes, monto: 0 };
-    }
-    acc[mes].monto += Number(r.montoRecaudado);
-    return acc;
-  }, {});
-
-  // En el ReporteEvento.tsx, reemplaza la sección del área chart con esto:
-
-  // Datos para el Area Chart de ROI por mes
-  const roisPorMes = dataToDisplay.reduce<
-    Record<string, { positivos: number[]; negativos: number[] }>
-  >((acc, evento) => {
-    const fecha = new Date(evento.fechaEvento);
-    const mesKey = `${fecha.getFullYear()}-${(fecha.getMonth() + 1)
-      .toString()
-      .padStart(2, "0")}`;
-
     const inversion = Number(evento.costoTotalEvento);
     const ganancia = Number(evento.montoRecaudado);
     const roi = inversion > 0 ? ((ganancia - inversion) / inversion) * 100 : 0;
 
     if (!acc[mesKey]) {
-      acc[mesKey] = { positivos: [], negativos: [] };
+      acc[mesKey] = {
+        positivos: 0,
+        negativos: 0,
+        nombre: nombreMes,
+      };
     }
 
+    // CONTAR eventos por tipo de ROI
     if (roi >= 0) {
-      acc[mesKey].positivos.push(roi);
+      acc[mesKey].positivos += 1;
     } else {
-      acc[mesKey].negativos.push(roi);
+      acc[mesKey].negativos += 1;
     }
 
     return acc;
-  }, {});
+  }, {} as Record<string, { positivos: number; negativos: number; nombre: string }>);
 
-  // Preparar datos para el Area Chart en formato ChartDatum
-  const roiAreaData: ChartDatum[] = [];
+  // Preparar datos para el Area Chart en formato ChartDatum - CANTIDAD de eventos
+  const eventosROIAreaData: ChartDatum[] = [];
 
-  Object.entries(roisPorMes)
+  Object.entries(eventosPorROIPorMes)
     .sort(([mesA], [mesB]) => mesA.localeCompare(mesB))
-    .forEach(([mesKey, rois]) => {
+    .forEach(([mesKey, datosMes]) => {
       const fecha = new Date(mesKey + "-15");
       const fechaFormateada = fecha.toISOString().split("T")[0];
 
-      // Calcular ROI promedio positivo para este mes
-      if (rois.positivos.length > 0) {
-        const roiPromedioPositivo =
-          rois.positivos.reduce((sum, roi) => sum + roi, 0) /
-          rois.positivos.length;
-        roiAreaData.push({
-          group: "ROI Positivo",
-          key: fechaFormateada, // Usamos la fecha como key
-          value: Math.round(roiPromedioPositivo * 100) / 100,
-        });
-      }
+      // Agregar datos para eventos POSITIVOS
+      eventosROIAreaData.push({
+        group: "Eventos con ROI Positivo",
+        key: fechaFormateada,
+        value: datosMes.positivos,
+      });
 
-      // Calcular ROI promedio negativo para este mes
-      if (rois.negativos.length > 0) {
-        const roiPromedioNegativo =
-          rois.negativos.reduce((sum, roi) => sum + roi, 0) /
-          rois.negativos.length;
-        roiAreaData.push({
-          group: "ROI Negativo",
-          key: fechaFormateada, // Usamos la fecha como key
-          value: Math.round(roiPromedioNegativo * 100) / 100,
-        });
-      }
+      // Agregar datos para eventos NEGATIVOS
+      eventosROIAreaData.push({
+        group: "Eventos con ROI Negativo",
+        key: fechaFormateada,
+        value: datosMes.negativos,
+      });
     });
+
+  const eventosConROIPositivo = dataToDisplay.filter((evento) => {
+    const inversion = Number(evento.costoTotalEvento);
+    const ganancia = Number(evento.montoRecaudado);
+    const roi = inversion > 0 ? ((ganancia - inversion) / inversion) * 100 : 0;
+    return roi >= 0;
+  }).length;
+
+  const eventosConROINegativo = dataToDisplay.filter((evento) => {
+    const inversion = Number(evento.costoTotalEvento);
+    const ganancia = Number(evento.montoRecaudado);
+    const roi = inversion > 0 ? ((ganancia - inversion) / inversion) * 100 : 0;
+    return roi < 0;
+  }).length;
 
   return (
     <div
@@ -285,20 +322,41 @@ const ReporteEvento: React.FC = () => {
                   S/. {ingresosTotales.toLocaleString()}
                 </div>
               </div>
+              <div className="metric-card">
+                <h3>Eventos ROI Positivo</h3>
+                <div className="metric-value positive">
+                  {eventosConROIPositivo}
+                </div>
+              </div>
+              <div className="metric-card">
+                <h3>Eventos ROI Negativo</h3>
+                <div className="metric-value negative">
+                  {eventosConROINegativo}
+                </div>
+              </div>
+              <div className="metric-card">
+                <h3>ROI Total</h3>
+                <div
+                  className={`metric-value ${
+                    roiPromedio >= 0 ? "positive" : "negative"
+                  }`}
+                >
+                  {Math.round(roiPromedio * 100) / 100}%
+                </div>
+              </div>
             </div>
 
             {/* Gráficos */}
             <div className="chart-container">
               <div className="chart-item">
-                <Gauge
-                  totalCapacity={100} // ROI máximo esperado (100%)
-                  usedCapacity={Math.max(0, Math.min(100, roiPromedio))} // ROI entre 0% y 100%
+                <GaugeROI
+                  roiValue={roiPromedio} // ROI entre 0% y 100%
                   title="ROI Promedio de Eventos"
                 />
               </div>
               <div className="chart-item full-width">
                 <GroupedBar
-                  data={ingresosCategoriaData}
+                  data={ingresosCategoriaEstadoData}
                   title="Ingresos por Categoría de Evento"
                 />
               </div>
@@ -306,11 +364,12 @@ const ReporteEvento: React.FC = () => {
                 <Donut
                   data={estadosData}
                   title="Distribución de Estados de Eventos"
+                  centerLabel="Cantidad de Eventos"
                 />
               </div>
               <div className="chart-item full-width">
                 <AreaChartROI
-                  data={roiAreaData}
+                  data={eventosROIAreaData}
                   title="Evolución de ROI Positivo vs Negativo por Mes"
                 />
               </div>
