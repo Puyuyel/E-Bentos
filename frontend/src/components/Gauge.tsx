@@ -6,9 +6,10 @@ import type { GaugeChartOptions } from "@carbon/charts";
 interface GaugeProps {
   totalCapacity: number;
   usedCapacity: number;
+  title?: string;
 }
 
-const Gauge: React.FC<GaugeProps> = ({ totalCapacity, usedCapacity }) => {
+const Gauge: React.FC<GaugeProps> = ({ totalCapacity, usedCapacity, title="Capacidad utilizada" }) => {
   const percentage = Math.round((usedCapacity / totalCapacity) * 100);
 
   // Estado del gauge
@@ -29,7 +30,7 @@ const Gauge: React.FC<GaugeProps> = ({ totalCapacity, usedCapacity }) => {
   ];
 
   const options: GaugeChartOptions = {
-    title: "Porcentaje de aforo utilizado",
+    title: title,
     resizable: true,
     height: "400px",
     gauge: {

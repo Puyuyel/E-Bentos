@@ -3,16 +3,21 @@ import { DonutChart } from "@carbon/charts-react";
 import type { ChartProps } from "./util/types.ts";
 import "@carbon/charts-react/styles.css";
 
-const Donut: React.FC<ChartProps> = ({ data }) => {
+interface DonutProps extends ChartProps {
+  title?: string;
+  centerLabel?: string;
+}
+
+const Donut: React.FC<DonutProps> = ({ data, title = "Porcentaje de ingresos por local", centerLabel = "Ingresos Totales (S/.)" }) => {
   const options = {
-    title: "Porcentaje de ingresos por local",
+    title: title,
     resizable: true,
     legend: {
       position: "left",
       truncation: { type: "none" },
     },
     donut: {
-      center: { label: "Ingresos Totales (S/.)" },
+      center: { label: centerLabel },
     },
     height: "400px",
   };

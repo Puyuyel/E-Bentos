@@ -2,6 +2,7 @@ package com.ebentos.backend.dto;
 
 public class ZonaEventoDTO {
 
+    private Integer zonaId;
     private Integer cantidadEntradasDisponible;
     private Double precioUnitario;
     private String tipoZona;
@@ -9,11 +10,12 @@ public class ZonaEventoDTO {
 
     public ZonaEventoDTO() {}
 
-    public ZonaEventoDTO(Integer cantidadEntradasDisponible, Double precioUnitario, String tipoZona) {
-        this(cantidadEntradasDisponible, precioUnitario, tipoZona, null);
+    public ZonaEventoDTO(Integer zonaId, Integer cantidadEntradasDisponible, Double precioUnitario, String tipoZona) {
+        this(zonaId, cantidadEntradasDisponible, precioUnitario, tipoZona, null);
     }
 
-    public ZonaEventoDTO(Integer cantidadEntradasDisponible, Double precioUnitario, String tipoZona, String letraZona) {
+    public ZonaEventoDTO(Integer zonaId, Integer cantidadEntradasDisponible, Double precioUnitario, String tipoZona, String letraZona) {
+        this.zonaId = zonaId;
         this.cantidadEntradasDisponible = cantidadEntradasDisponible;
         this.precioUnitario = precioUnitario;
         this.tipoZona = tipoZona;
@@ -50,5 +52,13 @@ public class ZonaEventoDTO {
 
     public void setLetraZona(String letraZona) {
         this.letraZona = letraZona;
+    }
+    
+    public Integer getZonaId() {
+        return zonaId;
+    }
+
+    public void setZonaId(Integer zonaId) {
+        this.zonaId = zonaId;
     }
 }
