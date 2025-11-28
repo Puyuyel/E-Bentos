@@ -6,7 +6,6 @@ import com.ebentos.backend.dto.SolicitudReservaDTO;
 import com.ebentos.backend.dto.VentaConEntradasDTO;
 import com.ebentos.backend.dto.VentaDTO;
 import com.ebentos.backend.model.Reserva;
-import com.ebentos.backend.model.Venta;
 import com.ebentos.backend.service.VentaService;
 
 import java.util.Collections;
@@ -29,15 +28,18 @@ public class VentaController {
     public VentaController(VentaService ventaService){
         this.ventaService = ventaService;
     }
+    
     //Lista todas las ventas sin importar que sean del cliente
     @GetMapping
-    public List<VentaConEntradasDTO> listarTodas() {
+    public List<VentaDTO> listarTodas() {
         return ventaService.listarTodas();
     }
     
     @GetMapping("/{id}")
-    public VentaDTO obtenerPorId(@PathVariable Integer id) {
-        return ventaService.obtenerPorId(id);
+    public VentaConEntradasDTO obtenerPorId(@PathVariable Integer id, Authentication authentication) {
+        UsuarioDetails user = (UsuarioDetails) authentication.getPrincipal();
+        Integer clienteId = user.getUsuarioId();
+        return ventaService.obtenerPorId(id, clienteId);
     }
     //lista las compras pasadas del cliente, lo hace chapando al cliente logeeado en ese momento
     @GetMapping("/pasadas")
@@ -48,7 +50,7 @@ public class VentaController {
     }
     //lista las compras activas del cliente, lo hace chapando al cliente logeeado en ese momento
     @GetMapping("/activas")
-    public List<VentaConEntradasDTO> listarActivas(Authentication authentication) {
+    public List<VentaDTO> listarActivas(Authentication authentication) {
         UsuarioDetails user = (UsuarioDetails) authentication.getPrincipal();
         Integer clienteId = user.getUsuarioId();
         return ventaService.listarActivas(clienteId);
@@ -90,10 +92,8 @@ public class VentaController {
     public ResponseEntity<?> confirmarVenta(@PathVariable Integer reservaId, @RequestParam String correo, @RequestBody RegistroVentaDTO registroVentaDTO) {
         try {
             // Llama al servicio que valida los 4 minutos y guarda la venta final
-            Venta ventaRealizada = ventaService.confirmarVenta(correo, reservaId, registroVentaDTO);
-
+            VentaConEntradasDTO ventaRealizada = ventaService.confirmarVenta(correo, reservaId, registroVentaDTO);
             return ResponseEntity.ok(ventaRealizada);
-
         } catch (RuntimeException e) {
             // Si expiró el tiempo o la reserva no existe
             return ResponseEntity.badRequest().body(Collections.singletonMap("error", e.getMessage()));

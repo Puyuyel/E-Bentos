@@ -27,7 +27,7 @@ public class EntradaService {
 
     //Métodos públicos
     @Transactional
-    public void insertar(String correo, List<RegistroEntradaDTO> registroEntradasDTO) {
+    public void insertar(List<RegistroEntradaDTO> registroEntradasDTO) {
         List<Entrada> entradasParaGuardar = registroEntradasDTO.stream()
                 .map(dto -> {
                     Entrada entrada = new Entrada();
@@ -56,8 +56,6 @@ public class EntradaService {
         // Guardamos todos de una sola vez, en vez de hacer for ( save )
         entradaRepository.saveAll(entradasParaGuardar);
 
-        //Enviamos el correo con todas las entradas que compró de forma asíncrona
-        emailService.enviarCorreoEntradas(correo, registroEntradasDTO);
     }
 
     //Obtener toda la info de la entrada ?

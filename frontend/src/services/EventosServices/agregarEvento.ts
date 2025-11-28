@@ -48,10 +48,17 @@ interface FormDataEvento {
   costo: number;
   aforo: number;
   fotoFiles: File[];
+  imagenZonasFiles: File[];
+  zonas: {
+    nombre: string;
+    letra: string;
+    aforo: number;
+    precio: number;
+  }[];
 }
 
 // Función para generar nombres únicos de archivos
-function generateImageNames(files: File[], eventoId: number): { blobNames: string[], publicUrls: string[] } {
+function generateImageNames(files: File[], eventoId: number, tipo: 'evento' | 'zona' = 'evento'): { blobNames: string[], publicUrls: string[] } {
   const blobNames: string[] = [];
   const publicUrls: string[] = [];
 
@@ -59,7 +66,8 @@ function generateImageNames(files: File[], eventoId: number): { blobNames: strin
     const fileExtension = file.name.split('.').pop();
     const timestamp = new Date().getTime();
     const randomString = Math.random().toString(36).substring(2, 15);
-    const blobName = `eventos/${eventoId}/imagen_${timestamp}_${randomString}.${fileExtension}`;
+    const prefix = tipo === 'zona' ? 'zona' : 'imagen';
+    const blobName = `eventos/${eventoId}/${prefix}_${timestamp}_${randomString}.${fileExtension}`;
     
     blobNames.push(blobName);
     publicUrls.push(`${import.meta.env.VITE_IMAGE_BASE_URL}/${blobName}`);
@@ -114,6 +122,21 @@ export default async function crearEvento(data:FormDataEvento, usuarioId: number
     const [horas, minutos] = data.duracion.split(' ')[0].split(':');
     const duracionEnMinutos = parseInt(horas) * 60 + parseInt(minutos);
 
+    // Mapear las zonas del formulario al formato de la API
+    const zonasParaAPI: ZonaEvento[] = data.zonas && data.zonas.length > 0 
+      ? data.zonas.map(zona => ({
+          capacidadTotal: zona.aforo,
+          tipoZona: zona.nombre,
+          letraZona: zona.letra,
+          precioUnitario: zona.precio,
+        }))
+      : [{
+          capacidadTotal: data.aforo,
+          tipoZona: "General",
+          letraZona: "A",
+          precioUnitario: data.costo / data.aforo,
+        }];
+
     const eventoData = {
       local: {
         localId: data.localId,
@@ -132,14 +155,7 @@ export default async function crearEvento(data:FormDataEvento, usuarioId: number
       fechaHorarioInicio: new Date(fechaCompleta).toISOString(),
       duracionEstimada: duracionEnMinutos,
       costoTotal: data.costo,
-      zonas: [
-        {
-          capacidadTotal: data.aforo,
-          tipoZona: "General",
-          letraZona: "A",
-          precioUnitario: data.costo / data.aforo,
-        },
-      ],
+      zonas: zonasParaAPI,
     };
 
     console.log("🚀 Creando evento en base de datos:", eventoData);
@@ -149,7 +165,7 @@ export default async function crearEvento(data:FormDataEvento, usuarioId: number
 
     // 4. Si el evento se creó exitosamente, subir las imágenes con los nombres ya generados
     if (eventoCreado && data.fotoFiles && data.fotoFiles.length > 0) {
-      console.log(`📤 Subiendo ${data.fotoFiles.length} imágenes...`);
+      console.log(`📤 Subiendo ${data.fotoFiles.length} imágenes del evento...`);
       
       try {
         // Usar uploadEventImages modificado para aceptar nombres pre-generados
@@ -159,7 +175,7 @@ export default async function crearEvento(data:FormDataEvento, usuarioId: number
           imageBlobNames // Pasar los nombres ya generados
         );
         
-        console.log("✅ Imágenes subidas:", imageUrls);
+        console.log("✅ Imágenes del evento subidas:", imageUrls);
 
         // Verificar que las URLs coincidan con las que ya tenemos en la BD
         if (imageUrls.length > 0 && 
@@ -177,8 +193,35 @@ export default async function crearEvento(data:FormDataEvento, usuarioId: number
         }
 
       } catch (uploadError) {
-        console.error("⚠️ Error subiendo imágenes, pero el evento fue creado:", uploadError);
+        console.error("⚠️ Error subiendo imágenes del evento, pero el evento fue creado:", uploadError);
         // El evento ya tiene los nombres generados, así que sigue siendo válido
+      }
+    }
+
+    // 5. Si hay imagen de zonas, subirla a Azure blob storage
+    if (eventoCreado && data.imagenZonasFiles && data.imagenZonasFiles.length > 0) {
+      console.log(`📤 Subiendo imagen de zonas...`);
+      
+      try {
+        const { blobNames: zonaBlobNames } = generateImageNames(
+          data.imagenZonasFiles, 
+          eventoCreado.eventoId,
+          'zona'
+        );
+        
+        const zonaImageUrls = await uploadEventImages(
+          data.imagenZonasFiles, 
+          eventoCreado.eventoId, 
+          zonaBlobNames
+        );
+        
+        console.log("✅ Imagen de zonas subida:", zonaImageUrls);
+        // La URL de la imagen de zonas se puede usar en el frontend para mostrarla
+        // Si necesitas guardarla en la BD, puedes hacer un PATCH aquí
+
+      } catch (uploadError) {
+        console.error("⚠️ Error subiendo imagen de zonas:", uploadError);
+        // No es crítico, el evento ya está creado
       }
     }
 

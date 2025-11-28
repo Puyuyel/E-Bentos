@@ -142,6 +142,8 @@ public class Securityconfig {
                                                 .requestMatchers(HttpMethod.GET,
                                                                 "/api/solicitudes/**")
                                                 .hasAnyRole("DUENHO_LOCAL", "ORGANIZADOR_EVENTOS")
+                                                .requestMatchers("/api/ventas/**")
+                                                .hasRole("CLIENTE")
                                                 // Protege todas las demás rutas
                                                 .anyRequest().authenticated())
 
