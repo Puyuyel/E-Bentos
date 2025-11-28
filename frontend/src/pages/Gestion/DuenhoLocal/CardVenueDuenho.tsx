@@ -1,6 +1,4 @@
 import {
-  Grid,
-  Column,
   Stack,
   TextInput,
   TextArea,
@@ -459,12 +457,12 @@ export default function CardVenue({ local }: CardVenueProps) {
       <ClickableTile
         className="back_card"
         onClick={openModal}
-        style={{ position: "relative" }}
+        style={{ position: "relative", overflow: "hidden" }}
       >
         {/* Dar de baja button inside the tile but stopPropagation to avoid triggering the tile click */}
 
-        <Grid>
-          <Column sm={4} md={4} lg={4} xlg={4} max={4}>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem", width: "100%" }}>
+          <div style={{ flex: "1 1 45%", minWidth: "150px" }}>
             <Stack gap={3}>
               <h4>{nombreLocal}</h4>
               <div
@@ -477,7 +475,7 @@ export default function CardVenue({ local }: CardVenueProps) {
                 style={{ display: "flex", alignItems: "left", gap: "0.5rem" }}
               ></div>
             </Stack>
-          </Column>
+          </div>
 
           <button
             onClick={onDarBajaClick}
@@ -495,18 +493,19 @@ export default function CardVenue({ local }: CardVenueProps) {
             <TrashCan size={30} />
           </button>
 
-          <Column sm={4} md={4} lg={4} xlg={4} max={4}>
+          <div style={{ flex: "1 1 45%", minWidth: "150px" }}>
             <div
               style={{
                 position: "relative",
                 width: "100%",
+                maxWidth: "100%",
                 overflow: "hidden",
               }}
             >
               <img
                 src={`${imageBaseUrl}/${local.foto}`} // local.foto
                 alt="Imagen del local"
-                style={{ width: "100%", objectFit: "cover" }}
+                style={{ width: "100%", maxWidth: "100%", objectFit: "cover", borderRadius: "8px" }}
               ></img>
 
               <div>
@@ -516,8 +515,8 @@ export default function CardVenue({ local }: CardVenueProps) {
                 ></CardVenueTag>
               </div>
             </div>
-          </Column>
-        </Grid>
+          </div>
+        </div>
       </ClickableTile>
     </div>
   );

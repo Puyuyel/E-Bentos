@@ -35,7 +35,7 @@ export default function VenueList() {
   }, []);
 
   return (
-    <div>
+    <div style={{ width: "100%", maxWidth: "100%", boxSizing: "border-box" }}>
       <div
         style={{
           display: "flex",
@@ -45,9 +45,9 @@ export default function VenueList() {
       >
         <SearchBar onChange={(e) => setSearch(e.target.value)} />
       </div>
-      <Grid>
+      <Grid narrow>
         {filteredLocales.map((local: Local) => (
-          <Column key={local.localId} sm={4} md={4} lg={8} xlg={8} max={8}>
+          <Column key={local.localId} sm={4} md={4} lg={8} xlg={8} max={8} style={{ marginBottom: "1rem" }}>
             <CardVenueDuenho local={local}></CardVenueDuenho>
           </Column>
         ))}
