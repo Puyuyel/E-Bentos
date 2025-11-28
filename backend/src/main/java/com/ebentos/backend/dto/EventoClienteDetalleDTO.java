@@ -25,6 +25,14 @@ public class EventoClienteDetalleDTO {
     public void setPosterHorizontal(String posterHorizontal) {
         this.posterHorizontal = posterHorizontal;
     }
+    
+    public String getImagenZonas() {
+        return imagenZonas;
+    }
+
+    public void setImagenZonas(String imagenZonas) {
+        this.imagenZonas = imagenZonas;
+    }
 
     public String getPosterVertical() {
         return posterVertical;
