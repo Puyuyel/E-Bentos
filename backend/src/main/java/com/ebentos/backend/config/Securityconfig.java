@@ -168,9 +168,11 @@ public class Securityconfig {
                                                 // Handler para ÉXITO de login (devuelve 200 OK)
                                                 .successHandler((request, response, authentication) -> {
                                                         response.setStatus(HttpServletResponse.SC_OK);
-                                                        response.setContentType("application/json");
-                                                        response.getWriter().write(
-                                                                        "{\"success\": true, \"message\": \"Login exitoso\"}");
+                                                        String sessionId = request.getSession().getId();
+                                                        response.setHeader(
+                                                                        "Set-Cookie",
+                                                                        "JSESSIONID=" + sessionId
+                                                                                        + "; Path=/; Secure; HttpOnly; SameSite=None");
                                                 })
                                                 .failureHandler((request, response, exception) -> {
                                                         // ¡Añade esta línea para imprimir el error en tu consola de
