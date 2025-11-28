@@ -1,13 +1,16 @@
 import React from "react";
 import { Button, Tile } from "@carbon/react";
-import { CheckmarkFilled, Download, Email } from "@carbon/icons-react";
+import { CheckmarkFilled, Email } from "@carbon/icons-react";
+import { useNavigate } from "react-router-dom";
+import { useEntradasClienteStore } from "../../../store/useEntradasClienteStore";
 
 interface ConfirmationProps {
   onStartOver: () => void;
 }
 
 export function Confirmation({ onStartOver }: ConfirmationProps) {
-  const orderNumber = `EB-${Date.now().toString().slice(-8)}`;
+  const { ventaId } = useEntradasClienteStore();
+  const navigate = useNavigate();
 
   return (
     <div
@@ -72,7 +75,7 @@ export function Confirmation({ onStartOver }: ConfirmationProps) {
             }}
           >
             <span style={{ color: "#525252" }}>Número de pedido</span>
-            <span style={{ fontWeight: 600 }}>{orderNumber}</span>
+            <span style={{ fontWeight: 600 }}>V-{ventaId}</span>
           </div>
           <div
             style={{
@@ -126,20 +129,20 @@ export function Confirmation({ onStartOver }: ConfirmationProps) {
 
       <div style={{ display: "flex", gap: "1rem", marginBottom: "2rem" }}>
         <Button
-          kind="secondary"
-          size="lg"
-          renderIcon={Download}
-          style={{ flex: 1 }}
-        >
-          Descargar tickets
-        </Button>
-        <Button
           kind="primary"
           size="lg"
           onClick={onStartOver}
           style={{ flex: 1 }}
         >
           Nueva compra
+        </Button>
+        <Button
+          kind="tertiary"
+          size="lg"
+          onClick={() => navigate("home")}
+          style={{ flex: 1 }}
+        >
+          Ir al menú principal
         </Button>
       </div>
 
@@ -151,7 +154,7 @@ export function Confirmation({ onStartOver }: ConfirmationProps) {
         }}
       >
         <p style={{ fontSize: "0.875rem", color: "#525252" }}>
-          Si tienes alguna pregunta, contáctanos a soporte@e-bentos.com
+          Si tienes alguna pregunta, contáctanos a ebentossuport@gmail.com
         </p>
       </div>
     </div>

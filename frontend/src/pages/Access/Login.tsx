@@ -33,7 +33,8 @@ const Login: React.FC = () => {
     if (isLoggedIn && user) {
       const params = new URLSearchParams(location.search);
       const redirectParam = params.get("redirect");
-      const safeRedirect = redirectParam && redirectParam.startsWith("/") ? redirectParam : null;
+      const safeRedirect =
+        redirectParam && redirectParam.startsWith("/") ? redirectParam : null;
       if (safeRedirect) {
         navigate(safeRedirect, { replace: true });
         return;
@@ -53,7 +54,8 @@ const Login: React.FC = () => {
       console.log("Rol:", rol);
       const params = new URLSearchParams(location.search);
       const redirectParam = params.get("redirect");
-      const safeRedirect = redirectParam && redirectParam.startsWith("/") ? redirectParam : null;
+      const safeRedirect =
+        redirectParam && redirectParam.startsWith("/") ? redirectParam : null;
       if (safeRedirect) {
         navigate(safeRedirect, { replace: true });
         return;

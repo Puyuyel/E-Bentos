@@ -1,7 +1,5 @@
 import "../../styles/Cliente/ContenedorZonasPrecios.css";
 
-import zonaProvisional from "../../assets/zonas-img-test.png";
-
 const imageBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL;
 
 import {
@@ -21,14 +19,15 @@ interface ContenedorZonasPreciosProps {
       letraZona: string;
     }
   ];
-  localTipo: string;
+  imagenZonas: string;
 }
 
 export default function ContenedorZonasPrecios({
   zonas,
-  localTipo,
+  imagenZonas,
 }: ContenedorZonasPreciosProps) {
   // const imagenZona = `${imageBaseUrl}/${localTipo}`;
+
   return (
     <div
       style={{
@@ -45,13 +44,35 @@ export default function ContenedorZonasPrecios({
       >
         ZONAS Y PRECIOS
       </h2>
-      <div style={{ display: "flex" }}>
+      <div
+        style={{
+          display: "flex",
+          gap: "1rem",
+          alignItems: "center",
+          flexWrap: "nowrap",
+        }}
+      >
         <div
-          className="img-zonas"
           style={{
-            backgroundImage: `url(${zonaProvisional})`,
+            flex: "0 0 40%",
+            maxWidth: "420px",
+            minWidth: "140px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
-        ></div>
+        >
+          <img
+            src={`${imageBaseUrl}/${imagenZonas}`}
+            alt="Zonas del evento"
+            style={{
+              width: "100%",
+              height: "auto",
+              objectFit: "contain",
+              display: "block",
+            }}
+          />
+        </div>
 
         <div>
           <StructuredListWrapper>

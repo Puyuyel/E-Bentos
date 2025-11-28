@@ -18,14 +18,23 @@ import { getLocalPorIdService } from "../../services/LocalesServices/getLocalPor
 import type { Local } from "../../types/locales.types";
 import { ConvertToCloud } from "@carbon/icons-react";
 import { useAuthStore } from "../../store/useAuthStore";
-
-const imageBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL;
+import { useZonasEventoStore } from "../../store/useZonasEventoStore";
+import { useEventos } from "../../store/useEventos";
 
 export default function VerDetalleEvento() {
-  const navigate = useNavigate();
-  const { isLoggedIn } = useAuthStore();
   const [datosEvento, setDatosEvento] = useState<EventoDetalle>();
+  const {
+    setZonas,
+    setTitulo,
+    setLugar,
+    setFecha,
+    setEventoID,
+    setUbicacion,
+    setImagenZonas,
+  } = useZonasEventoStore();
+  const { setEventSearchedByID, eventSearched } = useEventos();
   const { eventoId } = useParams();
+  const navigate = useNavigate();
   useEffect(() => {
     const llamarAPIConIdEvento = async () => {
       try {
@@ -48,6 +57,23 @@ export default function VerDetalleEvento() {
   }, [eventoId]);
 
   useEffect(() => {
+    const llenarZonas = () => {
+      if (datosEvento) {
+        console.log(datosEvento);
+        setZonas(datosEvento?.zonas);
+        setLugar(datosEvento.nombreLocal);
+        if (eventoId) setEventSearchedByID(Number(eventoId));
+        setTitulo(eventSearched);
+        setFecha(datosEvento.fecha);
+        setEventoID(Number(eventoId));
+        setUbicacion(datosEvento.direccionLocal);
+        setImagenZonas(datosEvento.imagenZonas);
+      }
+    };
+    llenarZonas();
+  }, [datosEvento]);
+
+  useEffect(() => {
     // Add class to body while this page is mounted to scope the body change
     document.body.classList.add("verdetalle-page");
     return () => {
@@ -56,7 +82,6 @@ export default function VerDetalleEvento() {
   }, []);
 
   const [loading, setLoading] = useState<boolean>(true);
-  const [loginModalOpen, setLoginModalOpen] = useState<boolean>(false);
 
   if (loading) {
     return (
@@ -70,35 +95,10 @@ export default function VerDetalleEvento() {
 
   if (!datosEvento) return <div>Sin datos disponibles.</div>;
 
-  const handleComprarEntradas = () => {
-    if (isLoggedIn === false) {
-      setLoginModalOpen(true);
-      return;
-    }
-    navigate(`/cliente/comprar-entradas-evento/${eventoId}`);
-  };
-
   return (
     <div className={styles.pageRoot}>
       <HeaderEbentos />
-      <Modal
-        open={loginModalOpen}
-        modalHeading="Necesitas iniciar sesión"
-        primaryButtonText="Iniciar sesión"
-        secondaryButtonText="Cerrar"
-        onRequestClose={() => setLoginModalOpen(false)}
-        onRequestSubmit={() =>
-          navigate(
-            `/login?redirect=${encodeURIComponent(
-              `/cliente/comprar-entradas-evento/${eventoId}`
-            )}`
-          )
-        }
-      >
-        <div style={{ padding: "0.5rem 0" }}>
-          <p>Debe iniciar sesión para comprar entradas.</p>
-        </div>
-      </Modal>
+
       <ContenedorImagenEvento
         imagen={datosEvento.posterHorizontal}
         className={styles.hero}
@@ -106,7 +106,7 @@ export default function VerDetalleEvento() {
       <main className={styles.container}>
         <ContenedorZonasPrecios
           zonas={datosEvento.zonas}
-          localTipo={datosEvento.tipoLocal}
+          imagenZonas={datosEvento.imagenZonas}
         />
         <div
           style={{
@@ -114,7 +114,13 @@ export default function VerDetalleEvento() {
           }}
           className={styles.ctaWrap}
         >
-          <Button onClick={handleComprarEntradas}>Comprar Entradas</Button>
+          <Button
+            onClick={() =>
+              navigate(`/cliente/comprar-entradas-evento/${eventoId}`)
+            }
+          >
+            Comprar Entradas
+          </Button>
         </div>
         <ContenedorInformacionEvento
           ubicacion={datosEvento.direccionLocal}

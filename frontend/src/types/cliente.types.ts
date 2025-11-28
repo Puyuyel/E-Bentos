@@ -1,3 +1,11 @@
+export interface BuyerData {
+  nombreTitularTarjeta: string;
+  fechaVencimiento: string;
+  cvvTarjeta: string;
+  numTarjeta: string;
+  correoCli: string;
+}
+
 export type Genero = "MASCULINO" | "FEMENINO" | "NINGUNO_DE_LOS_ANTERIORES";
 
 export interface ClienteDTO {
