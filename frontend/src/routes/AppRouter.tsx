@@ -292,11 +292,7 @@ const AppRouter: React.FC = () => {
         {/* Ruta /comprar entrada evento*/}
         <Route
           path={`/cliente/comprar-entradas-evento/:eventoId`}
-          element={
-            <ProtectedRoute requiredRole="CLIENTE">
-              <ComprarEvento />
-            </ProtectedRoute>
-          }
+          element={<ComprarEvento />}
         />
 
         {/* Redirige cualquier ruta desconocida según rol o a /home */}

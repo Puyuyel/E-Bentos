@@ -30,6 +30,13 @@ export interface EventoBackend {
   estado: string;
 }
 
+export interface Zona {
+  cantidadEntradasDisponible: number;
+  precioUnitario: number;
+  tipoZona: string;
+  letraZona: string;
+}
+
 export interface EventoDetalle {
   posterHorizontal: string;
   posterVertical: string;
@@ -39,12 +46,5 @@ export interface EventoDetalle {
   departamento: string;
   fecha: string;
   descripcion: string;
-  zonas: [
-    {
-      cantidadEntradasDisponible: number;
-      precioUnitario: number;
-      tipoZona: string;
-      letraZona: string;
-    }
-  ];
+  zonas: [Zona];
 }

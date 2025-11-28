@@ -21,12 +21,12 @@ interface ContenedorZonasPreciosProps {
       letraZona: string;
     }
   ];
-  localTipo: string;
+  imagenZonas: string;
 }
 
 export default function ContenedorZonasPrecios({
   zonas,
-  localTipo,
+  imagenZonas,
 }: ContenedorZonasPreciosProps) {
   // const imagenZona = `${imageBaseUrl}/${localTipo}`;
   return (
@@ -49,7 +49,7 @@ export default function ContenedorZonasPrecios({
         <div
           className="img-zonas"
           style={{
-            backgroundImage: `url(${zonaProvisional})`,
+            backgroundImage: `url(${imageBaseUrl})`,
           }}
         ></div>
 

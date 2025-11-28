@@ -1,25 +1,36 @@
 import React from "react";
 import { Button, TextInput, Form, Stack } from "@carbon/react";
+import yapeLogo from "../../../assets/yapeLogo.jpeg";
 import { ArrowLeft, ArrowRight } from "@carbon/icons-react";
+import { useAuthStore } from "../../../store/useAuthStore";
+
+import type { BuyerData } from "../../../types/cliente.types";
+import { useEntradasClienteStore } from "../../../store/useEntradasClienteStore";
 
 interface BuyerInformationProps {
   onNext: (data: BuyerData) => void;
   onBack: () => void;
 }
 
-export interface BuyerData {
-  fullName: string;
-  email: string;
-  phone: string;
-  idNumber: string;
-}
-
 export function BuyerInformation({ onNext, onBack }: BuyerInformationProps) {
+  const { user } = useAuthStore();
+  const {
+    setCorreoCli,
+    setCvvTarjeta,
+    setFechaVencimiento,
+    setNombreTitular,
+    setNumTarjeta,
+    setMetodoPago,
+  } = useEntradasClienteStore();
+  const [paymentMethod, setPaymentMethod] = React.useState<"TARJETA" | "YAPE">(
+    "TARJETA"
+  );
   const [formData, setFormData] = React.useState<BuyerData>({
-    fullName: "",
-    email: "",
-    phone: "",
-    idNumber: "",
+    nombreTitularTarjeta: "",
+    fechaVencimiento: "",
+    cvvTarjeta: "",
+    numTarjeta: "",
+    correoCli: "",
   });
 
   const [errors, setErrors] = React.useState<{ [key: string]: string }>({});
@@ -33,23 +44,36 @@ export function BuyerInformation({ onNext, onBack }: BuyerInformationProps) {
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
+    // If payment method is TARJETA, validate card fields
+    if (paymentMethod === "TARJETA") {
+      if (!formData.nombreTitularTarjeta.trim()) {
+        newErrors.nombreTitularTarjeta = "El nombre completo es obligatorio";
+      }
 
-    if (!formData.fullName.trim()) {
-      newErrors.fullName = "El nombre completo es obligatorio";
+      if (!formData.fechaVencimiento.trim()) {
+        newErrors.fechaVencimiento = "La fecha de vencimiento es obligatoria.";
+      }
+
+      if (!formData.cvvTarjeta.trim()) {
+        newErrors.cvvTarjeta = "El código de seguridad es obligatorio.";
+      }
+
+      if (!formData.numTarjeta.trim()) {
+        newErrors.numTarjeta = "El número de tarjeta es obligatorio.";
+      }
+
+      if (formData.numTarjeta.length != 19) {
+        newErrors.numTarjeta = "El número de tarjeta debe ser de 16 dígitos.";
+      }
     }
 
-    if (!formData.email.trim()) {
-      newErrors.email = "El correo electrónico es obligatorio";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Ingresa un correo electrónico válido";
-    }
-
-    if (!formData.phone.trim()) {
-      newErrors.phone = "El teléfono es obligatorio";
-    }
-
-    if (!formData.idNumber.trim()) {
-      newErrors.idNumber = "El número de identificación es obligatorio";
+    // correo only required when TAQUILLERO role (same behaviour as before)
+    if (user?.rol === "TAQUILLERO") {
+      if (!formData.correoCli.trim()) {
+        newErrors.correoCli = "El correo electrónico es obligatorio";
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]/.test(formData.correoCli)) {
+        newErrors.correoCli = "Ingresa un correo electrónico válido.";
+      }
     }
 
     setErrors(newErrors);
@@ -63,13 +87,21 @@ export function BuyerInformation({ onNext, onBack }: BuyerInformationProps) {
     }
   };
 
+  const handleComprarEntradas = async () => {
+    try {
+      console.log("Se ejecutó la compra");
+    } catch (error) {
+      console.log("error al momento de pagar. ", error.message);
+    }
+  };
+
   return (
     <div style={{ maxWidth: "800px", margin: "0 auto", padding: "0 1rem" }}>
       <div style={{ marginBottom: "2rem" }}>
         <h1
           style={{ fontSize: "2rem", fontWeight: 600, marginBottom: "0.5rem" }}
         >
-          Información del comprador
+          Información del comprador en el pago
         </h1>
         <p style={{ color: "#525252" }}>
           Por favor, completa tus datos para continuar
@@ -85,59 +117,165 @@ export function BuyerInformation({ onNext, onBack }: BuyerInformationProps) {
         }}
       >
         <Stack gap={6}>
-          <TextInput
-            id="fullName"
-            labelText="Nombre completo"
-            placeholder="Juan Pérez García"
-            value={formData.fullName}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              handleChange("fullName", e.target.value)
-            }
-            invalid={!!errors.fullName}
-            invalidText={errors.fullName}
-            size="lg"
-          />
+          {/* Payment method selector */}
+          <div style={{ display: "flex", gap: "1rem" }}>
+            <button
+              type="button"
+              onClick={() => {
+                setPaymentMethod("TARJETA");
+                setMetodoPago("TARJETA");
+              }}
+              aria-pressed={paymentMethod === "TARJETA"}
+              style={{
+                flex: 1,
+                padding: "0.75rem",
+                borderRadius: 8,
+                color: "black",
+                border:
+                  paymentMethod === "TARJETA"
+                    ? "2px solid #0f62fe"
+                    : "1px solid #e5e5e5",
+                background: paymentMethod === "TARJETA" ? "#f0f6ff" : "white",
+                cursor: "pointer",
+                fontWeight: 600,
+              }}
+            >
+              TARJETA
+            </button>
 
-          <TextInput
-            id="email"
-            labelText="Correo electrónico"
-            placeholder="ejemplo@correo.com"
-            type="email"
-            value={formData.email}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              handleChange("email", e.target.value)
-            }
-            invalid={!!errors.email}
-            invalidText={errors.email}
-            size="lg"
-          />
+            <button
+              type="button"
+              onClick={() => {
+                setPaymentMethod("YAPE");
+                setMetodoPago("YAPE");
+              }}
+              aria-pressed={paymentMethod === "YAPE"}
+              style={{
+                flex: 1,
+                padding: "0.75rem",
+                borderRadius: 8,
+                color: "black",
+                border:
+                  paymentMethod === "YAPE"
+                    ? "2px solid #0f62fe"
+                    : "1px solid #e5e5e5",
+                background: paymentMethod === "YAPE" ? "#f0f6ff" : "white",
+                cursor: "pointer",
+                fontWeight: 600,
+              }}
+            >
+              YAPE
+            </button>
+          </div>
 
-          <TextInput
-            id="phone"
-            labelText="Teléfono"
-            placeholder="+34 600 000 000"
-            type="tel"
-            value={formData.phone}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              handleChange("phone", e.target.value)
-            }
-            invalid={!!errors.phone}
-            invalidText={errors.phone}
-            size="lg"
-          />
+          {paymentMethod === "TARJETA" ? (
+            <>
+              <TextInput
+                id="nombreTitularTarjeta"
+                labelText="Nombre del titular"
+                placeholder="Ejm: Juan Pérez"
+                value={formData.nombreTitularTarjeta}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  handleChange("nombreTitularTarjeta", e.target.value);
+                  setNombreTitular(e.target.value);
+                }}
+                invalid={!!errors.nombreTitularTarjeta}
+                invalidText={errors.nombreTitularTarjeta}
+                size="lg"
+              />
 
-          <TextInput
-            id="idNumber"
-            labelText="Número de identificación"
-            placeholder="DNI, Pasaporte, etc."
-            value={formData.idNumber}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              handleChange("idNumber", e.target.value)
-            }
-            invalid={!!errors.idNumber}
-            invalidText={errors.idNumber}
-            size="lg"
-          />
+              <div
+                style={{
+                  display: "flex",
+                  gap: "2rem",
+                }}
+              >
+                <TextInput
+                  id="fechaVencimiento"
+                  labelText="Fecha de vencimiento"
+                  placeholder="Ejm: 11/25"
+                  value={formData.fechaVencimiento}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    handleChange("fechaVencimiento", e.target.value);
+                    setFechaVencimiento(e.target.value);
+                  }}
+                  invalid={!!errors.fechaVencimiento}
+                  invalidText={errors.fechaVencimiento}
+                  size="lg"
+                />
+
+                <TextInput
+                  id="cvvTarjeta"
+                  labelText="CVV"
+                  placeholder="Ejm: 123"
+                  value={formData.cvvTarjeta}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    handleChange("cvvTarjeta", e.target.value);
+                    setCvvTarjeta(e.target.value);
+                  }}
+                  invalid={!!errors.cvvTarjeta}
+                  invalidText={errors.cvvTarjeta}
+                  size="lg"
+                />
+              </div>
+
+              <TextInput
+                id="numTarjeta"
+                labelText="Número de tarjeta"
+                placeholder="Ejm: 1111 0000 1010 0011"
+                value={formData.numTarjeta}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  handleChange("numTarjeta", e.target.value);
+                  setNumTarjeta(e.target.value);
+                }}
+                invalid={!!errors.numTarjeta}
+                invalidText={errors.numTarjeta}
+                size="lg"
+              />
+            </>
+          ) : (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                padding: "1rem 0",
+              }}
+            >
+              <div
+                style={{
+                  borderRadius: 8,
+                  padding: "1rem",
+                  background: "#fff",
+                  boxShadow: "0 1px 6px rgba(0,0,0,0.06)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <img
+                  src={yapeLogo}
+                  alt="Yape QR"
+                  style={{ maxWidth: 220, maxHeight: 220 }}
+                />
+              </div>
+            </div>
+          )}
+
+          {user?.rol == "TAQUILLERO" && (
+            <TextInput
+              id="correoCli"
+              labelText="Correo del cliente"
+              placeholder="Ejm: correo@ebentos.com"
+              value={formData.correoCli}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                handleChange("correoCli", e.target.value);
+                setCorreoCli(e.target.value);
+              }}
+              invalid={!!errors.correoCli}
+              invalidText={errors.correoCli}
+              size="lg"
+            />
+          )}
 
           <div style={{ display: "flex", gap: "1rem", paddingTop: "1rem" }}>
             <Button
@@ -153,10 +291,11 @@ export function BuyerInformation({ onNext, onBack }: BuyerInformationProps) {
               type="submit"
               kind="primary"
               size="lg"
+              onClick={handleComprarEntradas}
               renderIcon={ArrowRight}
               style={{ flex: 1 }}
             >
-              Continuar
+              Pagar
             </Button>
           </div>
         </Stack>

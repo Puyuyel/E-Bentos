@@ -1,10 +1,19 @@
 import React from "react";
 import { Button, Tile } from "@carbon/react";
-import { ArrowLeft, Checkmark } from "@carbon/icons-react";
-import type { BuyerData } from "./BuyerInformation";
+import { ArrowLeft, Checkmark, Map } from "@carbon/icons-react";
+import { useZonasEventoStore } from "../../../store/useZonasEventoStore";
+import { obtenerFecha } from "../../util/obtenerFecha";
+import type { BuyerData } from "../../../types/cliente.types";
+import {
+  useEntradasClienteStore,
+  type TicketSelection,
+} from "../../../store/useEntradasClienteStore";
+import { useAuthStore } from "../../../store/useAuthStore";
+
+import { LocationIcon, CalendarIcon } from "../../icons";
 
 interface OrderSummaryProps {
-  tickets: { [key: string]: number };
+  tickets: TicketSelection;
   buyerData: BuyerData;
   onBack: () => void;
   onConfirm: () => void;
@@ -16,20 +25,34 @@ export function OrderSummary({
   onBack,
   onConfirm,
 }: OrderSummaryProps) {
-  const ticketTypes = [
-    { id: "general", name: "Entrada General", price: 25.0 },
-    { id: "vip", name: "Entrada VIP", price: 75.0 },
-    { id: "premium", name: "Entrada Premium", price: 150.0 },
-  ];
+  const { user } = useAuthStore();
+  const { titulo, lugar, fecha, eventoId, zonas, ubicacion } =
+    useZonasEventoStore();
+  const { getSelections, cliente, metodoPago } = useEntradasClienteStore();
+  buyerData = cliente;
+
+  // console.log("metodoPago: ", metodoPago);
+  // Para que TS no se queje .-.
+  if (eventoId) {
+    const ticketsPre = getSelections(eventoId);
+    if (ticketsPre) {
+      // console.log("dentro de ticketsPre");
+      tickets = ticketsPre;
+      // console.log("tickts: ", tickets);
+    }
+  }
+
+  const ticketTypes = zonas;
 
   const selectedTickets = ticketTypes.filter(
-    (ticket) => tickets[ticket.id] > 0
+    (ticket) => tickets[ticket.tipoZona] > 0
   );
+  // console.log("selectedTickets: ", selectedTickets);
   const subtotal = selectedTickets.reduce(
-    (sum, ticket) => sum + tickets[ticket.id] * ticket.price,
+    (sum, ticket) => sum + tickets[ticket.tipoZona] * ticket.precioUnitario,
     0
   );
-  const serviceFee = subtotal * 0.1;
+  const serviceFee = subtotal * 0.01;
   const total = subtotal + serviceFee;
 
   return (
@@ -62,7 +85,7 @@ export function OrderSummary({
               marginBottom: "1rem",
             }}
           >
-            Concierto de Rock 2025
+            {titulo}
           </h3>
           <div
             style={{
@@ -72,8 +95,16 @@ export function OrderSummary({
               color: "#525252",
             }}
           >
-            <p>📅 15 de Diciembre, 2025 - 20:00</p>
-            <p>📍 Estadio Nacional</p>
+            <p>
+              <CalendarIcon />
+              {" " + obtenerFecha(fecha)}
+            </p>
+            <p>
+              <LocationIcon /> {ubicacion}
+            </p>
+            <p style={{ gap: "0.3rem", display: "flex" }}>
+              <Map size={23} /> <span>{lugar}</span>
+            </p>
           </div>
         </Tile>
 
@@ -93,7 +124,7 @@ export function OrderSummary({
           >
             {selectedTickets.map((ticket) => (
               <div
-                key={ticket.id}
+                key={ticket.tipoZona}
                 style={{
                   display: "flex",
                   justifyContent: "space-between",
@@ -103,13 +134,14 @@ export function OrderSummary({
                 }}
               >
                 <div>
-                  <p style={{ fontWeight: 500 }}>{ticket.name}</p>
+                  <p style={{ fontWeight: 500 }}>Entrada {ticket.tipoZona}</p>
                   <p style={{ fontSize: "0.875rem", color: "#525252" }}>
-                    Cantidad: {tickets[ticket.id]}
+                    Cantidad: {tickets[ticket.tipoZona]}
                   </p>
                 </div>
                 <p style={{ fontWeight: 600 }}>
-                  ${(tickets[ticket.id] * ticket.price).toFixed(2)}
+                  S/.
+                  {(selectedTickets.length * ticket.precioUnitario).toFixed(2)}
                 </p>
               </div>
             ))}
@@ -135,22 +167,53 @@ export function OrderSummary({
               color: "#525252",
             }}
           >
-            <div style={{ display: "flex", gap: "0.5rem" }}>
-              <span style={{ color: "#737373" }}>Nombre:</span>
-              <span>{buyerData.fullName}</span>
-            </div>
-            <div style={{ display: "flex", gap: "0.5rem" }}>
-              <span style={{ color: "#737373" }}>Email:</span>
-              <span>{buyerData.email}</span>
-            </div>
-            <div style={{ display: "flex", gap: "0.5rem" }}>
-              <span style={{ color: "#737373" }}>Teléfono:</span>
-              <span>{buyerData.phone}</span>
-            </div>
-            <div style={{ display: "flex", gap: "0.5rem" }}>
-              <span style={{ color: "#737373" }}>ID:</span>
-              <span>{buyerData.idNumber}</span>
-            </div>
+            {user?.rol == "TAQUILLERO" && metodoPago == "CLIENTE" && (
+              <>
+                <div style={{ display: "flex", gap: "0.5rem" }}>
+                  <span style={{ color: "#737373" }}>Email:</span>
+                  <span>{buyerData.correoCli}</span>
+                </div>
+              </>
+            )}
+
+            {user?.rol == "CLIENTE" && metodoPago == "TARJETA" && (
+              <>
+                <div style={{ display: "flex", gap: "0.5rem" }}>
+                  <span style={{ color: "#737373" }}>Nombre:</span>
+                  <span>{buyerData.nombreTitularTarjeta}</span>
+                </div>
+
+                <div style={{ display: "flex", gap: "0.5rem" }}>
+                  <span style={{ color: "#737373" }}>Numero de tarjeta:</span>
+                  <span>{buyerData.numTarjeta}</span>
+                </div>
+
+                <div style={{ display: "flex", gap: "0.5rem" }}>
+                  <span style={{ color: "#737373" }}>CVV:</span>
+                  <span>{buyerData.cvvTarjeta}</span>
+                </div>
+
+                <div style={{ display: "flex", gap: "0.5rem" }}>
+                  <span style={{ color: "#737373" }}>
+                    Fecha de vencimiento:
+                  </span>
+                  <span>{buyerData.fechaVencimiento}</span>
+                </div>
+              </>
+            )}
+
+            {metodoPago == "YAPE" && (
+              <div style={{ display: "flex", gap: "0.5rem" }}>
+                <span style={{ color: "#737373" }}>Compra:</span>
+                <span>Su pago por YAPE fue SATISFACTORIO.</span>
+              </div>
+            )}
+            {user?.rol == "TAQUILLERO" && (
+              <div style={{ display: "flex", gap: "0.5rem" }}>
+                <span style={{ color: "#737373" }}>Correo Cliente:</span>
+                <span>{buyerData.correoCli}</span>
+              </div>
+            )}
           </div>
         </Tile>
 
@@ -176,7 +239,7 @@ export function OrderSummary({
               }}
             >
               <span>Subtotal</span>
-              <span>${subtotal.toFixed(2)}</span>
+              <span>S/.{subtotal.toFixed(2)}</span>
             </div>
             <div
               style={{
@@ -185,8 +248,8 @@ export function OrderSummary({
                 color: "#525252",
               }}
             >
-              <span>Cargo por servicio (10%)</span>
-              <span>${serviceFee.toFixed(2)}</span>
+              <span>Cargo por servicio (1%)</span>
+              <span>S/.{serviceFee.toFixed(2)}</span>
             </div>
             <div
               style={{
@@ -198,7 +261,7 @@ export function OrderSummary({
             >
               <span style={{ fontWeight: 600 }}>Total</span>
               <span style={{ fontSize: "1.5rem", fontWeight: 700 }}>
-                ${total.toFixed(2)}
+                S/.{total.toFixed(2)}
               </span>
             </div>
           </div>
