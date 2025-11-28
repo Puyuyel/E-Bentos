@@ -36,7 +36,13 @@ const TablaEventos: React.FC = () => {
     try {
       const data = await listarEventosFiltrados(Number(user?.id));
       console.log(data);
-      setEventos(data);
+      // Ordenar por fecha ascendente
+      const eventosOrdenados = [...data].sort((a, b) => {
+        const fechaA = a.fechaHorarioInicio ? new Date(a.fechaHorarioInicio).getTime() : 0;
+        const fechaB = b.fechaHorarioInicio ? new Date(b.fechaHorarioInicio).getTime() : 0;
+        return fechaA - fechaB;
+      });
+      setEventos(eventosOrdenados);
     } catch (err: any) {
       console.error('Error al cargar eventos:', err.message);
     } finally {

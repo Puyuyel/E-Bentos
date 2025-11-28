@@ -79,8 +79,9 @@ export default function OwnerCRUD() {
 
   return (
     <div
-      style={{ marginTop: "10rem", marginRight: "20px", marginLeft: "18rem" }}
+      style={{ marginRight: "20px", marginLeft: "18rem", paddingTop: "2rem" }}
     >
+      <h1 className="title">Registro de Local</h1>
       <SidebarGestor currentPath="registrar-local" />
       <FormProvider {...methods}>
         <Form onSubmit={methods.handleSubmit(onSubmit)}>
@@ -129,6 +130,7 @@ function VenueForm() {
 
   const fileUploaderRef = useRef<HTMLButtonElement>(null);
   const [files, setFiles] = useState<File[]>([]);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   useEffect((): void => {
     listarDistritos()
@@ -386,6 +388,13 @@ function VenueForm() {
                   setValue("fotoFile", newFile); // vincula el archivo al form
                   setValue("foto", newFile.name); // vincula el archivo al form
                   trigger("fotoFile"); // valida en caso de que antes faltara
+                  
+                  // Crear vista previa de la imagen
+                  const reader = new FileReader();
+                  reader.onloadend = () => {
+                    setImagePreview(reader.result as string);
+                  };
+                  reader.readAsDataURL(newFile);
                 }
               }}
             />
@@ -402,16 +411,45 @@ function VenueForm() {
                   },
                 }}
                 render={({ field }) => (
-                  <FileUploaderItem
-                    name={file.name}
-                    status="edit"
-                    size="md"
-                    onDelete={() => {
-                      setFiles(files.filter((_, i) => i !== index));
-                      field.onChange(undefined);
-                      trigger("fotoFile"); // 🔴 valida al eliminar
-                    }}
-                  />
+                  <div style={{ marginTop: "16px" }}>
+                    {imagePreview && (
+                      <div
+                        style={{
+                          width: "200px",
+                          height: "150px",
+                          border: "1px solid #e0e0e0",
+                          borderRadius: "8px",
+                          overflow: "hidden",
+                          marginBottom: "8px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          backgroundColor: "#f4f4f4",
+                        }}
+                      >
+                        <img
+                          src={imagePreview}
+                          alt="Vista previa del local"
+                          style={{
+                            maxWidth: "100%",
+                            maxHeight: "100%",
+                            objectFit: "contain",
+                          }}
+                        />
+                      </div>
+                    )}
+                    <FileUploaderItem
+                      name={file.name}
+                      status="edit"
+                      size="md"
+                      onDelete={() => {
+                        setFiles(files.filter((_, i) => i !== index));
+                        setImagePreview(null);
+                        field.onChange(undefined);
+                        trigger("fotoFile");
+                      }}
+                    />
+                  </div>
                 )}
               />
             ))}
