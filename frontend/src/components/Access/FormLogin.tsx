@@ -8,21 +8,23 @@ import {
   PasswordInput,
   Button,
 } from "@carbon/react";
+import { ArrowLeft } from "@carbon/icons-react";
 // import { useState } from "react";
 import "../../styles/Access/FormLogin.css";
 
 import type { LoginCredentials } from "../../types/auth.types";
+import { useNavigate } from "react-router-dom";
 
 interface FormLoginProps {
   onRegisterClick: () => void;
   onLoginClick: (credentials: LoginCredentials) => Promise<void>;
-  notifyMessage: () => void;
 }
 
 const FormLogin: React.FC<FormLoginProps> = ({
   onRegisterClick,
   onLoginClick,
 }) => {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [showNotify, setShowNotify] = useState(false);
   const [notifyParaph, setNotifyParaph] = useState("");
@@ -79,9 +81,28 @@ const FormLogin: React.FC<FormLoginProps> = ({
             <p>¿No tienes cuenta?</p>
           </div>
 
-          <Button kind="secondary" onClick={onRegisterClick}>
+          <Button size="md" kind="secondary" onClick={onRegisterClick}>
             Regístrate aquí
           </Button>
+        </div>
+      </div>
+
+      <div
+        style={{ display: "flex", justifyContent: "center", margin: "1rem 0" }}
+      >
+        <div
+          onClick={() => navigate("/home")}
+          style={{
+            border: "0.11rem #010d34 solid",
+            cursor: "pointer",
+            padding: "0.6rem 1.2rem",
+            gap: "1rem",
+            display: "flex",
+          }}
+          aria-label="Ir al menú principal"
+        >
+          <ArrowLeft />
+          <div style={{ color: "#165df6" }}>Ir al menú principal</div>
         </div>
       </div>
 
@@ -112,7 +133,10 @@ const FormLogin: React.FC<FormLoginProps> = ({
         />
 
         <p
-          style={{ visibility: showNotify ? "visible" : "hidden" }}
+          style={{
+            visibility: showNotify ? "visible" : "hidden",
+            color: "red",
+          }}
           className="notify-p"
         >
           {notifyParaph}
