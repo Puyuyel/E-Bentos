@@ -118,7 +118,7 @@ export default function MisEntradas() {
           <Ticket size={32} />
           <div>
             <p>Historial completo</p>
-            <strong>{ventas.length} entradas</strong>
+            <strong>{ventas.length} compras</strong>
           </div>
         </div>
       </section>

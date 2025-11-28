@@ -79,7 +79,7 @@ export default function MiPerfil() {
 
   const puntosDisponibles = useMemo(() => {
     if (!cliente) return 0;
-    return (cliente.puntosAcumulados || 0) - (cliente.puntosGastados || 0);
+    return (cliente.puntosAcumulados || 0);
   }, [cliente]);
 
   const handleInputChange = (
@@ -234,9 +234,6 @@ export default function MiPerfil() {
                     <p className={styles.kicker}>Contacto</p>
                     <h2 className={styles.cardTitle}>Datos para notificaciones</h2>
                   </div>
-                  <span className={styles.badgeSoft}>
-                    <Renew size={16} /> {cliente?.puntosAcumulados ?? 0} pts
-                  </span>
                 </header>
 
                 <div className={styles.fieldGrid}>
