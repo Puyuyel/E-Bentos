@@ -237,9 +237,9 @@ export default function EventoCRUD({ modo }: EventoCRUDProps) {
           data,
           Number(user?.id),
           {
-    ...imagenesExistentes,
-    imagenZonas: imagenZonasExistente // ✅ Pasar la imagen de zonas existente
-  },
+            ...imagenesExistentes,
+            imagenZonas: imagenZonasExistente, // ✅ Pasar la imagen de zonas existente
+          },
           estadoEvento
         );
         console.log("Evento actualizado:", eventoActualizado);
