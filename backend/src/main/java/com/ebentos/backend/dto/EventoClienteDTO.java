@@ -21,6 +21,7 @@ public class EventoClienteDTO {
     private Integer visitas;
     private String posterHorizontal;
     private String posterVertical;
+    private String imagenZonas;
     private Double porcentajeVendido; // El % de entradas vendidas
     private Double popularidad;       // El cálculo final
     

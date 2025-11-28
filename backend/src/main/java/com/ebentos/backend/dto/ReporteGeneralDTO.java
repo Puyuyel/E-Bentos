@@ -2,8 +2,9 @@ package com.ebentos.backend.dto;
 
 import java.time.LocalDateTime;
 
-public interface ReporteLocalDTO {
+public interface ReporteGeneralDTO {
     Integer getIdEvento();
+    String getNombreEvento();
     String getCategoriaEvento();
     LocalDateTime getFechaEvento();
     Integer getIdLocal();
@@ -13,4 +14,8 @@ public interface ReporteLocalDTO {
     String getNombreProductora();
     Double getMontoRecaudado();
     Long getAsistentes();
+    Double getCostoTotalEvento();
+    String getEstadoEvento();
+    Integer getMetaIngresos();
+    Integer getMetaTickets();
 }

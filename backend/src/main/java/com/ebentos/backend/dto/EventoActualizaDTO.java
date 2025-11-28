@@ -20,6 +20,7 @@ public class EventoActualizaDTO {
     private String descripcion;
     private String posterHorizontal;
     private String posterVertical;
+    private String imagenZonas;
     private LocalDateTime fechaHorarioInicio;
     private Integer duracionEstimada;
     private Double costoTotal;

@@ -14,6 +14,10 @@ public interface ZonaRepository extends JpaRepository<Zona, Integer> {
     @Modifying
     @Query("UPDATE Zona z SET z.cantidadEntradasDisponibles = z.cantidadEntradasDisponibles - :cantidad WHERE z.zonaId = :id AND z.cantidadEntradasDisponibles >= :cantidad")
     int descontarStock(@Param("id") Integer id, @Param("cantidad") int cantidad);
+    
+    @Modifying
+    @Query("UPDATE Zona z SET z.montoTotalRecaudado = z.montoTotalRecaudado + :precioFinal WHERE z.zonaId = :id")
+    int sumarMonto(@Param("id") Integer id, @Param("precioFinal") Double precioFinal);
 
     // Devuelve el stock (cuando se vence el tiempo)
     @Modifying

@@ -112,7 +112,7 @@ public class Securityconfig {
                                                 .hasAnyRole("ADMIN", "PRODUCTORA", "GESTOR_LOCAL",
                                                                 "DUENHO_LOCAL", "TAQUILLERO", "ORGANIZADOR_EVENTOS")
                                                 .requestMatchers(HttpMethod.GET,
-                                                                "/api/clientes/*")
+                                                                "/api/clientes/**")
                                                 .hasAnyRole("CLIENTE", "TAQUILLERO")
                                                 .requestMatchers("/api/productoras/**", "/api/puntoventas/**")
                                                 .hasRole("ADMIN")
@@ -142,6 +142,8 @@ public class Securityconfig {
                                                 .requestMatchers(HttpMethod.GET,
                                                                 "/api/solicitudes/**")
                                                 .hasAnyRole("DUENHO_LOCAL", "ORGANIZADOR_EVENTOS")
+                                                .requestMatchers("/api/ventas/**")
+                                                .hasRole("CLIENTE")
                                                 // Protege todas las demás rutas
                                                 .anyRequest().authenticated())
 

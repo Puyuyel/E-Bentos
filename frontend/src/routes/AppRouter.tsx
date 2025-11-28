@@ -28,6 +28,10 @@ import GestionarOrganizador from "../pages/GestionProductora/GestionarOrganizado
 import Metas from "../pages/GestionProductora/Metas";
 import MainEbentos from "../components/Cliente/MainEbentos";
 import GestionarDuenhos from "../pages/Gestion/GestorLocal/GestionarDuenhos";
+import GestionarSolicitudes from "../pages/Gestion/DuenhoLocal/GestionarSolicitudes";
+import MisEntradas from "../pages/Cliente/MisEntradas";
+import MiPerfil from "../pages/Cliente/MiPerfil";
+import MisPuntos from "../pages/Cliente/MisPuntos";
 
 const AppRouter: React.FC = () => {
   const { isLoggedIn, user } = useAuthStore();
@@ -215,6 +219,14 @@ const AppRouter: React.FC = () => {
         {/* RUTAS para DUEÑO DE LOCAL */}
         {/* Ruta /listado locales*/}
         <Route
+          path="/duenho_local/gestionar-solicitud"
+          element={
+            <ProtectedRoute requiredRole="DUENHO_LOCAL">
+              <GestionarSolicitudes />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/duenho_local/gestionar-local"
           element={
             <ProtectedRoute requiredRole="DUENHO_LOCAL">
@@ -293,6 +305,33 @@ const AppRouter: React.FC = () => {
         <Route
           path={`/cliente/comprar-entradas-evento/:eventoId`}
           element={<ComprarEvento />}
+        />
+
+        <Route
+          path="/perfil"
+          element={
+            <ProtectedRoute requiredRole="CLIENTE">
+              <MiPerfil />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/mis-entradas"
+          element={
+            <ProtectedRoute requiredRole="CLIENTE">
+              <MisEntradas />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/mis-puntos"
+          element={
+            <ProtectedRoute requiredRole="CLIENTE">
+              <MisPuntos />
+            </ProtectedRoute>
+          }
         />
 
         {/* Redirige cualquier ruta desconocida según rol o a /home */}

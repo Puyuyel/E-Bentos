@@ -1,6 +1,7 @@
 package com.ebentos.backend.service;
 
 import com.ebentos.backend.dto.RegistroEntradaDTO;
+import com.ebentos.backend.model.Entrada;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
@@ -46,7 +47,7 @@ public class EmailService {
     }
 
     @Async
-    public void enviarCorreoEntradas(String destinatario, List<RegistroEntradaDTO> registroEntradasDTO) {
+    public void enviarCorreoEntradas(String destinatario, byte[] pdfBytes, Integer ventaId) {
         //Para verificar que se está haciendo en otro hilo
         System.out.println("Hilo actual: " + Thread.currentThread().getName());
 
@@ -60,21 +61,14 @@ public class EmailService {
             helper.setText("<h1>¡Gracias por tu compra!</h1>" +
                     "<p>Adjunto encontrarás un archivo PDF con tus entradas y códigos QR.</p>" +
                     "<p>Descárgalo y preséntalo en la entrada.</p>", true);
+                
+            // Definimos un nombre único para el archivo
+            // Ejemplo: "Entrada-1.pdf", "Entrada-2.pdf"
+            String nombreArchivo = "entradas_" + ventaId + ".pdf";
 
-            // Recorremos la lista de entradas para armar la estructura visual
-            for (int i = 0; i < registroEntradasDTO.size(); i++) {
-                RegistroEntradaDTO entrada = registroEntradasDTO.get(i);
-
-                // Generamos el PDF individual para ESTA entrada
-                byte[] pdfBytes = generarPDFIndividual(entrada);
-
-                // Definimos un nombre único para el archivo
-                // Ejemplo: "Entrada-1.pdf", "Entrada-2.pdf"
-                String nombreArchivo = "Entrada-" + (i + 1) + "-" + entrada.getVentaId() + ".pdf";
-
-                // Adjuntamos el archivo al correo
-                helper.addAttachment(nombreArchivo, new ByteArrayResource(pdfBytes));
-            }
+            // Adjuntamos el archivo al correo
+            helper.addAttachment(nombreArchivo, new ByteArrayResource(pdfBytes));
+            
 
             //Enviamos mensaje
             mailSender.send(mensaje);
@@ -86,7 +80,7 @@ public class EmailService {
     }
 
     // Metodo para crear el archivo PDF
-    private byte[] generarPDFIndividual(RegistroEntradaDTO entrada) throws DocumentException {
+    private byte[] generarPDFIndividual(Entrada entrada) throws DocumentException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Document document = new Document();
         PdfWriter.getInstance(document, out);
@@ -104,11 +98,11 @@ public class EmailService {
         document.add(new Paragraph(" "));
 
         // Datos del Ticket
-        document.add(new Paragraph("Evento: " + entrada.getEntradaId(), fontSubtitulo));
+        document.add(new Paragraph("Evento: " + entrada.getZona().getEvento().getNombre(), fontSubtitulo));
         document.add(new Paragraph(" "));
-        // ACÁ PODRÍAN IR MÁS ATRIBUTOS
-        //document.add(new Paragraph(": " + entrada.get(), fontTexto));
-        //document.add(new Paragraph(":" + entrada.get(), fontTexto));
+        document.add(new Paragraph("Zona: " + entrada.getZona().getTipoZona(), fontTexto));
+        document.add(new Paragraph(" "));
+        document.add(new Paragraph("Precio:" + entrada.getPrecioFinal(), fontTexto));
 
         document.add(new Paragraph(" "));
         document.add(new Paragraph("Escanea el siguiente código para ingresar:", fontTexto));
@@ -116,7 +110,7 @@ public class EmailService {
 
         try {
             // Generar QR
-            byte[] qrBytes = generarQR(entrada.getQR(), 250, 250);
+            byte[] qrBytes = generarQR(entrada.getQr(), 250, 250);
             Image qrImage = Image.getInstance(qrBytes);
             qrImage.setAlignment(Element.ALIGN_CENTER); // Centrado queda mejor en ticket individual
             document.add(qrImage);
@@ -125,7 +119,7 @@ public class EmailService {
         }
 
         document.add(new Paragraph(" "));
-        document.add(new Paragraph("ID Único: " + entrada.getQR(), FontFactory.getFont(FontFactory.COURIER, 8)));
+        document.add(new Paragraph("ID Único: " + entrada.getQr(), FontFactory.getFont(FontFactory.COURIER, 8)));
 
         document.close();
         return out.toByteArray();
