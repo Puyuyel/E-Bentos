@@ -1,0 +1,3 @@
+Contact: mailto:ebentossuport@gmail.com
+Preferred-Languages: es, en
+Canonical: https://ebentos.com/.well-known/security.txt

@@ -1,0 +1,27 @@
+{
+  "name": "E-Bentos - Venta de Entradas para Eventos",
+  "short_name": "E-Bentos",
+  "description": "Compra tus entradas para conciertos, eventos deportivos, teatro y más. Plataforma líder en ticketing en Perú.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#8296FC",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/ebentos-logo-morado.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": [
+    "entertainment",
+    "events",
+    "tickets"
+  ],
+  "lang": "es-PE",
+  "dir": "ltr",
+  "scope": "/",
+  "screenshots": []
+}
