@@ -31,6 +31,7 @@ export interface EventoBackend {
 }
 
 export interface Zona {
+  zonaId: number;
   cantidadEntradasDisponible: number;
   precioUnitario: number;
   tipoZona: string;
@@ -38,6 +39,7 @@ export interface Zona {
 }
 
 export interface EventoDetalle {
+  imagenZonas: string;
   posterHorizontal: string;
   posterVertical: string;
   tipoLocal: string;
@@ -47,4 +49,27 @@ export interface EventoDetalle {
   fecha: string;
   descripcion: string;
   zonas: [Zona];
+}
+
+export interface ConfirmacionVenta {
+  eventoId: number;
+  gestorId?: number;
+  clienteId: number;
+  montoTotalOriginal: number;
+  descuentoTotal: number;
+  montoTotalFinal: number;
+  registradoPorTaquillero: number;
+  metodoPago: string;
+  entradas: [
+    {
+      entradaId: number;
+      ventaId: number;
+      zonaId: number;
+      precioOriginal: number;
+      descuento: number;
+      precioFinal: number;
+      correo: string;
+      qr: string;
+    }
+  ];
 }

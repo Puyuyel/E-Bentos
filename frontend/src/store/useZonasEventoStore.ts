@@ -11,12 +11,14 @@ interface ZonasEventoState {
   fecha: string;
   eventoId: number;
   ubicacion: string;
+  imagenZonas: string;
   setZonas: (zonas: Zona[] | null) => void;
   setTitulo: (titulo: string) => void;
   setLugar: (lugar: string) => void;
   setFecha: (fecha: string) => void;
   setEventoID: (eventoId: number) => void;
   setUbicacion: (ubi: string) => void;
+  setImagenZonas: (imagenZonas: string) => void;
 }
 
 export const useZonasEventoStore = create<ZonasEventoState>()(
@@ -28,6 +30,7 @@ export const useZonasEventoStore = create<ZonasEventoState>()(
       fecha: "",
       eventoId: -1,
       ubicacion: "",
+      imagenZonas: "",
       setZonas(zonas) {
         if (zonas) set({ zonas: zonas });
       },
@@ -45,6 +48,9 @@ export const useZonasEventoStore = create<ZonasEventoState>()(
       },
       setUbicacion(ubi) {
         if (ubi) set({ ubicacion: ubi });
+      },
+      setImagenZonas(imagenZonas) {
+        if (imagenZonas) set({ imagenZonas: imagenZonas });
       },
     }),
     {

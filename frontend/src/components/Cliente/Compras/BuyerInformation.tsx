@@ -1,11 +1,25 @@
 import React from "react";
-import { Button, TextInput, Form, Stack } from "@carbon/react";
+import {
+  Button,
+  TextInput,
+  Form,
+  Stack,
+  Modal,
+  InlineLoading,
+} from "@carbon/react";
 import yapeLogo from "../../../assets/yapeLogo.jpeg";
-import { ArrowLeft, ArrowRight } from "@carbon/icons-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Checkmark,
+  WarningAlt,
+} from "@carbon/icons-react";
 import { useAuthStore } from "../../../store/useAuthStore";
 
 import type { BuyerData } from "../../../types/cliente.types";
 import { useEntradasClienteStore } from "../../../store/useEntradasClienteStore";
+import { useZonasEventoStore } from "../../../store/useZonasEventoStore";
+import { comprarEntradasService } from "../../../services/ClientServices/comprarEntradasService";
 
 interface BuyerInformationProps {
   onNext: (data: BuyerData) => void;
@@ -14,6 +28,8 @@ interface BuyerInformationProps {
 
 export function BuyerInformation({ onNext, onBack }: BuyerInformationProps) {
   const { user } = useAuthStore();
+  const clienteId = user?.id;
+  const { eventoId } = useZonasEventoStore();
   const {
     setCorreoCli,
     setCvvTarjeta,
@@ -21,10 +37,12 @@ export function BuyerInformation({ onNext, onBack }: BuyerInformationProps) {
     setNombreTitular,
     setNumTarjeta,
     setMetodoPago,
+    getSelections,
+    setReservaId,
   } = useEntradasClienteStore();
-  const [paymentMethod, setPaymentMethod] = React.useState<"TARJETA" | "YAPE">(
-    "TARJETA"
-  );
+  const [paymentMethod, setPaymentMethod] = React.useState<
+    "TARJETA_DE_CREDITO" | "YAPE"
+  >("TARJETA_DE_CREDITO");
   const [formData, setFormData] = React.useState<BuyerData>({
     nombreTitularTarjeta: "",
     fechaVencimiento: "",
@@ -33,7 +51,14 @@ export function BuyerInformation({ onNext, onBack }: BuyerInformationProps) {
     correoCli: "",
   });
 
+  const tickets = getSelections(eventoId);
+
   const [errors, setErrors] = React.useState<{ [key: string]: string }>({});
+
+  const [isProcessing, setIsProcessing] = React.useState<boolean>(false);
+  const [processResult, setProcessResult] = React.useState<
+    null | "success" | "error"
+  >(null);
 
   const handleChange = (field: keyof BuyerData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -45,7 +70,7 @@ export function BuyerInformation({ onNext, onBack }: BuyerInformationProps) {
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
     // If payment method is TARJETA, validate card fields
-    if (paymentMethod === "TARJETA") {
+    if (paymentMethod === "TARJETA_DE_CREDITO") {
       if (!formData.nombreTitularTarjeta.trim()) {
         newErrors.nombreTitularTarjeta = "El nombre completo es obligatorio";
       }
@@ -88,15 +113,107 @@ export function BuyerInformation({ onNext, onBack }: BuyerInformationProps) {
   };
 
   const handleComprarEntradas = async () => {
+    // Validate form first; do not proceed if invalid
+    if (!validateForm()) {
+      return;
+    }
+
+    // show loading modal
+    setIsProcessing(true);
+    setProcessResult(null);
+
     try {
-      console.log("Se ejecutó la compra");
-    } catch (error) {
-      console.log("error al momento de pagar. ", error.message);
+      let response;
+      if (tickets && clienteId)
+        response = await comprarEntradasService(tickets, Number(clienteId));
+      console.log("Se ejecutó la compra, response: ", response);
+      // comprarEntradasService may return either axios response or direct data
+      const raw = response?.data ?? response;
+      console.log("reserva response data:", raw);
+
+      // extract reservaId from possible shapes
+      let parsedReservaId = 0;
+      if (raw == null) {
+        parsedReservaId = 0;
+      } else if (typeof raw === "number") {
+        parsedReservaId = raw;
+      } else if (
+        Array.isArray(raw) &&
+        raw.length > 0 &&
+        typeof raw[0] === "number"
+      ) {
+        parsedReservaId = raw[0];
+      } else if (typeof raw === "object" && (raw as any).reservaId != null) {
+        parsedReservaId = Number((raw as any).reservaId);
+      } else if (typeof raw === "string") {
+        const maybe = Number(raw);
+        parsedReservaId = Number.isFinite(maybe) ? maybe : 0;
+      }
+
+      console.log("parsedReservaId", parsedReservaId);
+      if (
+        parsedReservaId &&
+        Number.isFinite(parsedReservaId) &&
+        parsedReservaId > 0
+      ) {
+        setReservaId(parsedReservaId);
+        setProcessResult("success");
+        // advance to next phase only after user confirms success modal
+      } else {
+        setProcessResult("error");
+      }
+    } catch (error: any) {
+      console.log("error al momento de pagar. ", error?.message ?? error);
+      setProcessResult("error");
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   return (
     <div style={{ maxWidth: "800px", margin: "0 auto", padding: "0 1rem" }}>
+      {/* Processing modal */}
+      <Modal
+        open={isProcessing}
+        passiveModal
+        modalHeading="Recibiendo el pago..."
+        onRequestClose={() => {}}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+          <InlineLoading description="Recibiendo el pago..." />
+        </div>
+      </Modal>
+
+      {/* Success modal */}
+      <Modal
+        open={processResult === "success"}
+        modalHeading="Pago recibido"
+        primaryButtonText="Aceptar"
+        onRequestSubmit={() => {
+          setProcessResult(null);
+          onNext(formData);
+        }}
+        onRequestClose={() => setProcessResult(null)}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+          <Checkmark size={24} />
+          <span>El pago fue recibido correctamente</span>
+        </div>
+      </Modal>
+
+      {/* Error modal */}
+      <Modal
+        open={processResult === "error"}
+        modalHeading="Error en el pago"
+        primaryButtonText="Cerrar"
+        onRequestSubmit={() => setProcessResult(null)}
+        onRequestClose={() => setProcessResult(null)}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+          <WarningAlt size={24} />
+          <span>El pago no fue recibido correctamente</span>
+        </div>
+      </Modal>
       <div style={{ marginBottom: "2rem" }}>
         <h1
           style={{ fontSize: "2rem", fontWeight: 600, marginBottom: "0.5rem" }}
@@ -122,20 +239,21 @@ export function BuyerInformation({ onNext, onBack }: BuyerInformationProps) {
             <button
               type="button"
               onClick={() => {
-                setPaymentMethod("TARJETA");
-                setMetodoPago("TARJETA");
+                setPaymentMethod("TARJETA_DE_CREDITO");
+                setMetodoPago("TARJETA_DE_CREDITO");
               }}
-              aria-pressed={paymentMethod === "TARJETA"}
+              aria-pressed={paymentMethod === "TARJETA_DE_CREDITO"}
               style={{
                 flex: 1,
                 padding: "0.75rem",
                 borderRadius: 8,
                 color: "black",
                 border:
-                  paymentMethod === "TARJETA"
+                  paymentMethod === "TARJETA_DE_CREDITO"
                     ? "2px solid #0f62fe"
                     : "1px solid #e5e5e5",
-                background: paymentMethod === "TARJETA" ? "#f0f6ff" : "white",
+                background:
+                  paymentMethod === "TARJETA_DE_CREDITO" ? "#f0f6ff" : "white",
                 cursor: "pointer",
                 fontWeight: 600,
               }}
@@ -168,7 +286,7 @@ export function BuyerInformation({ onNext, onBack }: BuyerInformationProps) {
             </button>
           </div>
 
-          {paymentMethod === "TARJETA" ? (
+          {paymentMethod === "TARJETA_DE_CREDITO" ? (
             <>
               <TextInput
                 id="nombreTitularTarjeta"
@@ -288,7 +406,7 @@ export function BuyerInformation({ onNext, onBack }: BuyerInformationProps) {
               Volver
             </Button>
             <Button
-              type="submit"
+              type="button"
               kind="primary"
               size="lg"
               onClick={handleComprarEntradas}

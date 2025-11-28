@@ -133,7 +133,10 @@ const FormLogin: React.FC<FormLoginProps> = ({
         />
 
         <p
-          style={{ visibility: showNotify ? "visible" : "hidden" }}
+          style={{
+            visibility: showNotify ? "visible" : "hidden",
+            color: "red",
+          }}
           className="notify-p"
         >
           {notifyParaph}

@@ -1,6 +1,6 @@
-import React from "react";
-import { Button, Tile } from "@carbon/react";
-import { ArrowLeft, Checkmark, Map } from "@carbon/icons-react";
+import React, { useState } from "react";
+import { Button, Tile, Modal, InlineLoading } from "@carbon/react";
+import { ArrowLeft, Checkmark, Map, WarningAlt } from "@carbon/icons-react";
 import { useZonasEventoStore } from "../../../store/useZonasEventoStore";
 import { obtenerFecha } from "../../util/obtenerFecha";
 import type { BuyerData } from "../../../types/cliente.types";
@@ -11,6 +11,8 @@ import {
 import { useAuthStore } from "../../../store/useAuthStore";
 
 import { LocationIcon, CalendarIcon } from "../../icons";
+import { confirmarEntradasService } from "../../../services/ClientServices/confirmarEntradasService";
+import type { ConfirmacionVenta } from "../../../types/event.types";
 
 interface OrderSummaryProps {
   tickets: TicketSelection;
@@ -25,13 +27,22 @@ export function OrderSummary({
   onBack,
   onConfirm,
 }: OrderSummaryProps) {
+  // state for potential future use; not required for building payload
+  const [, setConfirmacion] = useState<ConfirmacionVenta | undefined>(
+    undefined
+  );
+  const [isConfirming, setIsConfirming] = useState<boolean>(false);
+  const [confirmResult, setConfirmResult] = useState<
+    null | "success" | "error"
+  >(null);
+
   const { user } = useAuthStore();
   const { titulo, lugar, fecha, eventoId, zonas, ubicacion } =
     useZonasEventoStore();
-  const { getSelections, cliente, metodoPago } = useEntradasClienteStore();
+  const { getSelections, cliente, metodoPago, reservaId, setVentaId } =
+    useEntradasClienteStore();
   buyerData = cliente;
 
-  // console.log("metodoPago: ", metodoPago);
   // Para que TS no se queje .-.
   if (eventoId) {
     const ticketsPre = getSelections(eventoId);
@@ -45,18 +56,143 @@ export function OrderSummary({
   const ticketTypes = zonas;
 
   const selectedTickets = ticketTypes.filter(
-    (ticket) => tickets[ticket.tipoZona] > 0
+    (ticket) => tickets[ticket.zonaId] > 0
   );
   // console.log("selectedTickets: ", selectedTickets);
   const subtotal = selectedTickets.reduce(
-    (sum, ticket) => sum + tickets[ticket.tipoZona] * ticket.precioUnitario,
+    (sum, ticket) => sum + tickets[ticket.zonaId] * ticket.precioUnitario,
     0
   );
   const serviceFee = subtotal * 0.01;
   const total = subtotal + serviceFee;
 
+  const handleConfirmacion = async () => {
+    // Build the ConfirmacionVenta payload using available data.
+    const confirmacionPayload: ConfirmacionVenta = {
+      eventoId: eventoId || 0,
+      clienteId: user?.rol === "CLIENTE" ? Number(user?.id) : 0,
+      montoTotalOriginal: subtotal || 0,
+      descuentoTotal: 0,
+      montoTotalFinal: total || 0,
+      registradoPorTaquillero: user?.rol === "TAQUILLERO" ? 1 : 0,
+      metodoPago: metodoPago || "",
+      entradas: (selectedTickets || []).map((ticket) => ({
+        //entradaId: 0,
+        //ventaId: 0,
+        zonaId: ticket.zonaId,
+        precioOriginal: ticket.precioUnitario,
+        descuento: 0,
+        precioFinal:
+          (ticket.precioUnitario || 0) * (tickets[ticket.zonaId] || 0),
+        //correo: buyerData?.correoCli || user?.loginCreds?.email || "",
+        //qr: "",
+      })) as any,
+    };
+
+    console.log("ConfirmaciónPayload: ", confirmacionPayload);
+    // store in state if needed later
+    setConfirmacion(confirmacionPayload);
+
+    // start confirming
+    setIsConfirming(true);
+    setConfirmResult(null);
+    try {
+      const data = await confirmarEntradasService(
+        reservaId,
+        user?.loginCreds?.email || "",
+        confirmacionPayload
+      );
+      console.log("confirmar response data:", data);
+
+      // Extract ventaId from multiple possible response shapes
+      let ventaIdParsed = 0;
+      if (data == null) {
+        ventaIdParsed = 0;
+      } else if (typeof data === "number") {
+        ventaIdParsed = data;
+      } else if (
+        Array.isArray(data) &&
+        data.length > 0 &&
+        typeof data[0] === "number"
+      ) {
+        ventaIdParsed = data[0];
+      } else if (typeof data === "object" && (data as any).ventaId != null) {
+        ventaIdParsed = Number((data as any).ventaId);
+      } else if (typeof data === "string") {
+        const maybe = Number(data);
+        ventaIdParsed = Number.isFinite(maybe) ? maybe : 0;
+      }
+
+      console.log("ventaIdParsed", ventaIdParsed);
+      if (
+        ventaIdParsed &&
+        Number.isFinite(ventaIdParsed) &&
+        ventaIdParsed > 0
+      ) {
+        setVentaId(ventaIdParsed);
+        setConfirmResult("success");
+      } else {
+        setConfirmResult("error");
+      }
+      console.log("Respuesta de la confirmación: ", data);
+    } catch (error) {
+      console.log("error al confirmar la reserva con id: ", {
+        reservaId,
+        error,
+      });
+      setConfirmResult("error");
+    } finally {
+      setIsConfirming(false);
+    }
+  };
+
   return (
     <div style={{ maxWidth: "900px", margin: "0 auto", padding: "0 1rem" }}>
+      {/* Confirming modal */}
+      <Modal
+        open={isConfirming}
+        passiveModal
+        modalHeading="Confirmando la venta..."
+        onRequestClose={() => {}}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+          <InlineLoading description="Confirmando la venta..." />
+        </div>
+      </Modal>
+
+      {/* Success modal */}
+      <Modal
+        open={confirmResult === "success"}
+        modalHeading="Venta confirmada"
+        primaryButtonText="Aceptar"
+        onRequestSubmit={() => {
+          setConfirmResult(null);
+          onConfirm();
+        }}
+        onRequestClose={() => setConfirmResult(null)}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+          <Checkmark size={24} />
+          <span>La venta fue confirmada correctamente</span>
+        </div>
+      </Modal>
+
+      {/* Error modal */}
+      <Modal
+        open={confirmResult === "error"}
+        modalHeading="Error al confirmar"
+        primaryButtonText="Cerrar"
+        onRequestSubmit={() => setConfirmResult(null)}
+        onRequestClose={() => setConfirmResult(null)}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+          <WarningAlt size={24} />
+          <span>
+            La venta no pudo ser confirmada. Le reembolsaremos el dinero en caso
+            de fallo.
+          </span>
+        </div>
+      </Modal>
       <div style={{ marginBottom: "2rem" }}>
         <h1
           style={{ fontSize: "2rem", fontWeight: 600, marginBottom: "0.5rem" }}
@@ -124,7 +260,7 @@ export function OrderSummary({
           >
             {selectedTickets.map((ticket) => (
               <div
-                key={ticket.tipoZona}
+                key={ticket.zonaId}
                 style={{
                   display: "flex",
                   justifyContent: "space-between",
@@ -136,7 +272,7 @@ export function OrderSummary({
                 <div>
                   <p style={{ fontWeight: 500 }}>Entrada {ticket.tipoZona}</p>
                   <p style={{ fontSize: "0.875rem", color: "#525252" }}>
-                    Cantidad: {tickets[ticket.tipoZona]}
+                    Cantidad: {tickets[ticket.zonaId]}
                   </p>
                 </div>
                 <p style={{ fontWeight: 600 }}>
@@ -176,7 +312,7 @@ export function OrderSummary({
               </>
             )}
 
-            {user?.rol == "CLIENTE" && metodoPago == "TARJETA" && (
+            {user?.rol == "CLIENTE" && metodoPago == "TARJETA_DE_CREDITO" && (
               <>
                 <div style={{ display: "flex", gap: "0.5rem" }}>
                   <span style={{ color: "#737373" }}>Nombre:</span>
@@ -281,7 +417,7 @@ export function OrderSummary({
         <Button
           kind="primary"
           size="lg"
-          onClick={onConfirm}
+          onClick={handleConfirmacion}
           renderIcon={Checkmark}
           style={{ flex: 1 }}
         >

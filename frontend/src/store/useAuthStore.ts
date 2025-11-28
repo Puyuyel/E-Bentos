@@ -30,11 +30,13 @@ export const useAuthStore = create<AuthState>()(
       login: async (loginCreds: LoginCredentials) => {
         try {
           const response = await login(loginCreds);
+          loginCreds.contrasenha = "";
           const userResponse = {
             id: response.id,
-            email: loginCreds.email,
+            loginCreds: loginCreds,
             rol: response.role,
           };
+
           set({ user: userResponse, isLoggedIn: true });
           return userResponse.rol;
         } catch (error) {

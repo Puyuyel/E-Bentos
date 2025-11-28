@@ -2,11 +2,13 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { BuyerData } from "../types/cliente.types";
 
-type TicketSelection = { [ticketKey: string]: number };
+type TicketSelection = { [ticketId: number]: number };
 
 interface EntradasStore {
   cliente: BuyerData;
   metodoPago: string;
+  reservaId: number;
+  ventaId: number;
   pendingSelections: Record<number, TicketSelection>;
   saveSelections: (eventId: number, tickets: TicketSelection) => void;
   getSelections: (eventId: number) => TicketSelection | undefined;
@@ -18,6 +20,8 @@ interface EntradasStore {
   setNombreTitular: (nombreTitular: string) => void;
   setNumTarjeta: (numTarjeta: string) => void;
   setMetodoPago: (metodo: string) => void;
+  setReservaId: (reservaId: number) => void;
+  setVentaId: (reservaId: number) => void;
 }
 
 export const useEntradasClienteStore = create<EntradasStore>()(
@@ -31,7 +35,9 @@ export const useEntradasClienteStore = create<EntradasStore>()(
         nombreTitularTarjeta: "",
         numTarjeta: "",
       },
-      metodoPago: "",
+      metodoPago: "TARJETA_DE_CREDITO", // Se inicia con tarjeta de crédito
+      reservaId: -1,
+      ventaId: -1,
       saveSelections: (eventId, tickets) =>
         set((state) => ({
           pendingSelections: { ...state.pendingSelections, [eventId]: tickets },
@@ -71,6 +77,16 @@ export const useEntradasClienteStore = create<EntradasStore>()(
       setMetodoPago: (metodo) => {
         if (metodo) {
           set({ metodoPago: metodo });
+        }
+      },
+      setReservaId: (reserva) => {
+        if (reserva) {
+          set({ reservaId: reserva });
+        }
+      },
+      setVentaId: (venta) => {
+        if (venta) {
+          set({ ventaId: venta });
         }
       },
     }),

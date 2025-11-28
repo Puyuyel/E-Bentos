@@ -21,12 +21,17 @@ import { useAuthStore } from "../../store/useAuthStore";
 import { useZonasEventoStore } from "../../store/useZonasEventoStore";
 import { useEventos } from "../../store/useEventos";
 
-const imageBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL;
-
 export default function VerDetalleEvento() {
   const [datosEvento, setDatosEvento] = useState<EventoDetalle>();
-  const { setZonas, setTitulo, setLugar, setFecha, setEventoID, setUbicacion } =
-    useZonasEventoStore();
+  const {
+    setZonas,
+    setTitulo,
+    setLugar,
+    setFecha,
+    setEventoID,
+    setUbicacion,
+    setImagenZonas,
+  } = useZonasEventoStore();
   const { setEventSearchedByID, eventSearched } = useEventos();
   const { eventoId } = useParams();
   const navigate = useNavigate();
@@ -62,6 +67,7 @@ export default function VerDetalleEvento() {
         setFecha(datosEvento.fecha);
         setEventoID(Number(eventoId));
         setUbicacion(datosEvento.direccionLocal);
+        setImagenZonas(datosEvento.imagenZonas);
       }
     };
     llenarZonas();
@@ -100,7 +106,7 @@ export default function VerDetalleEvento() {
       <main className={styles.container}>
         <ContenedorZonasPrecios
           zonas={datosEvento.zonas}
-          imagenZonas={datosEvento}
+          imagenZonas={datosEvento.imagenZonas}
         />
         <div
           style={{
