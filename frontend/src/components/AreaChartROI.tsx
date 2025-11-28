@@ -11,7 +11,7 @@ interface AreaChartROIProps {
 
 const AreaChartROI: React.FC<AreaChartROIProps> = ({ 
   data, 
-  title = "Evolución de ROI por Mes"
+  title = "Cantidad de Eventos por ROI y Mes"
 }) => {
   // Transformar los datos de ChartDatum al formato que necesita AreaChart
   const areaChartData = data.map(item => ({
@@ -30,7 +30,7 @@ const AreaChartROI: React.FC<AreaChartROIProps> = ({
       },
       left: {
         mapsTo: 'value',
-        title: 'ROI (%)',
+        title: 'Cantidad de Eventos', // Cambiado de "ROI (%)" a "Cantidad de Eventos"
         scaleType: ScaleTypes.LINEAR
       }
     },
@@ -39,8 +39,8 @@ const AreaChartROI: React.FC<AreaChartROIProps> = ({
     },
     color: {
       scale: {
-        "ROI Positivo": "#0f62fe", // Azul Carbon
-        "ROI Negativo": "#da1e28"  // Rojo Carbon
+        "Eventos con ROI Positivo": "#0f62fe", // Azul Carbon
+        "Eventos con ROI Negativo": "#da1e28"  // Rojo Carbon
       }
     },
     height: "400px",

@@ -13,8 +13,8 @@ const Gauge: React.FC<GaugeProps> = ({ totalCapacity, usedCapacity, title="Capac
   const percentage = Math.round((usedCapacity / totalCapacity) * 100);
 
   // Estado del gauge
-  let status: "success" | "warning" | "danger" = "success";
-  if (percentage >= 85) status = "danger";
+  let status: "success" | "warning" | "danger" = "danger";
+  if (percentage >= 85) status = "success";
   else if (percentage >= 70) status = "warning";
 
   // 👇 Estructura que Carbon necesita para mostrar el número dentro
