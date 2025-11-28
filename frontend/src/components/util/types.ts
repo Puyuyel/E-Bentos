@@ -8,10 +8,3 @@ export interface ChartDatum {
 export interface ChartProps {
   data: ChartDatum[];
 }
-
-export interface GaugeProps {
-  data: { group: string; value: number }[];
-  status?: "success" | "warning" | "danger";
-  title?: string;
-  delta?: number;
-}

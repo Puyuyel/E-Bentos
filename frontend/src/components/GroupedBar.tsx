@@ -5,13 +5,22 @@ import type { ChartProps } from "./util/types.ts";
 import type { BarChartOptions } from "@carbon/charts";
 import "@carbon/charts-react/styles.css";
 
-const GroupedBar: React.FC<ChartProps> = ({ data }) => {
+interface GroupedBarProps extends ChartProps {
+  title?: string;
+  yAxisTitle?: string;
+}
+
+const GroupedBar: React.FC<GroupedBarProps> = ({ 
+  data, 
+  title = "Ventas por tipo de Evento en Locales",
+  yAxisTitle = "Ventas (S/.)"
+}) => {
   const options: BarChartOptions = {
-    title: "Ventas por tipo de Evento en Locales",
+    title: title,
     axes: {
       left: {
         mapsTo: "value",
-        title: "Ventas (S/.)",
+        title: yAxisTitle,
       },
       bottom: {
         mapsTo: "key",

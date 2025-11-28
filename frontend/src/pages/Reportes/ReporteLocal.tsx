@@ -172,13 +172,20 @@ const ReporteLocal: React.FC = () => {
               <Gauge
                 totalCapacity={totalAforo}
                 usedCapacity={totalAsistentes}
+                title="Porcentaje de aforo utilizado"
               />
             </div>
             <div className="chart-item">
-              <Donut data={incomeData} />
+              <Donut 
+                data={incomeData} 
+                title="Porcentaje de ingresos por local"
+              />
             </div>
             <div className="chart-item">
-              <GroupedBar data={groupedData} />
+              <GroupedBar
+                data={groupedData}
+                title="Ventas por tipo de Evento en Locales"
+              />
             </div>
             <div className="chart-item">
               <Lollipop data={incomeData} />
