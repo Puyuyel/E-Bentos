@@ -1,0 +1,24 @@
+# robots.txt para E-Bentos
+User-agent: *
+Allow: /
+Allow: /cliente/*
+Allow: /eventos/*
+Disallow: /admin/*
+Disallow: /gestion/*
+Disallow: /api/*
+
+# Sitemap
+Sitemap: https://ebentos.com/sitemap.xml
+
+# Crawl-delay para evitar sobrecarga
+Crawl-delay: 1
+
+# Bots específicos
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /

@@ -51,8 +51,9 @@ export interface FormDataEvento {
   duracion: string;
   costo: number;
   aforo: number;
-  fotoFiles: File[];
-  imagenZonasFiles: File[];  // Para la imagen del mapa de zonas
+  fotoHorizontal: File | null;
+  fotoVertical: File | null;
+  imagenZonasFile: File | null;
   zonas: {
     nombre: string;
     letra: string;
@@ -97,13 +98,15 @@ export default function EventoCRUD({ modo }: EventoCRUDProps) {
       duracion: "",
       costo: 0,
       aforo: 0,
-      fotoFiles: [],
-      imagenZonasFiles: [],
+      fotoHorizontal: null,
+      fotoVertical: null,
+      imagenZonasFile: null,
       zonas: []
     },
   });
 
   const { handleSubmit, reset } = methods;
+  const [imagenZonasExistente, setImagenZonasExistente] = useState<string>("");
 
   // Cargar datos del evento si es editar o visualizar
   useEffect(() => {
@@ -113,6 +116,26 @@ export default function EventoCRUD({ modo }: EventoCRUDProps) {
           setCargando(true);
           const evento = await obtenerEventoPorId(Number(eventoId));
           setEstadoEvento(evento.estado);
+
+          const baseUrl = "https://ebentos.blob.core.windows.net/images/";
+          setImagenesExistentes({
+            posterHorizontal: evento.posterHorizontal.includes('http') 
+              ? evento.posterHorizontal 
+              : `${baseUrl}${evento.posterHorizontal}`,
+            posterVertical: evento.posterVertical.includes('http')
+              ? evento.posterVertical
+              : `${baseUrl}${evento.posterVertical}`,
+          });
+
+
+          if (evento.imagenZonas && !evento.imagenZonas.includes('placeholder')) {
+            const imagenZonasUrl = evento.imagenZonas.includes('http') 
+              ? evento.imagenZonas 
+              : `${baseUrl}${evento.imagenZonas}`;
+            setImagenZonasExistente(imagenZonasUrl);
+          } else {
+            setImagenZonasExistente("");
+          }
           // Pre-llenar el formulario con los datos del evento
           reset({
             nombre: evento.nombre,
@@ -126,12 +149,15 @@ export default function EventoCRUD({ modo }: EventoCRUDProps) {
             duracion: formatoDuracionParaInput(evento.duracionEstimada),
             costo: evento.costoTotal,
             aforo: evento.local.aforo,
-            fotoFiles: [],
-          });
-
-          setImagenesExistentes({
-            posterHorizontal: evento.posterHorizontal,
-            posterVertical: evento.posterVertical,
+            fotoHorizontal: null,
+            fotoVertical: null,
+            imagenZonasFile: null,
+            zonas: evento.zonas ? evento.zonas.map((zona: any) => ({
+              nombre: zona.tipoZona,
+              letra: zona.letraZona,
+              aforo: zona.capacidadTotal,
+              precio: zona.precioUnitario
+            })) : []
           });
 
           // Verificar estado de la solicitud del local si es editar
@@ -159,8 +185,31 @@ export default function EventoCRUD({ modo }: EventoCRUDProps) {
 
   const onSubmit = async (data: FormDataEvento) => {
     console.log("Submit form called - data: ", data);
-    
 
+    // Validar que las 3 imágenes estén subidas al crear
+    if (modo === "crear") {
+      if (!data.fotoHorizontal) {
+        alert("Debe subir la imagen horizontal del evento");
+        return;
+      }
+      if (!data.fotoVertical) {
+        alert("Debe subir la imagen vertical del evento");
+        return;
+      }
+      if (!data.imagenZonasFile) {
+        alert("Debe subir la imagen del mapa de zonas");
+        return;
+      }
+    }
+
+    // Validar que la suma de aforos de zonas sea igual al aforo total
+    if (data.zonas && data.zonas.length > 0) {
+      const sumaAforosZonas = data.zonas.reduce((sum, zona) => sum + (Number(zona.aforo) || 0), 0);
+      if (sumaAforosZonas !== data.aforo) {
+        alert(`La suma de los aforos de las zonas (${sumaAforosZonas}) debe ser igual al aforo total del local (${data.aforo})`);
+        return;
+      }
+    }
 
     try {
       if (modo === "crear") {
@@ -241,6 +290,7 @@ export default function EventoCRUD({ modo }: EventoCRUDProps) {
                   modo={modo}
                   permiteCambiarLocal={permiteCambiarLocal}
                   imagenesExistentes={imagenesExistentes}
+                  imagenZonasExistente={imagenZonasExistente}
                 />
                 {modo !== "visualizar" && (
                   <BottomButtons
@@ -309,12 +359,14 @@ interface VenueFormProps {
   modo: "crear" | "editar" | "visualizar";
   permiteCambiarLocal: boolean;
   imagenesExistentes: { posterHorizontal: string; posterVertical: string };
+  imagenZonasExistente?: string;
 }
 
 function VenueForm({
   modo,
   permiteCambiarLocal,
   imagenesExistentes,
+  imagenZonasExistente,
 }: VenueFormProps) {
   const {
     register,
@@ -322,7 +374,54 @@ function VenueForm({
     control,
     trigger,
     setValue,
+    watch,
   } = useFormContext<FormDataEvento>();
+
+  // Observar los valores de las imágenes
+  const fotoHorizontal = watch("fotoHorizontal");
+  const fotoVertical = watch("fotoVertical");
+
+  const [mostrarImagenesExistentes, setMostrarImagenesExistentes] = useState(
+    modo === "visualizar" || (modo === "editar" && !fotoHorizontal && !fotoVertical)
+  );
+
+  // Función para manejar la subida de imagen horizontal
+  const handleHorizontalUpload = (event: any, { addedFiles }: any) => {
+    if (addedFiles.length > 0) {
+      setValue("fotoHorizontal", addedFiles[0]);
+      trigger("fotoHorizontal");
+      setMostrarImagenesExistentes(false);
+    }
+  };
+
+  // Función para manejar la subida de imagen vertical
+  const handleVerticalUpload = (event: any, { addedFiles }: any) => {
+    if (addedFiles.length > 0) {
+      setValue("fotoVertical", addedFiles[0]);
+      trigger("fotoVertical");
+      setMostrarImagenesExistentes(false);
+    }
+  };
+
+  // Función para eliminar imagen horizontal
+  const handleDeleteHorizontal = () => {
+    setValue("fotoHorizontal", null);
+    trigger("fotoHorizontal");
+    // Si no hay ninguna imagen nueva, mostrar las existentes
+    if (!fotoVertical) {
+      setMostrarImagenesExistentes(true);
+    }
+  };
+
+  // Función para eliminar imagen vertical
+  const handleDeleteVertical = () => {
+    setValue("fotoVertical", null);
+    trigger("fotoVertical");
+    // Si no hay ninguna imagen nueva, mostrar las existentes
+    if (!fotoHorizontal) {
+      setMostrarImagenesExistentes(true);
+    }
+  };
 
   const categoriasEvento = [
     { value: "CONCIERTO", label: "Concierto" },
@@ -333,10 +432,6 @@ function VenueForm({
 
   const [locales, setLocales] = useState<any[]>([]);
   const fileUploaderRef = useRef<HTMLButtonElement>(null);
-  const [files, setFiles] = useState<File[]>([]);
-  const [mostrarImagenesExistentes, setMostrarImagenesExistentes] = useState(
-    modo === "visualizar" || (modo === "editar" && files.length === 0)
-  );
 
   useEffect(() => {
     getLocales()
@@ -345,23 +440,6 @@ function VenueForm({
       })
       .catch((err) => console.error("Error al cargar locales", err));
   }, []);
-
-  // Función para manejar la eliminación de archivos
-  const handleDeleteFile = (index: number) => {
-    const newFiles = files.filter((_, i) => i !== index);
-    setFiles(newFiles);
-    setValue("fotoFiles", newFiles);
-    trigger("fotoFiles");
-  };
-
-  // Mostrar imágenes existentes en modo visualizar/editar
-  useEffect(() => {
-    if (modo === "editar" && files.length > 0) {
-      setMostrarImagenesExistentes(false);
-    } else if (modo === "editar" && files.length === 0) {
-      setMostrarImagenesExistentes(true);
-    }
-  }, [files, modo]);
 
   const isDisabled = modo === "visualizar";
   const isLocalDisabled =
@@ -692,51 +770,156 @@ function VenueForm({
           </Stack>
         </Column>
 
-        {/* Sección de subida de archivos - Solo mostrar en crear/editar */}
-
-        {(modo === "crear" ||
-          (modo === "editar" && !mostrarImagenesExistentes)) && (
+        {/* SECCIÓN DE IMÁGENES SEPARADAS */}
+        {(modo === "crear" || (modo === "editar" && !mostrarImagenesExistentes)) && (
           <Column sm={4} md={4} lg={8} xlg={8} max={8}>
             <FormItem>
-              <p className="cds--file--label">Subir archivos</p>
+              <p className="cds--file--label">Subir imágenes del evento</p>
               <p className="cds--label-description">
-                El peso máximo por imagen es de 500KB. Utilice los formatos .jpg
-                y .png. Puede subir hasta 2 imágenes.
+                El peso máximo por imagen es de 500KB. Utilice los formatos .jpg y .png.
               </p>
 
-              <FileUploaderDropContainer
-                accept={["image/jpg", "image/jpeg", "image/png"]}
-                innerRef={fileUploaderRef}
-                labelText="Arrastre y deje caer archivos aquí para ser subidos."
-                onAddFiles={(event, { addedFiles }) => {
-                  const currentFiles = [...files];
+              <Grid>
+                {/* IMAGEN HORIZONTAL */}
+                <Column sm={4} md={4} lg={4}>
+                  <p className="cds--file--label" style={{ fontSize: '0.875rem' }}>Poster Horizontal</p>
+                  
+                  <FileUploaderDropContainer
+                    accept={["image/jpg", "image/jpeg", "image/png"]}
+                    labelText="Arrastre imagen horizontal aquí"
+                    onAddFiles={handleHorizontalUpload}
+                    disabled={isDisabled}
+                  />
 
-                  addedFiles
-                    .slice(0, 2 - currentFiles.length)
-                    .forEach((newFile) => {
-                      if (currentFiles.length < 2) {
-                        currentFiles.push(newFile);
-                      }
-                    });
+                  {fotoHorizontal && (
+                    <div style={{ marginTop: '16px' }}>
+                      <div
+                        style={{
+                          width: "150px",
+                          height: "150px",
+                          border: "1px solid #e0e0e0",
+                          borderRadius: "8px",
+                          overflow: "hidden",
+                          marginBottom: "8px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          backgroundColor: "#f4f4f4",
+                        }}
+                      >
+                        <img
+                          src={URL.createObjectURL(fotoHorizontal)}
+                          alt="Vista previa horizontal"
+                          style={{
+                            maxWidth: "100%",
+                            maxHeight: "100%",
+                            objectFit: "contain",
+                          }}
+                        />
+                      </div>
+                      <Button
+                        kind="ghost"
+                        size="sm"
+                        onClick={handleDeleteHorizontal}
+                        disabled={isDisabled}
+                      >
+                        Eliminar
+                      </Button>
+                    </div>
+                  )}
+                </Column>
 
-                  setFiles(currentFiles);
-                  setValue("fotoFiles", currentFiles);
-                  trigger("fotoFiles");
-                }}
-                disabled={isDisabled}
-              />
+                {/* IMAGEN VERTICAL */}
+                <Column sm={4} md={4} lg={4}>
+                  <p className="cds--file--label" style={{ fontSize: '0.875rem' }}>Poster Vertical</p>
+                  
+                  <FileUploaderDropContainer
+                    accept={["image/jpg", "image/jpeg", "image/png"]}
+                    labelText="Arrastre imagen vertical aquí"
+                    onAddFiles={handleVerticalUpload}
+                    disabled={isDisabled}
+                  />
 
-              {/* Vista previa de nuevas imágenes */}
-              <div
-                style={{
-                  display: "flex",
-                  gap: "16px",
-                  flexWrap: "wrap",
-                  marginTop: "16px",
-                }}
-              >
-                {files.map((file, index) => (
-                  <div key={index} style={{ width: "150px" }}>
+                  {fotoVertical && (
+                    <div style={{ marginTop: '16px' }}>
+                      <div
+                        style={{
+                          width: "150px",
+                          height: "150px",
+                          border: "1px solid #e0e0e0",
+                          borderRadius: "8px",
+                          overflow: "hidden",
+                          marginBottom: "8px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          backgroundColor: "#f4f4f4",
+                        }}
+                      >
+                        <img
+                          src={URL.createObjectURL(fotoVertical)}
+                          alt="Vista previa vertical"
+                          style={{
+                            maxWidth: "100%",
+                            maxHeight: "100%",
+                            objectFit: "contain",
+                          }}
+                        />
+                      </div>
+                      <Button
+                        kind="ghost"
+                        size="sm"
+                        onClick={handleDeleteVertical}
+                        disabled={isDisabled}
+                      >
+                        Eliminar
+                      </Button>
+                    </div>
+                  )}
+                </Column>
+              </Grid>
+
+              {/* Botón para volver a ver imágenes existentes (solo en editar) */}
+              {modo === "editar" && 
+               imagenesExistentes.posterHorizontal && 
+               !imagenesExistentes.posterHorizontal.includes("placeholder") && (
+                <Button
+                  kind="ghost"
+                  size="sm"
+                  onClick={() => setMostrarImagenesExistentes(true)}
+                  style={{ marginTop: "16px" }}
+                >
+                  Ver imágenes actuales
+                </Button>
+              )}
+            </FormItem>
+          </Column>
+        )}
+
+        {/* Mostrar imágenes existentes */}
+        {(modo === "visualizar" || (modo === "editar" && mostrarImagenesExistentes)) && 
+         imagenesExistentes.posterHorizontal && 
+         !imagenesExistentes.posterHorizontal.includes("placeholder") && (
+          <Column sm={4} md={4} lg={8} xlg={8} max={8}>
+            <FormItem>
+              <p className="cds--file--label">
+                {modo === "editar" ? "Imágenes actuales del evento" : "Imágenes del evento"}
+              </p>
+
+              {modo === "editar" && (
+                <Button
+                  kind="ghost"
+                  size="sm"
+                  onClick={() => setMostrarImagenesExistentes(false)}
+                  style={{ marginBottom: "16px" }}
+                >
+                  Cambiar imágenes
+                </Button>
+              )}
+
+              <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
+                {imagenesExistentes.posterHorizontal && (
+                  <div style={{ width: "150px" }}>
                     <div
                       style={{
                         width: "150px",
@@ -752,8 +935,8 @@ function VenueForm({
                       }}
                     >
                       <img
-                        src={URL.createObjectURL(file)}
-                        alt={`Vista previa ${index + 1}`}
+                        src={imagenesExistentes.posterHorizontal}
+                        alt="Poster horizontal del evento"
                         style={{
                           maxWidth: "100%",
                           maxHeight: "100%",
@@ -761,82 +944,15 @@ function VenueForm({
                         }}
                       />
                     </div>
-
-                    <FileUploaderItem
-                      name={file.name}
-                      status="edit"
-                      size="md"
-                      onDelete={() => handleDeleteFile(index)}
-                    />
+                    <p style={{ fontSize: "0.75rem", textAlign: "center" }}>
+                      Poster Horizontal
+                    </p>
                   </div>
-                ))}
-              </div>
-
-              {/* Botón para volver a ver imágenes existentes (solo en editar) */}
-              {modo === "editar" &&
-                imagenesExistentes.posterHorizontal &&
-                !imagenesExistentes.posterHorizontal.includes(
-                  "placeholder"
-                ) && (
-                  <Button
-                    kind="ghost"
-                    size="sm"
-                    onClick={() => setMostrarImagenesExistentes(true)}
-                    style={{ marginTop: "8px" }}
-                  >
-                    Ver imágenes actuales
-                  </Button>
                 )}
-
-              <p
-                style={{
-                  fontSize: "0.875rem",
-                  color: files.length >= 2 ? "#da1e28" : "#393939",
-                  marginTop: "8px",
-                }}
-              >
-                {files.length}/2 archivos subidos
-                {files.length >= 2 && " - Límite alcanzado"}
-              </p>
-
-              <div className="cds--file-container cds--file-container--drop" />
-            </FormItem>
-          </Column>
-        )}
-        {/* Mostrar imágenes existentes en modo visualizar o editar (cuando no hay nuevas) */}
-        {(modo === "visualizar" ||
-          (modo === "editar" && mostrarImagenesExistentes)) &&
-          imagenesExistentes.posterHorizontal &&
-          !imagenesExistentes.posterHorizontal.includes("placeholder") && (
-            <Column sm={4} md={4} lg={8} xlg={8} max={8}>
-              <FormItem>
-                <p className="cds--file--label">
-                  {modo === "editar"
-                    ? "Imágenes actuales del evento"
-                    : "Imágenes del evento"}
-                </p>
-
-                {/* Botón para cambiar imágenes (solo en editar) */}
-                {modo === "editar" && (
-                  <Button
-                    kind="ghost"
-                    size="sm"
-                    onClick={() => setMostrarImagenesExistentes(false)}
-                    style={{ marginBottom: "16px" }}
-                  >
-                    Cambiar imágenes
-                  </Button>
-                )}
-
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "16px",
-                    flexWrap: "wrap",
-                    marginTop: "16px",
-                  }}
-                >
-                  {imagenesExistentes.posterHorizontal && (
+                {imagenesExistentes.posterVertical &&
+                  !imagenesExistentes.posterVertical.includes(
+                    "placeholder"
+                  ) && (
                     <div style={{ width: "150px" }}>
                       <div
                         style={{
@@ -853,8 +969,8 @@ function VenueForm({
                         }}
                       >
                         <img
-                          src={imagenesExistentes.posterHorizontal}
-                          alt="Poster horizontal del evento"
+                          src={imagenesExistentes.posterVertical}
+                          alt="Poster vertical del evento"
                           style={{
                             maxWidth: "100%",
                             maxHeight: "100%",
@@ -863,52 +979,18 @@ function VenueForm({
                         />
                       </div>
                       <p style={{ fontSize: "0.75rem", textAlign: "center" }}>
-                        Poster Horizontal
+                        Poster Vertical
                       </p>
                     </div>
                   )}
-                  {imagenesExistentes.posterVertical &&
-                    !imagenesExistentes.posterVertical.includes(
-                      "placeholder"
-                    ) && (
-                      <div style={{ width: "150px" }}>
-                        <div
-                          style={{
-                            width: "150px",
-                            height: "150px",
-                            border: "1px solid #e0e0e0",
-                            borderRadius: "8px",
-                            overflow: "hidden",
-                            marginBottom: "8px",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            backgroundColor: "#f4f4f4",
-                          }}
-                        >
-                          <img
-                            src={imagenesExistentes.posterVertical}
-                            alt="Poster vertical del evento"
-                            style={{
-                              maxWidth: "100%",
-                              maxHeight: "100%",
-                              objectFit: "contain",
-                            }}
-                          />
-                        </div>
-                        <p style={{ fontSize: "0.75rem", textAlign: "center" }}>
-                          Poster Vertical
-                        </p>
-                      </div>
-                    )}
-                </div>
-              </FormItem>
-            </Column>
-          )}
+              </div>
+            </FormItem>
+          </Column>
+        )}
       </Grid>
 
-      {/* Sección de Zonas - Fuera del Grid Principal para ancho completo */}
-      <SeccionZonas modo={modo} isDisabled={isDisabled} />
+      {/* Sección de Zonas */}
+      <SeccionZonas modo={modo} isDisabled={isDisabled} imagenZonasExistente={imagenZonasExistente}/>
     </FormGroup>
   );
 }

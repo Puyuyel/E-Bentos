@@ -1,5 +1,6 @@
 // TablaEventos.tsx
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Pagination, Search, Button } from "@carbon/react";
+import { Add } from "@carbon/icons-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { listarEventosFiltrados } from "../services/eventoService";
@@ -7,6 +8,7 @@ import '../styles/CargaSpinner.css';
 import type { EventoBackend } from "../types/event.types";
 import { useAuthStore } from "../store/useAuthStore";
 import eliminarEvento from "../services/EventosServices/eliminarEvento";
+import { GoEye, GoPencil, GoTrash } from "react-icons/go";
 
 interface DataRow {
   id: number;
@@ -138,6 +140,7 @@ const TablaEventos: React.FC = () => {
           onClick={handleAgregarEvento}
           size="lg"
           style={{ marginRight: "auto" }}
+          renderIcon={Add}
         >
           Agregar Evento
         </Button>
@@ -179,7 +182,7 @@ const TablaEventos: React.FC = () => {
                       onClick={() => handleVerDetalles(row.raw.eventoId)}
                       title="Ver detalles"
                     >
-                      👁️
+                      <GoEye size={18}/>
                     </Button>
                     <Button
                       size="sm"
@@ -187,7 +190,7 @@ const TablaEventos: React.FC = () => {
                       onClick={() => handleEditar(row.raw.eventoId)}
                       title="Editar"
                     >
-                      ✏️
+                      <GoPencil size={18}/>
                     </Button>
                     <Button
                       size="sm"
@@ -195,7 +198,7 @@ const TablaEventos: React.FC = () => {
                       onClick={() => handleEliminar(row.raw)}
                       title="Eliminar"
                     >
-                      🗑️
+                      <GoTrash size={18}/>
                     </Button>
                   </div>
                 </TableCell>

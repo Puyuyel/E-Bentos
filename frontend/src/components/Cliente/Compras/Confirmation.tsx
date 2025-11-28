@@ -1,12 +1,16 @@
 import React from "react";
 import { Button, Tile } from "@carbon/react";
 import { CheckmarkFilled, Download, Email } from "@carbon/icons-react";
+import { useNavigate } from "react-router-dom";
+import { useEntradasClienteStore } from "../../../store/useEntradasClienteStore";
 
 interface ConfirmationProps {
   onStartOver: () => void;
 }
 
 export function Confirmation({ onStartOver }: ConfirmationProps) {
+  const { ventaId } = useEntradasClienteStore();
+  const navigate = useNavigate();
   const orderNumber = `EB-${Date.now().toString().slice(-8)}`;
 
   return (
@@ -72,7 +76,9 @@ export function Confirmation({ onStartOver }: ConfirmationProps) {
             }}
           >
             <span style={{ color: "#525252" }}>Número de pedido</span>
-            <span style={{ fontWeight: 600 }}>{orderNumber}</span>
+            <span style={{ fontWeight: 600 }}>
+              {orderNumber} / V-{ventaId}
+            </span>
           </div>
           <div
             style={{
@@ -141,6 +147,14 @@ export function Confirmation({ onStartOver }: ConfirmationProps) {
         >
           Nueva compra
         </Button>
+        <Button
+          kind="tertiary"
+          size="lg"
+          onClick={() => navigate("home")}
+          style={{ flex: 1 }}
+        >
+          Ir al menú principal
+        </Button>
       </div>
 
       <div
@@ -151,7 +165,7 @@ export function Confirmation({ onStartOver }: ConfirmationProps) {
         }}
       >
         <p style={{ fontSize: "0.875rem", color: "#525252" }}>
-          Si tienes alguna pregunta, contáctanos a soporte@e-bentos.com
+          Si tienes alguna pregunta, contáctanos a ebentossuport@gmail.com
         </p>
       </div>
     </div>
