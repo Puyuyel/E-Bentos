@@ -75,7 +75,7 @@ public class EventoClienteService {
         }
 
         Object[] row = results.get(0);
-        if (row.length < 8) {
+        if (row.length < 9) {
             // datos incompletos
             return null;
         }
@@ -106,42 +106,52 @@ public class EventoClienteService {
         }
 
         detalle.setDescripcion(row[7] != null ? row[7].toString() : null);
+        detalle.setImagenZonas(row[8] != null ? row[8].toString() : null);
 
         // Traer zonas
         List<Object[]> zonasRows = eventoClienteRepository.findZonasByEventoId(eventoId);
         List<ZonaEventoDTO> zonas = new ArrayList<>();
         if (zonasRows != null) {
             for (Object[] zr : zonasRows) {
+                Integer zonaId = null;
                 Integer cantidad = null;
                 Double precio = null;
                 String tipo = null;
                 String letra = null;
-
+                
                 if (zr.length > 0 && zr[0] != null) {
                     if (zr[0] instanceof Number) {
-                        cantidad = ((Number) zr[0]).intValue();
+                        zonaId = ((Number) zr[0]).intValue();
                     } else {
-                        try { cantidad = Integer.parseInt(zr[0].toString()); } catch (Exception e) { cantidad = null; }
+                        try { zonaId = Integer.parseInt(zr[0].toString()); } catch (Exception e) { zonaId = null; }
                     }
                 }
 
                 if (zr.length > 1 && zr[1] != null) {
                     if (zr[1] instanceof Number) {
-                        precio = ((Number) zr[1]).doubleValue();
+                        cantidad = ((Number) zr[1]).intValue();
                     } else {
-                        try { precio = Double.parseDouble(zr[1].toString()); } catch (Exception e) { precio = null; }
+                        try { cantidad = Integer.parseInt(zr[1].toString()); } catch (Exception e) { cantidad = null; }
                     }
                 }
 
                 if (zr.length > 2 && zr[2] != null) {
-                    tipo = zr[2].toString();
+                    if (zr[2] instanceof Number) {
+                        precio = ((Number) zr[2]).doubleValue();
+                    } else {
+                        try { precio = Double.parseDouble(zr[2].toString()); } catch (Exception e) { precio = null; }
+                    }
                 }
 
                 if (zr.length > 3 && zr[3] != null) {
-                    letra = zr[3].toString();
+                    tipo = zr[3].toString();
                 }
 
-                zonas.add(new ZonaEventoDTO(cantidad, precio, tipo, letra));
+                if (zr.length > 4 && zr[4] != null) {
+                    letra = zr[4].toString();
+                }
+
+                zonas.add(new ZonaEventoDTO(zonaId, cantidad, precio, tipo, letra));
             }
         }
 
