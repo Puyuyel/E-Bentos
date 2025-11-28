@@ -1,6 +1,6 @@
 import React from "react";
 import { Button, Tile } from "@carbon/react";
-import { CheckmarkFilled, Download, Email } from "@carbon/icons-react";
+import { CheckmarkFilled, Email } from "@carbon/icons-react";
 import { useNavigate } from "react-router-dom";
 import { useEntradasClienteStore } from "../../../store/useEntradasClienteStore";
 
@@ -11,7 +11,6 @@ interface ConfirmationProps {
 export function Confirmation({ onStartOver }: ConfirmationProps) {
   const { ventaId } = useEntradasClienteStore();
   const navigate = useNavigate();
-  const orderNumber = `EB-${Date.now().toString().slice(-8)}`;
 
   return (
     <div
@@ -76,9 +75,7 @@ export function Confirmation({ onStartOver }: ConfirmationProps) {
             }}
           >
             <span style={{ color: "#525252" }}>Número de pedido</span>
-            <span style={{ fontWeight: 600 }}>
-              {orderNumber} / V-{ventaId}
-            </span>
+            <span style={{ fontWeight: 600 }}>V-{ventaId}</span>
           </div>
           <div
             style={{
@@ -131,14 +128,6 @@ export function Confirmation({ onStartOver }: ConfirmationProps) {
       </div>
 
       <div style={{ display: "flex", gap: "1rem", marginBottom: "2rem" }}>
-        <Button
-          kind="secondary"
-          size="lg"
-          renderIcon={Download}
-          style={{ flex: 1 }}
-        >
-          Descargar tickets
-        </Button>
         <Button
           kind="primary"
           size="lg"

@@ -37,10 +37,23 @@ export function OrderSummary({
   >(null);
 
   const { user } = useAuthStore();
-  const { titulo, lugar, fecha, eventoId, zonas, ubicacion } =
-    useZonasEventoStore();
-  const { getSelections, cliente, metodoPago, reservaId, setVentaId } =
-    useEntradasClienteStore();
+  const {
+    titulo,
+    lugar,
+    fecha,
+    eventoId,
+    zonas,
+    ubicacion,
+    clearZonasEventosStore,
+  } = useZonasEventoStore();
+  const {
+    getSelections,
+    cliente,
+    metodoPago,
+    reservaId,
+    setVentaId,
+    clearAll,
+  } = useEntradasClienteStore();
   buyerData = cliente;
 
   // Para que TS no se queje .-.
@@ -55,12 +68,21 @@ export function OrderSummary({
 
   const ticketTypes = zonas;
 
-  const selectedTickets = ticketTypes.filter(
-    (ticket) => tickets[ticket.zonaId] > 0
-  );
-  // console.log("selectedTickets: ", selectedTickets);
+  // Build a normalized selectedTickets array with only the fields we need
+  // { zonaId, precioUnitario, tipoZona, cantidad }
+  const selectedTickets = (Array.isArray(ticketTypes) ? ticketTypes : [])
+    .filter((ticket) => (tickets?.[ticket.zonaId] || 0) > 0)
+    .map((ticket) => ({
+      zonaId: ticket.zonaId,
+      precioUnitario: ticket.precioUnitario,
+      tipoZona: ticket.tipoZona,
+      cantidad: tickets?.[ticket.zonaId] || 0,
+    }));
+
+  console.log("selectedTickets: ", selectedTickets);
+
   const subtotal = selectedTickets.reduce(
-    (sum, ticket) => sum + tickets[ticket.zonaId] * ticket.precioUnitario,
+    (sum, ticket) => sum + ticket.cantidad * ticket.precioUnitario,
     0
   );
   const serviceFee = subtotal * 0.01;
@@ -76,17 +98,14 @@ export function OrderSummary({
       montoTotalFinal: total || 0,
       registradoPorTaquillero: user?.rol === "TAQUILLERO" ? 1 : 0,
       metodoPago: metodoPago || "",
-      entradas: (selectedTickets || []).map((ticket) => ({
-        //entradaId: 0,
-        //ventaId: 0,
-        zonaId: ticket.zonaId,
-        precioOriginal: ticket.precioUnitario,
-        descuento: 0,
-        precioFinal:
-          (ticket.precioUnitario || 0) * (tickets[ticket.zonaId] || 0),
-        //correo: buyerData?.correoCli || user?.loginCreds?.email || "",
-        //qr: "",
-      })) as any,
+      entradas: (selectedTickets || []).flatMap((ticket) =>
+        Array.from({ length: ticket.cantidad }).map(() => ({
+          zonaId: ticket.zonaId,
+          precioOriginal: ticket.precioUnitario,
+          descuento: 0,
+          precioFinal: ticket.precioUnitario,
+        }))
+      ) as any,
     };
 
     console.log("ConfirmaciónPayload: ", confirmacionPayload);
@@ -135,6 +154,10 @@ export function OrderSummary({
         setConfirmResult("error");
       }
       console.log("Respuesta de la confirmación: ", data);
+
+      // Borrar todas las selecciones anteriores y los datos guardados en los stores.
+      clearAll();
+      clearZonasEventosStore();
     } catch (error) {
       console.log("error al confirmar la reserva con id: ", {
         reservaId,
@@ -277,7 +300,7 @@ export function OrderSummary({
                 </div>
                 <p style={{ fontWeight: 600 }}>
                   S/.
-                  {(selectedTickets.length * ticket.precioUnitario).toFixed(2)}
+                  {(ticket.cantidad * ticket.precioUnitario).toFixed(2)}
                 </p>
               </div>
             ))}

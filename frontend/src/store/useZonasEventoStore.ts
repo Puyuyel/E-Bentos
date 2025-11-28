@@ -19,6 +19,7 @@ interface ZonasEventoState {
   setEventoID: (eventoId: number) => void;
   setUbicacion: (ubi: string) => void;
   setImagenZonas: (imagenZonas: string) => void;
+  clearZonasEventosStore: () => void;
 }
 
 export const useZonasEventoStore = create<ZonasEventoState>()(
@@ -52,6 +53,16 @@ export const useZonasEventoStore = create<ZonasEventoState>()(
       setImagenZonas(imagenZonas) {
         if (imagenZonas) set({ imagenZonas: imagenZonas });
       },
+      clearZonasEventosStore: () =>
+        set(() => ({
+          zonas: [],
+          titulo: "",
+          lugar: "",
+          fecha: "",
+          eventoId: -1,
+          ubicacion: "",
+          imagenZonas: "",
+        })),
     }),
     {
       name: "zonas-evento-storage",
