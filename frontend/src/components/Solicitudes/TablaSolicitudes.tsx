@@ -51,11 +51,23 @@ const TablaSolicitudes: React.FC = () => {
 
       // Manejar diferentes estructuras de respuesta
       if (Array.isArray(response)) {
-        setSolicitudes(response);
-        setTotalItems(response.length);
+        // Ordenar por fecha ascendente
+        const ordenadas = [...response].sort((a, b) => {
+          const fechaA = a.fechaInicio ? new Date(a.fechaInicio).getTime() : 0;
+          const fechaB = b.fechaInicio ? new Date(b.fechaInicio).getTime() : 0;
+          return fechaA - fechaB;
+        });
+        setSolicitudes(ordenadas);
+        setTotalItems(ordenadas.length);
       } else if (response.data) {
-        setSolicitudes(response.data);
-        setTotalItems(response.pagination?.totalItems || response.data.length);
+        // Ordenar por fecha ascendente
+        const ordenadas = [...response.data].sort((a: Solicitud, b: Solicitud) => {
+          const fechaA = a.fechaInicio ? new Date(a.fechaInicio).getTime() : 0;
+          const fechaB = b.fechaInicio ? new Date(b.fechaInicio).getTime() : 0;
+          return fechaA - fechaB;
+        });
+        setSolicitudes(ordenadas);
+        setTotalItems(response.pagination?.totalItems || ordenadas.length);
       } else {
         setSolicitudes([]);
         setTotalItems(0);
