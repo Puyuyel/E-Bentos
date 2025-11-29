@@ -127,18 +127,11 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath = "" , onToggleSidebar}) 
   const reportItems: NavEntry[] = [
     { icon: <CalendarIcon />, label: "Eventos", route: "reporte-evento" },
     { icon: <OfficeBuildingIcon />, label: "Locales", route: "reporte-local" },
-    { icon: <UsersIcon />, label: "Clientes", route: "reporte-cliente" },
     {
       icon: <DocumentReportIcon />,
       label: "Productoras",
       route: "reporte-productora",
     },
-    {
-      icon: <ChartBarIcon />,
-      label: "Organizadores",
-      route: "reporte-organizador",
-    },
-    { icon: <TicketIcon />, label: "Taquilleros", route: "reporte-taquillero" },
   ];
 
   return (
