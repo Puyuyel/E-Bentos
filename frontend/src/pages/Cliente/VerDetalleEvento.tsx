@@ -14,10 +14,7 @@ import { useParams } from "react-router-dom";
 import type { EventoDetalle } from "../../types/event.types";
 import { obtenerFecha } from "../../components/util/obtenerFecha";
 import { useNavigate } from "react-router-dom";
-import { getLocalPorIdService } from "../../services/LocalesServices/getLocalPorId";
-import type { Local } from "../../types/locales.types";
-import { ConvertToCloud } from "@carbon/icons-react";
-import { useAuthStore } from "../../store/useAuthStore";
+
 import { useZonasEventoStore } from "../../store/useZonasEventoStore";
 import { useEventos } from "../../store/useEventos";
 
@@ -35,43 +32,47 @@ export default function VerDetalleEvento() {
   const { setEventSearchedByID, eventSearched } = useEventos();
   const { eventoId } = useParams();
   const navigate = useNavigate();
-  useEffect(() => {
-    const llamarAPIConIdEvento = async () => {
-      try {
-        console.log("Llamando API para eventoId:", eventoId);
-        const response = await obtenerDetalleEvento(Number(eventoId)); // ya me da el .data
-        console.log("Respuesta de detalleEventoService:", response);
-        setDatosEvento(response);
-        if (response) {
-          setLoading(false);
-        }
-      } catch (error: any) {
-        alert(
-          `ERROR al recuperar el Detalle del evento o del Local: ${eventoId} - ${String(
-            error
-          )}`
-        );
-      }
-    };
-    llamarAPIConIdEvento();
-  }, [eventoId]);
 
   useEffect(() => {
-    const llenarZonas = () => {
-      if (datosEvento) {
-        console.log(datosEvento);
-        setZonas(datosEvento?.zonas);
-        setLugar(datosEvento.nombreLocal);
-        if (eventoId) setEventSearchedByID(Number(eventoId));
-        setTitulo(eventSearched);
-        setFecha(datosEvento.fecha);
+    if (eventoId) {
+      setEventSearchedByID(Number(eventoId));
+    }
+  }, [eventoId, setEventSearchedByID]);
+
+  useEffect(() => {
+    if (eventSearched) {
+      setTitulo(eventSearched);
+    }
+  }, [eventSearched, setTitulo]);
+
+  useEffect(() => {
+    const cargarDatosEvento = async () => {
+      if (!eventoId) return;
+
+      setLoading(true);
+
+      try {
+        const response = await obtenerDetalleEvento(Number(eventoId));
+        if (!response) return;
+
+        setDatosEvento(response);
+        setZonas(response.zonas);
+        setLugar(response.nombreLocal);
+        setFecha(response.fecha);
+        setUbicacion(response.direccionLocal);
+        setImagenZonas(response.imagenZonas);
         setEventoID(Number(eventoId));
-        setUbicacion(datosEvento.direccionLocal);
-        setImagenZonas(datosEvento.imagenZonas);
+      } catch (error: any) {
+        alert(
+          `ERROR al recuperar Detalle del evento ${eventoId}: ${String(error)}`
+        );
+      } finally {
+        setLoading(false);
       }
     };
-    llenarZonas();
-  }, [datosEvento]);
+
+    cargarDatosEvento();
+  }, [eventoId]);
 
   useEffect(() => {
     // Add class to body while this page is mounted to scope the body change

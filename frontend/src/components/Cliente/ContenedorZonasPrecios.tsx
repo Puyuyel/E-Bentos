@@ -90,7 +90,7 @@ export default function ContenedorZonasPrecios({
                   <StructuredListRow key={index}>
                     {/* Nombre de la zona */}
                     <StructuredListCell noWrap>
-                      {zona.tipoZona} {zona.letraZona}
+                      {zona.tipoZona}
                     </StructuredListCell>
 
                     {/* Precio regular */}
