@@ -7,11 +7,15 @@ import "@carbon/charts-react/styles.css";
 interface AreaChartROIProps {
   data: ChartDatum[];
   title?: string;
+  xAxisTitle?: string;
+  yAxisTitle?: string;
 }
 
 const AreaChartROI: React.FC<AreaChartROIProps> = ({ 
   data, 
-  title = "Cantidad de Eventos por ROI y Mes"
+  title = "Cantidad de Eventos por ROI y Mes",
+  xAxisTitle = "Periodo",
+  yAxisTitle = "Valor"
 }) => {
   // Transformar los datos de ChartDatum al formato que necesita AreaChart
   const areaChartData = data.map(item => ({
@@ -24,13 +28,13 @@ const AreaChartROI: React.FC<AreaChartROIProps> = ({
     title: title,
     axes: {
       bottom: {
-        title: 'Periodo',
+        title: xAxisTitle,
         mapsTo: 'date',
         scaleType: ScaleTypes.TIME
       },
       left: {
         mapsTo: 'value',
-        title: 'Cantidad de Eventos', // Cambiado de "ROI (%)" a "Cantidad de Eventos"
+        title: yAxisTitle, // Cambiado de "ROI (%)" a "Cantidad de Eventos"
         scaleType: ScaleTypes.LINEAR
       }
     },
