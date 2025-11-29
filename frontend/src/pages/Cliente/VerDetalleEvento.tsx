@@ -28,6 +28,7 @@ export default function VerDetalleEvento() {
     setEventoID,
     setUbicacion,
     setImagenZonas,
+    clearZonasEventosStore,
   } = useZonasEventoStore();
   const { setEventSearchedByID, eventSearched } = useEventos();
   const { eventoId } = useParams();
@@ -47,6 +48,7 @@ export default function VerDetalleEvento() {
 
   useEffect(() => {
     const cargarDatosEvento = async () => {
+      clearZonasEventosStore();
       if (!eventoId) return;
 
       setLoading(true);

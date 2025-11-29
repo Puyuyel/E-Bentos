@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button, NumberInput, Tile, Modal } from "@carbon/react";
 import { ShoppingCart, Calendar, Location, Map } from "@carbon/icons-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuthStore } from "../../../store/useAuthStore";
 import { useEntradasClienteStore } from "../../../store/useEntradasClienteStore";
+
+import zonaRespaldo from "../../../assets/zonas-img-test.png";
 
 interface EventSelectionProps {
   onNext: (tickets: { [key: string]: number }) => void;
@@ -21,6 +23,8 @@ export function EventSelection({ onNext }: EventSelectionProps) {
   const { isLoggedIn } = useAuthStore();
   const { zonas, titulo, lugar, fecha, ubicacion, imagenZonas } =
     useZonasEventoStore();
+  const [bgImage, setBgImage] = useState(`${imageBaseUrl}/${imagenZonas}`);
+
   // console.log("url: imagenzona ", `${imageBaseUrl}/${imagenZonas}`);
   const { eventoId } = useParams();
   const { saveSelections, getSelections, clearSelections, setMetodoPago } =
@@ -31,6 +35,19 @@ export function EventSelection({ onNext }: EventSelectionProps) {
   }>({});
 
   const ticketTypes: Zona[] = zonas;
+
+  useEffect(() => {
+    const img = new Image();
+    img.src = `${imageBaseUrl}/${imagenZonas}`;
+
+    img.onload = () => {
+      setBgImage(`${imageBaseUrl}/${imagenZonas}`);
+    };
+
+    img.onerror = () => {
+      setBgImage(`${zonaRespaldo}`); // ← imagen fallback
+    };
+  }, [imageBaseUrl, imagenZonas]);
 
   const handleQuantityChange = (ticketId: number, value: string | number) => {
     const numValue = typeof value === "string" ? parseInt(value) || 0 : value;
@@ -215,7 +232,7 @@ export function EventSelection({ onNext }: EventSelectionProps) {
           >
             <div
               style={{
-                backgroundImage: `url(${imageBaseUrl}/${imagenZonas})`,
+                backgroundImage: `url(${bgImage})`,
                 backgroundPosition: "center",
                 backgroundRepeat: "no-repeat",
                 backgroundSize: "contain", // 🔹 Hace que la imagen se vea completa

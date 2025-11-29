@@ -1,5 +1,7 @@
 import "../../styles/Cliente/ContenedorZonasPrecios.css";
 
+import zonaRespaldo from "../../assets/zonas-img-test.png";
+
 const imageBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL;
 
 import {
@@ -65,6 +67,9 @@ export default function ContenedorZonasPrecios({
           <img
             src={`${imageBaseUrl}/${imagenZonas}`}
             alt="Zonas del evento"
+            onError={(e) => {
+              e.target.src = zonaRespaldo;
+            }}
             style={{
               width: "100%",
               height: "auto",
