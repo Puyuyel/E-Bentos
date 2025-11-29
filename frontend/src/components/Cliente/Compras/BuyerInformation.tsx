@@ -69,34 +69,57 @@ export function BuyerInformation({ onNext, onBack }: BuyerInformationProps) {
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
-    // If payment method is TARJETA, validate card fields
+
+    // 🔹 Validaciones solo si paga con tarjeta
     if (paymentMethod === "TARJETA_DE_CREDITO") {
+      // Nombre
       if (!formData.nombreTitularTarjeta.trim()) {
-        newErrors.nombreTitularTarjeta = "El nombre completo es obligatorio";
+        newErrors.nombreTitularTarjeta = "El nombre completo es obligatorio.";
       }
 
+      // Fecha de vencimiento
       if (!formData.fechaVencimiento.trim()) {
         newErrors.fechaVencimiento = "La fecha de vencimiento es obligatoria.";
+      } else {
+        const fecha = formData.fechaVencimiento;
+        const regexFecha = /^\d{2}\/\d{2}$/; // MM/YY
+
+        if (!regexFecha.test(fecha)) {
+          newErrors.fechaVencimiento = "La fecha debe tener el formato MM/YY.";
+        } else {
+          const [mesStr, anioStr] = fecha.split("/");
+          const mes = Number(mesStr);
+
+          if (mes < 1 || mes > 12) {
+            newErrors.fechaVencimiento = "El mes debe estar entre 01 y 12.";
+          }
+        }
       }
 
+      // CVV
       if (!formData.cvvTarjeta.trim()) {
         newErrors.cvvTarjeta = "El código de seguridad es obligatorio.";
+      } else if (!/^\d{3}$/.test(formData.cvvTarjeta)) {
+        newErrors.cvvTarjeta = "El CVV debe tener exactamente 3 dígitos.";
       }
 
+      // Número de tarjeta
       if (!formData.numTarjeta.trim()) {
         newErrors.numTarjeta = "El número de tarjeta es obligatorio.";
-      }
+      } else {
+        const soloDigitos = formData.numTarjeta.replace(/\s/g, ""); // remover espacios
 
-      if (formData.numTarjeta.length != 19) {
-        newErrors.numTarjeta = "El número de tarjeta debe ser de 16 dígitos.";
+        if (!/^\d{16}$/.test(soloDigitos)) {
+          newErrors.numTarjeta = "El número de tarjeta debe tener 16 dígitos.";
+        }
       }
     }
 
-    // correo only required when TAQUILLERO role (same behaviour as before)
+    // 🔹 Validación de correo SOLO PARA TAQUILLERO
     if (user?.rol === "TAQUILLERO") {
       if (!formData.correoCli.trim()) {
-        newErrors.correoCli = "El correo electrónico es obligatorio";
-      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]/.test(formData.correoCli)) {
+        newErrors.correoCli = "El correo electrónico es obligatorio.";
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.correoCli)) {
         newErrors.correoCli = "Ingresa un correo electrónico válido.";
       }
     }

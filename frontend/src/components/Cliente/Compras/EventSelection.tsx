@@ -21,6 +21,7 @@ export function EventSelection({ onNext }: EventSelectionProps) {
   const { isLoggedIn } = useAuthStore();
   const { zonas, titulo, lugar, fecha, ubicacion, imagenZonas } =
     useZonasEventoStore();
+  // console.log("url: imagenzona ", `${imageBaseUrl}/${imagenZonas}`);
   const { eventoId } = useParams();
   const { saveSelections, getSelections, clearSelections, setMetodoPago } =
     useEntradasClienteStore();
@@ -213,12 +214,13 @@ export function EventSelection({ onNext }: EventSelectionProps) {
             }}
           >
             <div
-              className="img-zonas"
               style={{
                 backgroundImage: `url(${imageBaseUrl}/${imagenZonas})`,
                 backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+                backgroundSize: "contain", // 🔹 Hace que la imagen se vea completa
+                height: "260px",
                 width: "100%",
-                backgroundSize: "13rem",
                 borderRadius: 8,
                 boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
               }}
