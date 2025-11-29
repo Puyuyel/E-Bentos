@@ -127,15 +127,7 @@ export function Confirmation({ onStartOver }: ConfirmationProps) {
         </div>
       </div>
 
-      <div style={{ display: "flex", gap: "1rem", marginBottom: "2rem" }}>
-        <Button
-          kind="primary"
-          size="lg"
-          onClick={onStartOver}
-          style={{ flex: 1 }}
-        >
-          Nueva compra
-        </Button>
+      <div style={{ display: "block", gap: "1rem", marginBottom: "2rem" }}>
         <Button
           kind="tertiary"
           size="lg"
