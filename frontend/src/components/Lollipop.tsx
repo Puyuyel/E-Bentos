@@ -5,9 +5,14 @@ import type{ LollipopChartOptions } from "@carbon/charts";
 import type { ChartProps } from "./util/types.ts";
 import "@carbon/charts-react/styles.css";
 
-const Lollipop: React.FC<ChartProps> = ({ data }) => {
+interface LollipopProps extends ChartProps {
+  title?: string;
+  desc?: string;
+}
+
+const Lollipop: React.FC<LollipopProps> = ({ data, title="Ingresos totales por local", desc="Ingresos totales en nuevos soles (S/.)"}) => {
   const options: LollipopChartOptions = {
-    title: "Ingresos totales por local",
+    title: title,
     axes: {
       left: {
         title: "Locales",
@@ -15,7 +20,7 @@ const Lollipop: React.FC<ChartProps> = ({ data }) => {
         mapsTo: "key",
       },
       bottom: {
-        title: "Ingresos totales en nuevos soles (S/.)",
+        title: desc,
         mapsTo: "value",
       },
     },

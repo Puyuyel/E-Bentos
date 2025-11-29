@@ -143,7 +143,7 @@ public class Securityconfig {
                                                                 "/api/solicitudes/**")
                                                 .hasAnyRole("DUENHO_LOCAL", "ORGANIZADOR_EVENTOS")
                                                 .requestMatchers("/api/ventas/**")
-                                                .hasRole("CLIENTE")
+                                                .hasAnyRole("CLIENTE","TAQUILLERO")
                                                 // Protege todas las demás rutas
                                                 .anyRequest().authenticated())
 

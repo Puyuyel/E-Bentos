@@ -113,7 +113,7 @@ const Header: React.FC = () => {
                     className="user-item"
                     onClick={() => goTo("/mis-entradas")}
                   >
-                    Mis entradas
+                    Mis compras
                   </button>
                   <button
                     className="user-item"
